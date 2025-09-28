@@ -149,5 +149,3 @@ Mọi đóng góp đều được chào đón! Vui lòng:
 ## License
 
 Dự án được phát triển cho mục đích nghiên cứu và học tập.
-
-**Lưu ý**: Đây là phiên bản demo với dữ liệu mẫu. Trong môi trường thực tế, cần tích hợp với API backend và cơ sở dữ liệu thực.
