@@ -1,0 +1,675 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  bool _notificationsEnabled = true;
+  bool _darkModeEnabled = false;
+  bool _temperatureAlert = true;
+  bool _humidityAlert = true;
+  bool _phAlert = true;
+  String _selectedLanguage = 'Tiếng Việt';
+  String _selectedUpdateFrequency = 'Cập nhật mỗi 30 phút';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
+      appBar: AppBar(
+        title: Text(
+          'Cài đặt',
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: const Color(0xFF5E81AC),
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // Profile Section
+            _buildProfileSection(),
+            const SizedBox(height: 24),
+
+            // System Settings
+            _buildSystemSettings(),
+            const SizedBox(height: 24),
+
+            // Environmental Settings
+            _buildEnvironmentalSettings(),
+            const SizedBox(height: 24),
+
+            // About Section
+            _buildAboutSection(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileSection() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 40,
+            backgroundColor: const Color(0xFF5E81AC).withOpacity(0.1),
+            child: const Icon(Icons.person, size: 40, color: Color(0xFF5E81AC)),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Quản trị viên',
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF2E3440),
+            ),
+          ),
+          Text(
+            'admin@agriculture.vn',
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: const Color(0xFF88C0D0),
+            ),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              _showEditProfileDialog();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF5E81AC),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(
+              'Chỉnh sửa thông tin',
+              style: GoogleFonts.inter(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSystemSettings() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Cài đặt hệ thống',
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF2E3440),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildSettingItem(
+            icon: Icons.notifications,
+            title: 'Thông báo',
+            subtitle: 'Nhận thông báo về cập nhật hệ thống',
+            trailing: Switch(
+              value: _notificationsEnabled,
+              onChanged: (value) {
+                setState(() {
+                  _notificationsEnabled = value;
+                });
+              },
+              activeThumbColor: const Color(0xFF5E81AC),
+            ),
+          ),
+          const Divider(),
+          _buildSettingItem(
+            icon: Icons.language,
+            title: 'Ngôn ngữ',
+            subtitle: _selectedLanguage,
+            trailing: const Icon(Icons.chevron_right, color: Color(0xFF88C0D0)),
+            onTap: () {
+              _showLanguageDialog();
+            },
+          ),
+          const Divider(),
+          _buildSettingItem(
+            icon: Icons.dark_mode,
+            title: 'Chế độ tối',
+            subtitle: 'Giao diện tối cho mắt',
+            trailing: Switch(
+              value: _darkModeEnabled,
+              onChanged: (value) {
+                setState(() {
+                  _darkModeEnabled = value;
+                });
+              },
+              activeThumbColor: const Color(0xFF5E81AC),
+            ),
+          ),
+          const Divider(),
+          _buildSettingItem(
+            icon: Icons.sync,
+            title: 'Đồng bộ dữ liệu',
+            subtitle: 'Tự động đồng bộ mỗi 15 phút',
+            trailing: const Icon(Icons.chevron_right, color: Color(0xFF88C0D0)),
+            onTap: () {
+              _showSyncDialog();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEnvironmentalSettings() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Cài đặt môi trường',
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF2E3440),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildSettingItem(
+            icon: Icons.thermostat,
+            title: 'Cảnh báo nhiệt độ',
+            subtitle: 'Cảnh báo khi nhiệt độ vượt ngưỡng',
+            trailing: Switch(
+              value: _temperatureAlert,
+              onChanged: (value) {
+                setState(() {
+                  _temperatureAlert = value;
+                });
+              },
+              activeThumbColor: const Color(0xFF5E81AC),
+            ),
+          ),
+          const Divider(),
+          _buildSettingItem(
+            icon: Icons.water_drop,
+            title: 'Cảnh báo độ ẩm',
+            subtitle: 'Cảnh báo khi độ ẩm thấp',
+            trailing: Switch(
+              value: _humidityAlert,
+              onChanged: (value) {
+                setState(() {
+                  _humidityAlert = value;
+                });
+              },
+              activeThumbColor: const Color(0xFF5E81AC),
+            ),
+          ),
+          const Divider(),
+          _buildSettingItem(
+            icon: Icons.science,
+            title: 'Giám sát độ pH',
+            subtitle: 'Theo dõi độ pH của đất',
+            trailing: Switch(
+              value: _phAlert,
+              onChanged: (value) {
+                setState(() {
+                  _phAlert = value;
+                });
+              },
+              activeThumbColor: const Color(0xFF5E81AC),
+            ),
+          ),
+          const Divider(),
+          _buildSettingItem(
+            icon: Icons.schedule,
+            title: 'Tần suất cập nhật',
+            subtitle: _selectedUpdateFrequency,
+            trailing: const Icon(Icons.chevron_right, color: Color(0xFF88C0D0)),
+            onTap: () {
+              _showUpdateFrequencyDialog();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAboutSection() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Thông tin ứng dụng',
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF2E3440),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildSettingItem(
+            icon: Icons.info,
+            title: 'Phiên bản',
+            subtitle: 'v1.0.0',
+            trailing: const Icon(Icons.chevron_right, color: Color(0xFF88C0D0)),
+            onTap: () {
+              _showVersionDialog();
+            },
+          ),
+          const Divider(),
+          _buildSettingItem(
+            icon: Icons.help,
+            title: 'Trợ giúp',
+            subtitle: 'Hướng dẫn sử dụng',
+            trailing: const Icon(Icons.chevron_right, color: Color(0xFF88C0D0)),
+            onTap: () {
+              _showHelpDialog();
+            },
+          ),
+          const Divider(),
+          _buildSettingItem(
+            icon: Icons.privacy_tip,
+            title: 'Chính sách bảo mật',
+            subtitle: 'Quyền riêng tư và bảo mật',
+            trailing: const Icon(Icons.chevron_right, color: Color(0xFF88C0D0)),
+            onTap: () {
+              _showPrivacyDialog();
+            },
+          ),
+          const Divider(),
+          _buildSettingItem(
+            icon: Icons.logout,
+            title: 'Đăng xuất',
+            subtitle: 'Thoát khỏi hệ thống',
+            trailing: const Icon(Icons.chevron_right, color: Color(0xFF88C0D0)),
+            onTap: () {
+              _showLogoutDialog();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingItem({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Widget trailing,
+    VoidCallback? onTap,
+  }) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF5E81AC).withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(icon, color: const Color(0xFF5E81AC), size: 20),
+      ),
+      title: Text(
+        title,
+        style: GoogleFonts.inter(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: const Color(0xFF2E3440),
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF88C0D0)),
+      ),
+      trailing: trailing,
+      onTap: onTap,
+    );
+  }
+
+  void _showEditProfileDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Chỉnh sửa thông tin',
+            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          ),
+          content: const Text(
+            'Tính năng này sẽ được phát triển trong phiên bản tiếp theo.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Đóng',
+                style: GoogleFonts.inter(color: const Color(0xFF5E81AC)),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showLanguageDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Chọn ngôn ngữ',
+            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: const Text('Tiếng Việt'),
+                leading: Radio<String>(
+                  value: 'Tiếng Việt',
+                  groupValue: _selectedLanguage,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedLanguage = value!;
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  activeColor: const Color(0xFF5E81AC),
+                ),
+              ),
+              ListTile(
+                title: const Text('English'),
+                leading: Radio<String>(
+                  value: 'English',
+                  groupValue: _selectedLanguage,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedLanguage = value!;
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  activeColor: const Color(0xFF5E81AC),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showSyncDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Đồng bộ dữ liệu',
+            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          ),
+          content: const Text(
+            'Tính năng này sẽ được phát triển trong phiên bản tiếp theo.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Đóng',
+                style: GoogleFonts.inter(color: const Color(0xFF5E81AC)),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showUpdateFrequencyDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Tần suất cập nhật',
+            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: const Text('Cập nhật mỗi 15 phút'),
+                leading: Radio<String>(
+                  value: 'Cập nhật mỗi 15 phút',
+                  groupValue: _selectedUpdateFrequency,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedUpdateFrequency = value!;
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  activeColor: const Color(0xFF5E81AC),
+                ),
+              ),
+              ListTile(
+                title: const Text('Cập nhật mỗi 30 phút'),
+                leading: Radio<String>(
+                  value: 'Cập nhật mỗi 30 phút',
+                  groupValue: _selectedUpdateFrequency,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedUpdateFrequency = value!;
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  activeColor: const Color(0xFF5E81AC),
+                ),
+              ),
+              ListTile(
+                title: const Text('Cập nhật mỗi 1 giờ'),
+                leading: Radio<String>(
+                  value: 'Cập nhật mỗi 1 giờ',
+                  groupValue: _selectedUpdateFrequency,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedUpdateFrequency = value!;
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  activeColor: const Color(0xFF5E81AC),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showVersionDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Thông tin phiên bản',
+            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Phiên bản: v1.0.0', style: GoogleFonts.inter()),
+              Text('Ngày phát hành: 2025', style: GoogleFonts.inter()),
+              Text('Nhà phát triển: Thien Nguyen', style: GoogleFonts.inter()),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Đóng',
+                style: GoogleFonts.inter(color: const Color(0xFF5E81AC)),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showHelpDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Trợ giúp',
+            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          ),
+          content: const Text(
+            'Tài liệu hướng dẫn sẽ được cập nhật trong phiên bản tiếp theo.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Đóng',
+                style: GoogleFonts.inter(color: const Color(0xFF5E81AC)),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showPrivacyDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Chính sách bảo mật',
+            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          ),
+          content: const Text(
+            'Chính sách bảo mật sẽ được cập nhật trong phiên bản tiếp theo.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Đóng',
+                style: GoogleFonts.inter(color: const Color(0xFF5E81AC)),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Đăng xuất',
+            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          ),
+          content: const Text('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Hủy',
+                style: GoogleFonts.inter(color: Colors.grey[600]),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Logout logic here
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Đã đăng xuất thành công',
+                      style: GoogleFonts.inter(),
+                    ),
+                    backgroundColor: const Color(0xFFA3BE8C),
+                  ),
+                );
+              },
+              child: Text(
+                'Đăng xuất',
+                style: GoogleFonts.inter(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
