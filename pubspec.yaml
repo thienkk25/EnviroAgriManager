@@ -1,6 +1,6 @@
 name: enviro_agri_manager 
 description: "Đây là ứng dụng Flutter được thiết kế để quản lý danh mục điện tử dùng chung cho ngành Nông nghiệp và Môi trường. Hệ thống cung cấp các chức năng quản lý sản phẩm, theo dõi dữ liệu môi trường, và báo cáo thống kê."
-version: 0.1.0
+version: 1.0.0
 
 environment:
   sdk: ^3.9.2
