@@ -52,15 +52,15 @@ class SimpleHomeScreen extends StatelessWidget {
                     'Hệ thống quản lý danh mục điện tử dùng chung',
                     style: GoogleFonts.inter(
                       fontSize: 16,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: .9),
                     ),
                   ),
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Features Grid
             Text(
               'Tính năng chính',
@@ -71,7 +71,7 @@ class SimpleHomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             GridView.count(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -106,9 +106,9 @@ class SimpleHomeScreen extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Environmental Data
             Container(
               padding: const EdgeInsets.all(20),
@@ -117,7 +117,7 @@ class SimpleHomeScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: .05),
                     blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
@@ -128,11 +128,7 @@ class SimpleHomeScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(
-                        Icons.eco,
-                        color: Color(0xFF5E81AC),
-                        size: 24,
-                      ),
+                      const Icon(Icons.eco, color: Color(0xFF5E81AC), size: 24),
                       const SizedBox(width: 8),
                       Text(
                         'Dữ liệu Môi trường Hiện tại',
@@ -191,9 +187,9 @@ class SimpleHomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Sample Products
             Text(
               'Sản phẩm mẫu',
@@ -204,7 +200,7 @@ class SimpleHomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             _SampleProductCard(
               name: 'Lúa Jasmine',
               category: 'Cây lương thực',
@@ -254,7 +250,7 @@ class _FeatureCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: .05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -266,14 +262,10 @@ class _FeatureCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: .1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 24,
-            ),
+            child: Icon(icon, color: color, size: 24),
           ),
           const Spacer(),
           Text(
@@ -316,16 +308,12 @@ class _EnvironmentalMetric extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF5E81AC).withOpacity(0.05),
+        color: const Color(0xFF5E81AC).withValues(alpha: .05),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
-          Icon(
-            icon,
-            color: const Color(0xFF5E81AC),
-            size: 20,
-          ),
+          Icon(icon, color: const Color(0xFF5E81AC), size: 20),
           const SizedBox(height: 8),
           Text(
             value,
@@ -347,7 +335,7 @@ class _EnvironmentalMetric extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: const Color(0xFFA3BE8C).withOpacity(0.1),
+              color: const Color(0xFFA3BE8C).withValues(alpha: .1),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
@@ -386,7 +374,7 @@ class _SampleProductCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: .05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -398,7 +386,7 @@ class _SampleProductCard extends StatelessWidget {
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: const Color(0xFF5E81AC).withOpacity(0.1),
+              color: const Color(0xFF5E81AC).withValues(alpha: .1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -422,9 +410,12 @@ class _SampleProductCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFA3BE8C).withOpacity(0.1),
+                    color: const Color(0xFFA3BE8C).withValues(alpha: .1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(

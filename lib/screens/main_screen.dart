@@ -35,7 +35,7 @@ class _MainScreenState extends State<MainScreen> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: .1),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
@@ -73,10 +73,7 @@ class _MainScreenState extends State<MainScreen> {
               icon: Icon(Icons.category),
               label: 'Danh mục',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.eco),
-              label: 'Môi trường',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.eco), label: 'Môi trường'),
             BottomNavigationBarItem(
               icon: Icon(Icons.analytics),
               label: 'Báo cáo',

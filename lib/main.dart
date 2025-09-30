@@ -4,6 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'providers/product_provider.dart';
 import 'providers/category_provider.dart';
 import 'screens/main_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/register_screen.dart';
+import 'screens/forgot_password_screen.dart';
 
 void main() {
   runApp(const MainApp());
@@ -47,7 +50,14 @@ class MainApp extends StatelessWidget {
             ),
           ),
         ),
-        home: const MainScreen(),
+        initialRoute: LoginScreen.routeName,
+        routes: {
+          LoginScreen.routeName: (context) => const LoginScreen(),
+          RegisterScreen.routeName: (context) => const RegisterScreen(),
+          ForgotPasswordScreen.routeName: (context) =>
+              const ForgotPasswordScreen(),
+          '/': (context) => const MainScreen(),
+        },
         debugShowCheckedModeBanner: false,
       ),
     );

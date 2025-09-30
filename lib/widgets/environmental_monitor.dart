@@ -17,7 +17,7 @@ class EnvironmentalMonitor extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: .1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -28,11 +28,7 @@ class EnvironmentalMonitor extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
-                Icons.eco,
-                color: Colors.white,
-                size: 24,
-              ),
+              const Icon(Icons.eco, color: Colors.white, size: 24),
               const SizedBox(width: 8),
               Text(
                 'Giám sát Môi trường',
@@ -46,15 +42,12 @@ class EnvironmentalMonitor extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: .2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   'Trực tiếp',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: Colors.white,
-                  ),
+                  style: GoogleFonts.inter(fontSize: 12, color: Colors.white),
                 ),
               ),
             ],
@@ -149,16 +142,12 @@ class _EnvironmentalMetric extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: .1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
-          Icon(
-            icon,
-            color: Colors.white,
-            size: 20,
-          ),
+          Icon(icon, color: Colors.white, size: 20),
           const SizedBox(height: 8),
           Text(
             value,
@@ -173,22 +162,19 @@ class _EnvironmentalMetric extends StatelessWidget {
             label,
             style: GoogleFonts.inter(
               fontSize: 12,
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: .8),
             ),
           ),
           const SizedBox(height: 4),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: .2),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
               status,
-              style: GoogleFonts.inter(
-                fontSize: 10,
-                color: Colors.white,
-              ),
+              style: GoogleFonts.inter(fontSize: 10, color: Colors.white),
             ),
           ),
         ],

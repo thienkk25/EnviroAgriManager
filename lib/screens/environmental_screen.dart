@@ -117,10 +117,34 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                         style: GoogleFonts.inter(color: Colors.white),
                         underline: Container(),
                         items: const [
-                          DropdownMenuItem(value: 'Tất cả', child: Text('Tất cả', style: TextStyle(color: Color(0xFF5E81AC)))),
-                          DropdownMenuItem(value: 'Khu A', child: Text('Khu A', style: TextStyle(color: Color(0xFF5E81AC)))),
-                          DropdownMenuItem(value: 'Khu B', child: Text('Khu B', style: TextStyle(color: Color(0xFF5E81AC)))),
-                          DropdownMenuItem(value: 'Khu C', child: Text('Khu C', style: TextStyle(color: Color(0xFF5E81AC)))),
+                          DropdownMenuItem(
+                            value: 'Tất cả',
+                            child: Text(
+                              'Tất cả',
+                              style: TextStyle(color: Color(0xFF5E81AC)),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Khu A',
+                            child: Text(
+                              'Khu A',
+                              style: TextStyle(color: Color(0xFF5E81AC)),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Khu B',
+                            child: Text(
+                              'Khu B',
+                              style: TextStyle(color: Color(0xFF5E81AC)),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Khu C',
+                            child: Text(
+                              'Khu C',
+                              style: TextStyle(color: Color(0xFF5E81AC)),
+                            ),
+                          ),
                         ],
                         onChanged: (value) {
                           setState(() {
@@ -138,9 +162,27 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                       style: GoogleFonts.inter(color: Colors.white),
                       underline: Container(),
                       items: const [
-                        DropdownMenuItem(value: 'Hôm nay', child: Text('Hôm nay', style: TextStyle(color: Color(0xFF5E81AC)))),
-                        DropdownMenuItem(value: '7 ngày', child: Text('7 ngày', style: TextStyle(color: Color(0xFF5E81AC)))),
-                        DropdownMenuItem(value: '30 ngày', child: Text('30 ngày', style: TextStyle(color: Color(0xFF5E81AC)))),
+                        DropdownMenuItem(
+                          value: 'Hôm nay',
+                          child: Text(
+                            'Hôm nay',
+                            style: TextStyle(color: Color(0xFF5E81AC)),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: '7 ngày',
+                          child: Text(
+                            '7 ngày',
+                            style: TextStyle(color: Color(0xFF5E81AC)),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: '30 ngày',
+                          child: Text(
+                            '30 ngày',
+                            style: TextStyle(color: Color(0xFF5E81AC)),
+                          ),
+                        ),
                       ],
                       onChanged: (value) {
                         setState(() {
@@ -153,7 +195,7 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
               ],
             ),
           ),
-          
+
           // Environmental Data List
           Expanded(
             child: ListView.builder(
@@ -179,18 +221,21 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
 
   List<Map<String, dynamic>> _getFilteredData() {
     List<Map<String, dynamic>> filteredData = _environmentalData;
-    
+
     if (_selectedLocation != 'Tất cả') {
-      filteredData = filteredData.where((data) => data['location'] == _selectedLocation).toList();
+      filteredData = filteredData
+          .where((data) => data['location'] == _selectedLocation)
+          .toList();
     }
-    
+
     // Filter by time range (simplified)
     final now = DateTime.now();
     if (_selectedTimeRange == 'Hôm nay') {
-      filteredData = filteredData.where((data) => 
-        data['recordedAt'].day == now.day).toList();
+      filteredData = filteredData
+          .where((data) => data['recordedAt'].day == now.day)
+          .toList();
     }
-    
+
     return filteredData;
   }
 
@@ -205,7 +250,7 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
     final phosphorusController = TextEditingController();
     final potassiumController = TextEditingController();
     final notesController = TextEditingController();
-    
+
     String selectedLocation = 'Khu A';
     String selectedWeather = 'Nắng';
 
@@ -360,7 +405,7 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: DropdownButtonFormField<String>(
-                            value: selectedLocation,
+                            initialValue: selectedLocation,
                             decoration: InputDecoration(
                               labelText: 'Vị trí',
                               border: OutlineInputBorder(
@@ -368,9 +413,18 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                               ),
                             ),
                             items: const [
-                              DropdownMenuItem(value: 'Khu A', child: Text('Khu A')),
-                              DropdownMenuItem(value: 'Khu B', child: Text('Khu B')),
-                              DropdownMenuItem(value: 'Khu C', child: Text('Khu C')),
+                              DropdownMenuItem(
+                                value: 'Khu A',
+                                child: Text('Khu A'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Khu B',
+                                child: Text('Khu B'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Khu C',
+                                child: Text('Khu C'),
+                              ),
                             ],
                             onChanged: (value) {
                               setState(() {
@@ -386,7 +440,7 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                       children: [
                         Expanded(
                           child: DropdownButtonFormField<String>(
-                            value: selectedWeather,
+                            initialValue: selectedWeather,
                             decoration: InputDecoration(
                               labelText: 'Thời tiết',
                               border: OutlineInputBorder(
@@ -394,10 +448,22 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                               ),
                             ),
                             items: const [
-                              DropdownMenuItem(value: 'Nắng', child: Text('Nắng')),
-                              DropdownMenuItem(value: 'Mây', child: Text('Mây')),
-                              DropdownMenuItem(value: 'Mưa', child: Text('Mưa')),
-                              DropdownMenuItem(value: 'Âm u', child: Text('Âm u')),
+                              DropdownMenuItem(
+                                value: 'Nắng',
+                                child: Text('Nắng'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Mây',
+                                child: Text('Mây'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Mưa',
+                                child: Text('Mưa'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Âm u',
+                                child: Text('Âm u'),
+                              ),
                             ],
                             onChanged: (value) {
                               setState(() {
@@ -476,7 +542,7 @@ class EnvironmentalDataCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: .05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -510,7 +576,7 @@ class EnvironmentalDataCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFA3BE8C).withOpacity(0.1),
+                  color: const Color(0xFFA3BE8C).withValues(alpha: .1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -524,9 +590,9 @@ class EnvironmentalDataCard extends StatelessWidget {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Environmental Metrics
           Row(
             children: [
@@ -556,9 +622,9 @@ class EnvironmentalDataCard extends StatelessWidget {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           Row(
             children: [
               Expanded(
@@ -587,9 +653,9 @@ class EnvironmentalDataCard extends StatelessWidget {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Nutrients
           Text(
             'Dinh dưỡng đất',
@@ -628,9 +694,9 @@ class EnvironmentalDataCard extends StatelessWidget {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Notes and Time
           if (data['notes'].isNotEmpty) ...[
             Container(
@@ -641,11 +707,7 @@ class EnvironmentalDataCard extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.note,
-                    color: Color(0xFF88C0D0),
-                    size: 16,
-                  ),
+                  const Icon(Icons.note, color: Color(0xFF88C0D0), size: 16),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -661,7 +723,7 @@ class EnvironmentalDataCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
           ],
-          
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -714,16 +776,12 @@ class _MetricItem extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: .1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         children: [
-          Icon(
-            icon,
-            color: color,
-            size: 16,
-          ),
+          Icon(icon, color: color, size: 16),
           const SizedBox(height: 4),
           Text(
             value,

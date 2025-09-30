@@ -1,3 +1,4 @@
+import 'login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -64,7 +65,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: .05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -74,7 +75,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           CircleAvatar(
             radius: 40,
-            backgroundColor: const Color(0xFF5E81AC).withOpacity(0.1),
+            backgroundColor: const Color(0xFF5E81AC).withValues(alpha: .1),
             child: const Icon(Icons.person, size: 40, color: Color(0xFF5E81AC)),
           ),
           const SizedBox(height: 16),
@@ -125,7 +126,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: .05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -205,7 +206,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: .05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -290,7 +291,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: .05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -364,7 +365,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: const Color(0xFF5E81AC).withOpacity(0.1),
+          color: const Color(0xFF5E81AC).withValues(alpha: .1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(icon, color: const Color(0xFF5E81AC), size: 20),
@@ -421,38 +422,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
             'Chọn ngôn ngữ',
             style: GoogleFonts.inter(fontWeight: FontWeight.w600),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: const Text('Tiếng Việt'),
-                leading: Radio<String>(
-                  value: 'Tiếng Việt',
-                  groupValue: _selectedLanguage,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedLanguage = value!;
-                    });
-                    Navigator.of(context).pop();
-                  },
-                  activeColor: const Color(0xFF5E81AC),
+          content: RadioGroup<String>(
+            groupValue: _selectedLanguage,
+            onChanged: (value) {
+              setState(() {
+                _selectedLanguage = value!;
+              });
+              Navigator.of(context).pop();
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  title: const Text('Tiếng Việt'),
+                  leading: const Radio(
+                    value: 'Tiếng Việt',
+                    activeColor: Color(0xFF5E81AC),
+                  ),
                 ),
-              ),
-              ListTile(
-                title: const Text('English'),
-                leading: Radio<String>(
-                  value: 'English',
-                  groupValue: _selectedLanguage,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedLanguage = value!;
-                    });
-                    Navigator.of(context).pop();
-                  },
-                  activeColor: const Color(0xFF5E81AC),
+                ListTile(
+                  title: const Text('English'),
+                  leading: const Radio(
+                    value: 'English',
+                    activeColor: Color(0xFF5E81AC),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -494,52 +490,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
             'Tần suất cập nhật',
             style: GoogleFonts.inter(fontWeight: FontWeight.w600),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: const Text('Cập nhật mỗi 15 phút'),
-                leading: Radio<String>(
-                  value: 'Cập nhật mỗi 15 phút',
-                  groupValue: _selectedUpdateFrequency,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedUpdateFrequency = value!;
-                    });
-                    Navigator.of(context).pop();
-                  },
-                  activeColor: const Color(0xFF5E81AC),
+          content: RadioGroup<String>(
+            groupValue: _selectedUpdateFrequency,
+            onChanged: (value) {
+              setState(() {
+                _selectedUpdateFrequency = value!;
+              });
+              Navigator.of(context).pop();
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  title: const Text('Cập nhật mỗi 15 phút'),
+                  leading: Radio<String>(
+                    value: 'Cập nhật mỗi 15 phút',
+                    activeColor: const Color(0xFF5E81AC),
+                  ),
                 ),
-              ),
-              ListTile(
-                title: const Text('Cập nhật mỗi 30 phút'),
-                leading: Radio<String>(
-                  value: 'Cập nhật mỗi 30 phút',
-                  groupValue: _selectedUpdateFrequency,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedUpdateFrequency = value!;
-                    });
-                    Navigator.of(context).pop();
-                  },
-                  activeColor: const Color(0xFF5E81AC),
+                ListTile(
+                  title: const Text('Cập nhật mỗi 30 phút'),
+                  leading: Radio<String>(
+                    value: 'Cập nhật mỗi 30 phút',
+                    activeColor: const Color(0xFF5E81AC),
+                  ),
                 ),
-              ),
-              ListTile(
-                title: const Text('Cập nhật mỗi 1 giờ'),
-                leading: Radio<String>(
-                  value: 'Cập nhật mỗi 1 giờ',
-                  groupValue: _selectedUpdateFrequency,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedUpdateFrequency = value!;
-                    });
-                    Navigator.of(context).pop();
-                  },
-                  activeColor: const Color(0xFF5E81AC),
+                ListTile(
+                  title: const Text('Cập nhật mỗi 1 giờ'),
+                  leading: Radio<String>(
+                    value: 'Cập nhật mỗi 1 giờ',
+                    activeColor: const Color(0xFF5E81AC),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -650,8 +634,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
-                // Logout logic here
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  LoginScreen.routeName,
+                  (route) => false,
+                );
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(

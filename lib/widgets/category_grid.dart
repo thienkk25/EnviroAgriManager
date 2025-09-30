@@ -10,8 +10,11 @@ class CategoryGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<CategoryProvider>(
       builder: (context, categoryProvider, child) {
-        final categories = categoryProvider.getMainCategories().take(6).toList();
-        
+        final categories = categoryProvider
+            .getMainCategories()
+            .take(6)
+            .toList();
+
         if (categoryProvider.isLoading) {
           return const Center(child: CircularProgressIndicator());
         }
@@ -49,7 +52,7 @@ class _CategoryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: .05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -70,7 +73,9 @@ class _CategoryCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Color(int.parse(category.color.replaceFirst('#', '0xFF'))).withOpacity(0.1),
+                    color: Color(
+                      int.parse(category.color.replaceFirst('#', '0xFF')),
+                    ).withValues(alpha: .1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(

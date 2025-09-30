@@ -70,7 +70,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
@@ -107,19 +107,19 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            
+
             // Overview Cards
             _buildOverviewCards(),
             const SizedBox(height: 24),
-            
+
             // Products Chart
             _buildProductsChart(),
             const SizedBox(height: 24),
-            
+
             // Category Distribution
             _buildCategoryDistribution(),
             const SizedBox(height: 24),
-            
+
             // Environmental Data Chart
             _buildEnvironmentalChart(),
           ],
@@ -132,7 +132,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
     return Consumer<ProductProvider>(
       builder: (context, productProvider, child) {
         final stats = productProvider.getStatistics();
-        
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -169,14 +169,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 ),
                 _OverviewCard(
                   title: 'Giá trị tổng',
-                  value: '${(stats['totalValue'] / 1000000).toStringAsFixed(1)}M ₫',
+                  value:
+                      '${(stats['totalValue'] / 1000000).toStringAsFixed(1)}M ₫',
                   icon: Icons.attach_money,
                   color: const Color(0xFFD08770),
                   trend: '+15%',
                 ),
                 _OverviewCard(
                   title: 'Danh mục',
-                  value: '${context.watch<CategoryProvider>().categories.length}',
+                  value:
+                      '${context.watch<CategoryProvider>().categories.length}',
                   icon: Icons.category,
                   color: const Color(0xFFB48EAD),
                   trend: '+3',
@@ -197,7 +199,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -239,7 +241,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     dotData: FlDotData(show: false),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: const Color(0xFF5E81AC).withOpacity(0.1),
+                      color: const Color(0xFF5E81AC).withValues(alpha: 0.1),
                     ),
                   ),
                 ],
@@ -259,7 +261,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -356,7 +358,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -383,8 +385,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 barTouchData: BarTouchData(enabled: false),
                 titlesData: FlTitlesData(
                   show: true,
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
@@ -430,18 +436,30 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 ),
                 borderData: FlBorderData(show: false),
                 barGroups: [
-                  BarChartGroupData(x: 0, barRods: [
-                    BarChartRodData(toY: 28, color: const Color(0xFF5E81AC)),
-                  ]),
-                  BarChartGroupData(x: 1, barRods: [
-                    BarChartRodData(toY: 75, color: const Color(0xFFA3BE8C)),
-                  ]),
-                  BarChartGroupData(x: 2, barRods: [
-                    BarChartRodData(toY: 65, color: const Color(0xFFD08770)),
-                  ]),
-                  BarChartGroupData(x: 3, barRods: [
-                    BarChartRodData(toY: 85, color: const Color(0xFFB48EAD)),
-                  ]),
+                  BarChartGroupData(
+                    x: 0,
+                    barRods: [
+                      BarChartRodData(toY: 28, color: const Color(0xFF5E81AC)),
+                    ],
+                  ),
+                  BarChartGroupData(
+                    x: 1,
+                    barRods: [
+                      BarChartRodData(toY: 75, color: const Color(0xFFA3BE8C)),
+                    ],
+                  ),
+                  BarChartGroupData(
+                    x: 2,
+                    barRods: [
+                      BarChartRodData(toY: 65, color: const Color(0xFFD08770)),
+                    ],
+                  ),
+                  BarChartGroupData(
+                    x: 3,
+                    barRods: [
+                      BarChartRodData(toY: 85, color: const Color(0xFFB48EAD)),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -476,7 +494,7 @@ class _OverviewCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -491,7 +509,7 @@ class _OverviewCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, color: color, size: 20),
@@ -499,7 +517,7 @@ class _OverviewCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
