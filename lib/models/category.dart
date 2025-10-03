@@ -32,8 +32,12 @@ class Category {
       color: json['color'] ?? '#4CAF50',
       parentId: json['parentId'] ?? '',
       subCategories: List<String>.from(json['subCategories'] ?? []),
-      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
-      updatedAt: DateTime.parse(json['updatedAt'] ?? DateTime.now().toIso8601String()),
+      createdAt: DateTime.parse(
+        json['createdAt'] ?? DateTime.now().toIso8601String(),
+      ),
+      updatedAt: DateTime.parse(
+        json['updatedAt'] ?? DateTime.now().toIso8601String(),
+      ),
       isActive: json['isActive'] ?? true,
     );
   }

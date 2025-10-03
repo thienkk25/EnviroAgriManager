@@ -1,14 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'config/supabase_config.dart';
 import 'providers/product_provider.dart';
 import 'providers/category_provider.dart';
-import 'screens/main_screen.dart';
+import 'providers/auth_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/forgot_password_screen.dart';
+import 'screens/auth_wrapper.dart';
+import 'screens/user_management_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: SupabaseConfig.supabaseUrl,
+    anonKey: SupabaseConfig.supabaseAnonKey,
+  );
+
   runApp(const MainApp());
 }
 
@@ -19,6 +30,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
       ],
@@ -50,13 +62,14 @@ class MainApp extends StatelessWidget {
             ),
           ),
         ),
-        initialRoute: LoginScreen.routeName,
+        home: const AuthWrapper(),
         routes: {
           LoginScreen.routeName: (context) => const LoginScreen(),
           RegisterScreen.routeName: (context) => const RegisterScreen(),
           ForgotPasswordScreen.routeName: (context) =>
               const ForgotPasswordScreen(),
-          '/': (context) => const MainScreen(),
+          UserManagementScreen.routeName: (context) =>
+              const UserManagementScreen(),
         },
         debugShowCheckedModeBanner: false,
       ),

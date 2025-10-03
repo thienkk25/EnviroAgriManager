@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -22,20 +24,41 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
     setState(() {
       _isSubmitting = true;
     });
-    await Future.delayed(const Duration(milliseconds: 700));
+
+    final success = await authProvider.resetPassword(
+      _emailController.text.trim(),
+    );
+
     if (!mounted) return;
+
     setState(() {
       _isSubmitting = false;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Nếu email tồn tại, hướng dẫn đặt lại đã được gửi.'),
-      ),
-    );
-    Navigator.of(context).pop();
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Vui lòng kiểm tra email (nếu tồn tại trong hệ thống, bạn sẽ nhận được email reset).',
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(authProvider.errorMessage ?? 'Gửi email thất bại'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -126,4 +149,3 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 }
-

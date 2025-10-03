@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -30,15 +32,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
     setState(() {
       _isSubmitting = true;
     });
-    await Future.delayed(const Duration(milliseconds: 800));
+
+    final success = await authProvider.signUp(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+      fullName: _nameController.text.trim(),
+    );
+
     if (!mounted) return;
+
     setState(() {
       _isSubmitting = false;
     });
-    Navigator.of(context).pop();
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.',
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(authProvider.errorMessage ?? 'Đăng ký thất bại'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override

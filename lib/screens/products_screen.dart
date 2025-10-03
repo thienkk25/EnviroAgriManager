@@ -1,8 +1,13 @@
+import 'package:enviro_agri_manager/models/product.dart';
+import 'package:enviro_agri_manager/providers/category_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 import '../providers/product_provider.dart';
+import '../providers/auth_provider.dart';
+import '../widgets/role_based_widget.dart';
 
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
@@ -18,7 +23,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<ProductProvider>().fetchProducts();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ProductProvider>(context, listen: false).fetchProducts();
+      Provider.of<CategoryProvider>(context, listen: false).fetchCategories();
+    });
   }
 
   @override
@@ -36,16 +44,19 @@ class _ProductsScreenState extends State<ProductsScreen> {
         backgroundColor: const Color(0xFF5E81AC),
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AddProductScreen(),
-                ),
-              );
-            },
+          RoleBasedActionButton(
+            permission: 'edit',
+            child: IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddProductScreen(),
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -86,12 +97,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 const SizedBox(height: 12),
 
                 // Category Filter
-                Consumer<ProductProvider>(
-                  builder: (context, productProvider, child) {
-                    final stats = productProvider.getStatistics();
+                Consumer<CategoryProvider>(
+                  builder: (context, categoryProvider, child) {
+                    final data = categoryProvider.categories;
                     final categories = [
-                      'Tất cả',
-                      ...stats['categoryStats'].keys.toList(),
+                      {'id': 'Tất cả', 'name': 'Tất cả'},
+                      ...data.map((e) => {'id': e.id, 'name': e.name}),
                     ];
 
                     return SizedBox(
@@ -101,16 +112,17 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         itemCount: categories.length,
                         itemBuilder: (context, index) {
                           final category = categories[index];
-                          final isSelected = category == _selectedCategory;
+                          final isSelected =
+                              category['id'] == _selectedCategory;
 
                           return Padding(
                             padding: const EdgeInsets.only(right: 8),
                             child: FilterChip(
-                              label: Text(category),
+                              label: Text(category['name']!),
                               selected: isSelected,
                               onSelected: (selected) {
                                 setState(() {
-                                  _selectedCategory = category;
+                                  _selectedCategory = category['id']!;
                                 });
                               },
                               selectedColor: Colors.white,
@@ -167,7 +179,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 }
 
                 // Filter products
-                List<dynamic> filteredProducts = productProvider.products;
+                List<Product> filteredProducts = productProvider.products;
 
                 // Search filter
                 if (_searchController.text.isNotEmpty) {
@@ -179,7 +191,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 // Category filter
                 if (_selectedCategory != 'Tất cả') {
                   filteredProducts = filteredProducts
-                      .where((product) => product.category == _selectedCategory)
+                      .where(
+                        (product) => product.categoryId == _selectedCategory,
+                      )
                       .toList();
                 }
 
@@ -235,15 +249,18 @@ class _ProductsScreenState extends State<ProductsScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddProductScreen()),
-          );
-        },
-        backgroundColor: const Color(0xFF5E81AC),
-        child: const Icon(Icons.add, color: Colors.white),
+      floatingActionButton: RoleBasedActionButton(
+        permission: 'edit',
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AddProductScreen()),
+            );
+          },
+          backgroundColor: const Color(0xFF5E81AC),
+          child: const Icon(Icons.add, color: Colors.white),
+        ),
       ),
     );
   }
@@ -273,6 +290,15 @@ class _ProductsScreenState extends State<ProductsScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
                 context.read<ProductProvider>().deleteProduct(product.id);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Xóa sản phẩm thành công',
+                      style: GoogleFonts.inter(),
+                    ),
+                    backgroundColor: const Color(0xFFA3BE8C),
+                  ),
+                );
               },
               child: Text('Xóa', style: GoogleFonts.inter(color: Colors.red)),
             ),
@@ -290,7 +316,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 }
 
 class ProductCard extends StatelessWidget {
-  final dynamic product;
+  final Product product;
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
@@ -396,7 +422,7 @@ class ProductCard extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
-                                  product.category,
+                                  product.unit,
                                   style: GoogleFonts.inter(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
@@ -432,50 +458,79 @@ class ProductCard extends StatelessWidget {
                     ),
 
                     // Actions Menu
-                    PopupMenuButton<String>(
-                      onSelected: (value) {
-                        switch (value) {
-                          case 'edit':
-                            onEdit?.call();
-                            break;
-                          case 'delete':
-                            onDelete?.call();
-                            break;
+                    Consumer<AuthProvider>(
+                      builder: (context, authProvider, child) {
+                        final canEdit = authProvider.hasPermission('edit');
+                        final canDelete = authProvider.hasPermission('delete');
+
+                        if (!canEdit && !canDelete) {
+                          return const SizedBox.shrink();
                         }
+
+                        return PopupMenuButton<String>(
+                          onSelected: (value) {
+                            switch (value) {
+                              case 'edit':
+                                onEdit?.call();
+                                break;
+                              case 'delete':
+                                onDelete?.call();
+                                break;
+                            }
+                          },
+                          itemBuilder: (BuildContext context) {
+                            final items = <PopupMenuItem<String>>[];
+
+                            if (canEdit) {
+                              items.add(
+                                PopupMenuItem<String>(
+                                  value: 'edit',
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.edit,
+                                        size: 20,
+                                        color: Color(0xFF5E81AC),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Chỉnh sửa',
+                                        style: GoogleFonts.inter(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
+
+                            if (canDelete) {
+                              items.add(
+                                PopupMenuItem<String>(
+                                  value: 'delete',
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.delete,
+                                        size: 20,
+                                        color: Colors.red,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Xóa',
+                                        style: GoogleFonts.inter(
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
+
+                            return items;
+                          },
+                        );
                       },
-                      itemBuilder: (BuildContext context) => [
-                        PopupMenuItem<String>(
-                          value: 'edit',
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.edit,
-                                size: 20,
-                                color: Color(0xFF5E81AC),
-                              ),
-                              const SizedBox(width: 8),
-                              Text('Chỉnh sửa', style: GoogleFonts.inter()),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem<String>(
-                          value: 'delete',
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.delete,
-                                size: 20,
-                                color: Colors.red,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Xóa',
-                                style: GoogleFonts.inter(color: Colors.red),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
                     ),
                   ],
                 ),
@@ -881,6 +936,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 16,
                   children: [
                     Text(
                       'Phân loại',
@@ -890,68 +946,52 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         color: const Color(0xFF2E3440),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    DropdownButtonFormField<String>(
-                      initialValue: _selectedCategory.isEmpty
-                          ? null
-                          : _selectedCategory,
-                      decoration: InputDecoration(
-                        labelText: 'Chọn danh mục *',
-                        labelStyle: GoogleFonts.inter(
-                          color: const Color(0xFF88C0D0),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF88C0D0),
+                    Consumer<CategoryProvider>(
+                      builder: (context, categoryProvider, child) {
+                        final categories = categoryProvider.categories;
+                        return DropdownButtonFormField<String>(
+                          initialValue: _selectedCategory.isEmpty
+                              ? null
+                              : _selectedCategory,
+                          decoration: InputDecoration(
+                            labelText: 'Chọn danh mục *',
+                            labelStyle: GoogleFonts.inter(
+                              color: const Color(0xFF88C0D0),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                color: Color(0xFF88C0D0),
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                color: Color(0xFF5E81AC),
+                              ),
+                            ),
                           ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF5E81AC),
+                          items: List.generate(
+                            categories.length,
+                            (index) => DropdownMenuItem(
+                              value: categories[index].id,
+                              child: Text(categories[index].name),
+                            ),
                           ),
-                        ),
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'Cây lương thực',
-                          child: Text('Cây lương thực'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Rau củ',
-                          child: Text('Rau củ'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Trái cây',
-                          child: Text('Trái cây'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Cây công nghiệp',
-                          child: Text('Cây công nghiệp'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Thủy sản',
-                          child: Text('Thủy sản'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Chăn nuôi',
-                          child: Text('Chăn nuôi'),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedCategory = value ?? '';
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Vui lòng chọn danh mục';
-                        }
-                        return null;
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedCategory = value ?? '';
+                            });
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Vui lòng chọn danh mục';
+                            }
+                            return null;
+                          },
+                        );
                       },
                     ),
-                    const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
                       initialValue: _selectedStatus,
                       decoration: InputDecoration(
@@ -1021,22 +1061,21 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
   void _saveProduct() {
     if (_formKey.currentState!.validate()) {
-      final product = {
-        'id': DateTime.now().millisecondsSinceEpoch.toString(),
-        'name': _nameController.text,
-        'description': _descriptionController.text,
-        'category': _selectedCategory,
-        'price': double.parse(_priceController.text),
-        'quantity': int.parse(_quantityController.text),
-        'unit': _unitController.text,
-        'imageUrl': _imageUrl,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'status': _selectedStatus,
-        'environmentalData': {'temperature': 28.0, 'humidity': 70.0, 'ph': 6.5},
-      };
+      final Product product = Product(
+        id: Uuid().v4(),
+        name: _nameController.text,
+        description: _descriptionController.text,
+        categoryId: _selectedCategory,
+        price: double.parse(_priceController.text),
+        quantity: int.parse(_quantityController.text),
+        unit: _unitController.text,
+        imageUrl: _imageUrl,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        status: _selectedStatus,
+      );
 
-      // Add product logic here
+      context.read<ProductProvider>().addProduct(product);
       Navigator.of(context).pop();
 
       ScaffoldMessenger.of(context).showSnackBar(

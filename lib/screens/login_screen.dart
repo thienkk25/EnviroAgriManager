@@ -1,5 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -26,15 +28,40 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
     setState(() {
       _isSubmitting = true;
     });
-    await Future.delayed(const Duration(milliseconds: 600));
+
+    final success = await authProvider.signIn(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
+
     if (!mounted) return;
+
     setState(() {
       _isSubmitting = false;
     });
-    Navigator.of(context).pushReplacementNamed('/');
+
+    if (success) {
+      Navigator.of(context).pushNamedAndRemoveUntil('/', (router) => false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Đăng nhập thành công!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(authProvider.errorMessage ?? 'Đăng nhập thất bại'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override

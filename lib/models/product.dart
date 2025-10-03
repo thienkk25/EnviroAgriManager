@@ -2,7 +2,7 @@ class Product {
   final String id;
   final String name;
   final String description;
-  final String category;
+  final String categoryId; // tham chiếu sang bảng categories
   final double price;
   final int quantity;
   final String unit;
@@ -10,13 +10,13 @@ class Product {
   final DateTime createdAt;
   final DateTime updatedAt;
   final String status; // 'active', 'inactive', 'discontinued'
-  final Map<String, dynamic> environmentalData; // Dữ liệu môi trường
+  final Map<String, dynamic> environmentalData; // dữ liệu môi trường (jsonb)
 
   Product({
     required this.id,
     required this.name,
     required this.description,
-    required this.category,
+    required this.categoryId,
     required this.price,
     required this.quantity,
     required this.unit,
@@ -27,45 +27,48 @@ class Product {
     this.environmentalData = const {},
   });
 
+  /// Parse từ JSON (snake_case -> camelCase)
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
       description: json['description'] ?? '',
-      category: json['category'] ?? '',
+      categoryId: json['category_id'] ?? '', // map đúng DB
       price: (json['price'] ?? 0).toDouble(),
-      quantity: json['quantity'] ?? 0,
+      quantity: (json['quantity'] ?? 0).toInt(),
       unit: json['unit'] ?? '',
-      imageUrl: json['imageUrl'] ?? '',
-      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
-      updatedAt: DateTime.parse(json['updatedAt'] ?? DateTime.now().toIso8601String()),
+      imageUrl: json['image_url'] ?? '',
+      createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updated_at'] ?? '') ?? DateTime.now(),
       status: json['status'] ?? 'active',
-      environmentalData: json['environmentalData'] ?? {},
+      environmentalData: json['environmental_data'] ?? {},
     );
   }
 
+  /// Convert về JSON để insert/update Supabase
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'name': name,
       'description': description,
-      'category': category,
+      'category_id': categoryId,
       'price': price,
       'quantity': quantity,
       'unit': unit,
-      'imageUrl': imageUrl,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'image_url': imageUrl,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
       'status': status,
-      'environmentalData': environmentalData,
+      'environmental_data': environmentalData,
     };
   }
 
+  /// Copy object để dễ update
   Product copyWith({
     String? id,
     String? name,
     String? description,
-    String? category,
+    String? categoryId,
     double? price,
     int? quantity,
     String? unit,
@@ -79,7 +82,7 @@ class Product {
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
-      category: category ?? this.category,
+      categoryId: categoryId ?? this.categoryId,
       price: price ?? this.price,
       quantity: quantity ?? this.quantity,
       unit: unit ?? this.unit,

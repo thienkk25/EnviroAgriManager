@@ -1,6 +1,8 @@
-import 'login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
+import '../models/user_role.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -58,63 +60,95 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildProfileSection() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: .05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundColor: const Color(0xFF5E81AC).withValues(alpha: .1),
-            child: const Icon(Icons.person, size: 40, color: Color(0xFF5E81AC)),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Quản trị viên',
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF2E3440),
-            ),
-          ),
-          Text(
-            'admin@agriculture.vn',
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              color: const Color(0xFF88C0D0),
-            ),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              _showEditProfileDialog();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF5E81AC),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+    return Consumer<AuthProvider>(
+      builder: (context, authProvider, child) {
+        final user = authProvider.user;
+        final userRole = authProvider.userRole;
+        final displayName = user?.userMetadata?['full_name'] ?? 'Người dùng';
+        final email = user?.email ?? 'email@example.com';
+
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: .05),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
               ),
-            ),
-            child: Text(
-              'Chỉnh sửa thông tin',
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            ],
           ),
-        ],
-      ),
+          child: Column(
+            children: [
+              CircleAvatar(
+                radius: 40,
+                backgroundColor: const Color(0xFF5E81AC).withValues(alpha: .1),
+                child: const Icon(
+                  Icons.person,
+                  size: 40,
+                  color: Color(0xFF5E81AC),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                displayName,
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF2E3440),
+                ),
+              ),
+              Text(
+                email,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: const Color(0xFF88C0D0),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: _getRoleColor(userRole).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  userRole.displayName,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: _getRoleColor(userRole),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  _showEditProfileDialog();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF5E81AC),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'Chỉnh sửa thông tin',
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -633,21 +667,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  LoginScreen.routeName,
-                  (route) => false,
-                );
+              onPressed: () async {
+                Navigator.of(context).pop();
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Đã đăng xuất thành công',
-                      style: GoogleFonts.inter(),
-                    ),
-                    backgroundColor: const Color(0xFFA3BE8C),
-                  ),
+                final authProvider = Provider.of<AuthProvider>(
+                  context,
+                  listen: false,
                 );
+                await authProvider.signOut();
+
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Đã đăng xuất thành công',
+                        style: GoogleFonts.inter(),
+                      ),
+                      backgroundColor: const Color(0xFFA3BE8C),
+                    ),
+                  );
+                }
               },
               child: Text(
                 'Đăng xuất',
@@ -658,5 +697,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
       },
     );
+  }
+
+  Color _getRoleColor(UserRole role) {
+    switch (role) {
+      case UserRole.admin:
+        return Colors.red;
+      case UserRole.editor:
+        return Colors.orange;
+      case UserRole.viewer:
+        return Colors.blue;
+    }
   }
 }

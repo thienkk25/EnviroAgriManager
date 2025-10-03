@@ -33,42 +33,45 @@ class EnvironmentalData {
     this.notes = '',
   });
 
+  /// Parse từ JSON Supabase (snake_case)
   factory EnvironmentalData.fromJson(Map<String, dynamic> json) {
     return EnvironmentalData(
       id: json['id'] ?? '',
-      productId: json['productId'] ?? '',
+      productId: json['product_id'] ?? '',
       temperature: (json['temperature'] ?? 0).toDouble(),
       humidity: (json['humidity'] ?? 0).toDouble(),
       ph: (json['ph'] ?? 0).toDouble(),
-      soilMoisture: (json['soilMoisture'] ?? 0).toDouble(),
-      lightIntensity: (json['lightIntensity'] ?? 0).toDouble(),
-      co2Level: (json['co2Level'] ?? 0).toDouble(),
+      soilMoisture: (json['soil_moisture'] ?? 0).toDouble(),
+      lightIntensity: (json['light_intensity'] ?? 0).toDouble(),
+      co2Level: (json['co2_level'] ?? 0).toDouble(),
       nitrogen: (json['nitrogen'] ?? 0).toDouble(),
       phosphorus: (json['phosphorus'] ?? 0).toDouble(),
       potassium: (json['potassium'] ?? 0).toDouble(),
-      weatherCondition: json['weatherCondition'] ?? '',
+      weatherCondition: json['weather_condition'] ?? '',
       location: json['location'] ?? '',
-      recordedAt: DateTime.parse(json['recordedAt'] ?? DateTime.now().toIso8601String()),
+      recordedAt:
+          DateTime.tryParse(json['recorded_at'] ?? '') ?? DateTime.now(),
       notes: json['notes'] ?? '',
     );
   }
 
+  /// Convert về JSON để insert/update Supabase
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'productId': productId,
+      'product_id': productId,
       'temperature': temperature,
       'humidity': humidity,
       'ph': ph,
-      'soilMoisture': soilMoisture,
-      'lightIntensity': lightIntensity,
-      'co2Level': co2Level,
+      'soil_moisture': soilMoisture,
+      'light_intensity': lightIntensity,
+      'co2_level': co2Level,
       'nitrogen': nitrogen,
       'phosphorus': phosphorus,
       'potassium': potassium,
-      'weatherCondition': weatherCondition,
+      'weather_condition': weatherCondition,
       'location': location,
-      'recordedAt': recordedAt.toIso8601String(),
+      'recorded_at': recordedAt.toIso8601String(),
       'notes': notes,
     };
   }
