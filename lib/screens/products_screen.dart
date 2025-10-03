@@ -24,8 +24,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<ProductProvider>(context, listen: false).fetchProducts();
-      Provider.of<CategoryProvider>(context, listen: false).fetchCategories();
+      context.read<ProductProvider>().fetchProducts();
+      context.read<CategoryProvider>().fetchCategories();
     });
   }
 
@@ -52,7 +52,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const AddProductScreen(),
+                    builder: (_) =>
+                        ProductFormScreen(mode: ProductFormMode.add),
                   ),
                 );
               },
@@ -233,10 +234,26 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     return ProductCard(
                       product: product,
                       onTap: () {
-                        // Navigate to product detail
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ProductFormScreen(
+                              mode: ProductFormMode.view,
+                              product: product,
+                            ),
+                          ),
+                        );
                       },
                       onEdit: () {
-                        // Navigate to edit product
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ProductFormScreen(
+                              mode: ProductFormMode.edit,
+                              product: product,
+                            ),
+                          ),
+                        );
                       },
                       onDelete: () {
                         _showDeleteDialog(context, product);
@@ -255,7 +272,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const AddProductScreen()),
+              MaterialPageRoute(
+                builder: (_) => ProductFormScreen(mode: ProductFormMode.add),
+              ),
             );
           },
           backgroundColor: const Color(0xFF5E81AC),
@@ -646,26 +665,67 @@ class ProductCard extends StatelessWidget {
   }
 }
 
-class AddProductScreen extends StatefulWidget {
-  const AddProductScreen({super.key});
+enum ProductFormMode { add, edit, view }
+
+class ProductFormScreen extends StatefulWidget {
+  final ProductFormMode mode;
+  final Product? product;
+
+  const ProductFormScreen({super.key, required this.mode, this.product});
 
   @override
-  State<AddProductScreen> createState() => _AddProductScreenState();
+  State<ProductFormScreen> createState() => _ProductFormScreenState();
 }
 
-class _AddProductScreenState extends State<AddProductScreen> {
+class _ProductFormScreenState extends State<ProductFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _priceController = TextEditingController();
-  final _quantityController = TextEditingController();
-  final _unitController = TextEditingController();
+
+  late TextEditingController _nameController;
+  late TextEditingController _descriptionController;
+  late TextEditingController _priceController;
+  late TextEditingController _quantityController;
+  late TextEditingController _unitController;
 
   String _selectedCategory = '';
-  String _selectedStatus = 'active';
   String _imageUrl = 'https://via.placeholder.com/150';
+  String _selectedStatus = 'active';
 
-  final List<String> _statusOptions = ['active', 'inactive', 'discontinued'];
+  bool get isView => widget.mode == ProductFormMode.view;
+  bool get isEdit => widget.mode == ProductFormMode.edit;
+  bool get isAdd => widget.mode == ProductFormMode.add;
+
+  @override
+  void initState() {
+    super.initState();
+    final p = widget.product;
+
+    _nameController = TextEditingController(text: p?.name ?? '');
+    _descriptionController = TextEditingController(text: p?.description ?? '');
+    _priceController = TextEditingController(
+      text: p != null ? p.price.toStringAsFixed(0) : '',
+    );
+    _quantityController = TextEditingController(
+      text: p != null ? p.quantity.toString() : '',
+    );
+    _unitController = TextEditingController(text: p?.unit ?? '');
+    _selectedCategory = p?.categoryId ?? '';
+    _selectedStatus = p?.status ?? 'active';
+  }
+
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: GoogleFonts.inter(color: const Color(0xFF88C0D0)),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFF88C0D0)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFF5E81AC)),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -673,7 +733,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         title: Text(
-          'Thêm Sản phẩm Mới',
+          isAdd
+              ? 'Thêm Sản phẩm Mới'
+              : isEdit
+              ? 'Chỉnh sửa Sản phẩm'
+              : 'Chi tiết Sản phẩm',
           style: GoogleFonts.inter(
             fontWeight: FontWeight.w600,
             color: Colors.white,
@@ -682,16 +746,24 @@ class _AddProductScreenState extends State<AddProductScreen> {
         backgroundColor: const Color(0xFF5E81AC),
         elevation: 0,
         actions: [
-          TextButton(
-            onPressed: _saveProduct,
-            child: Text(
-              'Lưu',
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
+          if (!isView)
+            TextButton(
+              onPressed: () {
+                if (isAdd) {
+                  _addProduct();
+                } else {
+                  _updateProduct(widget.product!);
+                }
+              },
+
+              child: Text(
+                'Lưu',
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-          ),
         ],
       ),
       body: Form(
@@ -701,119 +773,45 @@ class _AddProductScreenState extends State<AddProductScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Product Information
+              // --- Thông tin sản phẩm ---
               Container(
                 padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: .05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
+                decoration: _boxDecoration(),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Thông tin sản phẩm',
-                      style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF2E3440),
-                      ),
-                    ),
+                    _sectionTitle('Thông tin sản phẩm'),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _nameController,
-                      decoration: InputDecoration(
-                        labelText: 'Tên sản phẩm *',
-                        labelStyle: GoogleFonts.inter(
-                          color: const Color(0xFF88C0D0),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF88C0D0),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF5E81AC),
-                          ),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Vui lòng nhập tên sản phẩm';
-                        }
-                        return null;
-                      },
+                      decoration: _inputDecoration('Tên sản phẩm *'),
+                      readOnly: isView,
+                      validator: (v) =>
+                          (v == null || v.isEmpty) ? 'Vui lòng nhập tên' : null,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _descriptionController,
                       maxLines: 3,
-                      decoration: InputDecoration(
-                        labelText: 'Mô tả sản phẩm *',
-                        labelStyle: GoogleFonts.inter(
-                          color: const Color(0xFF88C0D0),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF88C0D0),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF5E81AC),
-                          ),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Vui lòng nhập mô tả sản phẩm';
-                        }
-                        return null;
-                      },
+                      decoration: _inputDecoration('Mô tả sản phẩm *'),
+                      readOnly: isView,
+                      validator: (v) => (v == null || v.isEmpty)
+                          ? 'Vui lòng nhập mô tả'
+                          : null,
                     ),
                   ],
                 ),
               ),
-
               const SizedBox(height: 24),
 
-              // Price and Quantity
+              // --- Giá và Số lượng ---
               Container(
                 padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: .05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
+                decoration: _boxDecoration(),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Giá và Số lượng',
-                      style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF2E3440),
-                      ),
-                    ),
+                    _sectionTitle('Giá và Số lượng'),
                     const SizedBox(height: 16),
                     Row(
                       children: [
@@ -821,29 +819,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           child: TextFormField(
                             controller: _priceController,
                             keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              labelText: 'Giá bán (₫) *',
-                              labelStyle: GoogleFonts.inter(
-                                color: const Color(0xFF88C0D0),
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFF88C0D0),
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFF5E81AC),
-                                ),
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
+                            decoration: _inputDecoration('Giá bán (₫) *'),
+                            readOnly: isView,
+                            validator: (v) {
+                              if (v == null || v.isEmpty) {
                                 return 'Vui lòng nhập giá bán';
                               }
-                              if (double.tryParse(value) == null) {
+                              if (double.tryParse(v) == null) {
                                 return 'Giá bán không hợp lệ';
                               }
                               return null;
@@ -855,29 +837,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           child: TextFormField(
                             controller: _quantityController,
                             keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              labelText: 'Số lượng *',
-                              labelStyle: GoogleFonts.inter(
-                                color: const Color(0xFF88C0D0),
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFF88C0D0),
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFF5E81AC),
-                                ),
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
+                            decoration: _inputDecoration('Số lượng *'),
+                            readOnly: isView,
+                            validator: (v) {
+                              if (v == null || v.isEmpty) {
                                 return 'Vui lòng nhập số lượng';
                               }
-                              if (int.tryParse(value) == null) {
+                              if (int.tryParse(v) == null) {
                                 return 'Số lượng không hợp lệ';
                               }
                               return null;
@@ -889,63 +855,26 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _unitController,
-                      decoration: InputDecoration(
-                        labelText: 'Đơn vị *',
-                        labelStyle: GoogleFonts.inter(
-                          color: const Color(0xFF88C0D0),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF88C0D0),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF5E81AC),
-                          ),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Vui lòng nhập đơn vị';
-                        }
-                        return null;
-                      },
+                      decoration: _inputDecoration('Đơn vị *'),
+                      readOnly: isView,
+                      validator: (v) => (v == null || v.isEmpty)
+                          ? 'Vui lòng nhập đơn vị'
+                          : null,
                     ),
                   ],
                 ),
               ),
-
               const SizedBox(height: 24),
 
-              // Category and Status
+              // --- Phân loại ---
               Container(
                 padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: .05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
+                decoration: _boxDecoration(),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 16,
                   children: [
-                    Text(
-                      'Phân loại',
-                      style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF2E3440),
-                      ),
-                    ),
+                    _sectionTitle('Phân loại'),
+                    const SizedBox(height: 16),
                     Consumer<CategoryProvider>(
                       builder: (context, categoryProvider, child) {
                         final categories = categoryProvider.categories;
@@ -953,38 +882,21 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           initialValue: _selectedCategory.isEmpty
                               ? null
                               : _selectedCategory,
-                          decoration: InputDecoration(
-                            labelText: 'Chọn danh mục *',
-                            labelStyle: GoogleFonts.inter(
-                              color: const Color(0xFF88C0D0),
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: Color(0xFF88C0D0),
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: Color(0xFF5E81AC),
-                              ),
-                            ),
-                          ),
-                          items: List.generate(
-                            categories.length,
-                            (index) => DropdownMenuItem(
-                              value: categories[index].id,
-                              child: Text(categories[index].name),
-                            ),
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedCategory = value ?? '';
-                            });
-                          },
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
+                          decoration: _inputDecoration('Chọn danh mục *'),
+                          items: categories
+                              .map(
+                                (c) => DropdownMenuItem(
+                                  value: c.id,
+                                  child: Text(c.name),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: isView
+                              ? null
+                              : (v) =>
+                                    setState(() => _selectedCategory = v ?? ''),
+                          validator: (v) {
+                            if (v == null || v.isEmpty) {
                               return 'Vui lòng chọn danh mục';
                             }
                             return null;
@@ -992,66 +904,59 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         );
                       },
                     ),
+                    const SizedBox(height: 16),
+
                     DropdownButtonFormField<String>(
                       initialValue: _selectedStatus,
-                      decoration: InputDecoration(
-                        labelText: 'Trạng thái sản phẩm',
-                        labelStyle: GoogleFonts.inter(
-                          color: const Color(0xFF88C0D0),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF88C0D0),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF5E81AC),
-                          ),
-                        ),
-                      ),
-                      items: _statusOptions.map((status) {
-                        return DropdownMenuItem<String>(
-                          value: status,
-                          child: Text(_getStatusText(status)),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedStatus = value ?? 'active';
-                        });
-                      },
+                      decoration: _inputDecoration('Trạng thái sản phẩm'),
+                      items: ['active', 'inactive', 'discontinued']
+                          .map(
+                            (s) => DropdownMenuItem(
+                              value: s,
+                              child: Text(_getStatusText(s)),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: isView
+                          ? null
+                          : (v) =>
+                                setState(() => _selectedStatus = v ?? 'active'),
                     ),
                   ],
                 ),
               ),
-
               const SizedBox(height: 32),
 
-              // Save Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _saveProduct,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5E81AC),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              // --- Nút lưu ---
+              if (!isView)
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (isAdd) {
+                        _addProduct();
+                      } else {
+                        _updateProduct(widget.product!);
+                      }
+                    },
+
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF5E81AC),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    'Lưu sản phẩm',
-                    style: GoogleFonts.inter(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                    child: Text(
+                      isAdd ? 'Lưu sản phẩm' : 'Cập nhật sản phẩm',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
@@ -1059,7 +964,32 @@ class _AddProductScreenState extends State<AddProductScreen> {
     );
   }
 
-  void _saveProduct() {
+  BoxDecoration _boxDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: .05),
+          blurRadius: 10,
+          offset: const Offset(0, 2),
+        ),
+      ],
+    );
+  }
+
+  Widget _sectionTitle(String text) {
+    return Text(
+      text,
+      style: GoogleFonts.inter(
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+        color: const Color(0xFF2E3440),
+      ),
+    );
+  }
+
+  void _addProduct() {
     if (_formKey.currentState!.validate()) {
       final Product product = Product(
         id: Uuid().v4(),
@@ -1082,6 +1012,35 @@ class _AddProductScreenState extends State<AddProductScreen> {
         SnackBar(
           content: Text(
             'Đã thêm sản phẩm thành công',
+            style: GoogleFonts.inter(),
+          ),
+          backgroundColor: const Color(0xFFA3BE8C),
+        ),
+      );
+    }
+  }
+
+  void _updateProduct(Product oldProduct) {
+    if (_formKey.currentState!.validate()) {
+      final updatedProduct = oldProduct.copyWith(
+        name: _nameController.text,
+        description: _descriptionController.text,
+        categoryId: _selectedCategory,
+        price: double.parse(_priceController.text),
+        quantity: int.parse(_quantityController.text),
+        unit: _unitController.text,
+        imageUrl: _imageUrl,
+        updatedAt: DateTime.now(), // chỉ cập nhật thời gian sửa
+        status: _selectedStatus,
+      );
+
+      context.read<ProductProvider>().updateProduct(updatedProduct);
+      Navigator.of(context).pop();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Đã cập nhật sản phẩm thành công',
             style: GoogleFonts.inter(),
           ),
           backgroundColor: const Color(0xFFA3BE8C),

@@ -30,15 +30,11 @@ class Category {
       description: json['description'] ?? '',
       icon: json['icon'] ?? '🌱',
       color: json['color'] ?? '#4CAF50',
-      parentId: json['parentId'] ?? '',
-      subCategories: List<String>.from(json['subCategories'] ?? []),
-      createdAt: DateTime.parse(
-        json['createdAt'] ?? DateTime.now().toIso8601String(),
-      ),
-      updatedAt: DateTime.parse(
-        json['updatedAt'] ?? DateTime.now().toIso8601String(),
-      ),
-      isActive: json['isActive'] ?? true,
+      parentId: json['parent_id'] ?? '',
+      subCategories: List<String>.from(json['sub_categories'] ?? []),
+      createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updated_at'] ?? '') ?? DateTime.now(),
+      isActive: json['is_active'] ?? true,
     );
   }
 
@@ -49,11 +45,11 @@ class Category {
       'description': description,
       'icon': icon,
       'color': color,
-      'parentId': parentId,
-      'subCategories': subCategories,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
-      'isActive': isActive,
+      'parent_id': parentId,
+      'sub_categories': subCategories,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'is_active': isActive,
     };
   }
 

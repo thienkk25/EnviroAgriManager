@@ -31,12 +31,7 @@ class CategoryService {
 
   Future<void> addCategory(Category category) async {
     try {
-      final response = await _supabase
-          .from('categories')
-          .insert(category.toJson());
-      if (response == null) {
-        throw Exception('Thêm danh mục thất bại');
-      }
+      await _supabase.from('categories').insert(category.toJson());
     } catch (e) {
       throw Exception('Lỗi thêm danh mục: $e');
     }
@@ -44,13 +39,10 @@ class CategoryService {
 
   Future<void> updateCategory(Category category) async {
     try {
-      final response = await _supabase
+      await _supabase
           .from('categories')
           .update(category.toJson())
           .eq('id', category.id);
-      if ((response as List).isEmpty) {
-        throw Exception('Cập nhật danh mục thất bại!');
-      }
     } catch (e) {
       throw Exception('Lỗi cập nhật danh mục: $e');
     }
@@ -58,10 +50,7 @@ class CategoryService {
 
   Future<void> deleteCategory(String id) async {
     try {
-      final response = await _supabase.from('categories').delete().eq('id', id);
-      if ((response as List).isEmpty) {
-        throw Exception('Xóa danh mục thất bại!');
-      }
+      await _supabase.from('categories').delete().eq('id', id);
     } catch (e) {
       throw Exception('Lỗi xóa danh mục: $e');
     }

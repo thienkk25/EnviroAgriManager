@@ -61,9 +61,7 @@ class ProductProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      // Giả lập API call
-      await Future.delayed(const Duration(seconds: 1));
-
+      await _productService.updateProduct(product);
       final index = _products.indexWhere((p) => p.id == product.id);
       if (index != -1) {
         _products[index] = product;

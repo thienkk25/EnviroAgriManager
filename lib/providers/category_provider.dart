@@ -44,9 +44,7 @@ class CategoryProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      // Giả lập API call
-      await Future.delayed(const Duration(seconds: 1));
-
+      await _categoryService.addCategory(category);
       _categories.add(category);
       _error = '';
     } catch (e) {
@@ -63,8 +61,7 @@ class CategoryProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      // Giả lập API call
-      await Future.delayed(const Duration(seconds: 1));
+      await _categoryService.updateCategory(category);
 
       final index = _categories.indexWhere((c) => c.id == category.id);
       if (index != -1) {
@@ -80,15 +77,14 @@ class CategoryProvider with ChangeNotifier {
   }
 
   // Xóa danh mục
-  Future<void> deleteCategory(String categoryId) async {
+  Future<void> deleteCategory(String id) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      // Giả lập API call
-      await Future.delayed(const Duration(seconds: 1));
+      await _categoryService.deleteCategory(id);
 
-      _categories.removeWhere((category) => category.id == categoryId);
+      _categories.removeWhere((category) => category.id == id);
       _error = '';
     } catch (e) {
       _error = 'Lỗi khi xóa danh mục: ${e.toString()}';

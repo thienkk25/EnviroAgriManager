@@ -1,7 +1,11 @@
+import 'package:enviro_agri_manager/models/category.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 import '../providers/category_provider.dart';
+
+enum CategoryDialogMode { add, edit, view }
 
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
@@ -24,7 +28,13 @@ class CategoriesScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              _showAddCategoryDialog(context);
+              _showCategoryDialog(
+                context,
+                mode: CategoryDialogMode.add,
+                onSave: (category) {
+                  // gọi provider/service để thêm
+                },
+              );
             },
           ),
         ],
@@ -104,174 +114,208 @@ class CategoriesScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showAddCategoryDialog(context);
+          _showCategoryDialog(
+            context,
+            mode: CategoryDialogMode.add,
+            onSave: (category) {
+              // gọi provider/service để thêm
+            },
+          );
         },
         backgroundColor: const Color(0xFF5E81AC),
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
+}
 
-  void _showAddCategoryDialog(BuildContext context) {
-    final nameController = TextEditingController();
-    final descriptionController = TextEditingController();
-    String selectedIcon = '🌱';
-    String selectedColor = '#4CAF50';
+void _showCategoryDialog(
+  BuildContext context, {
+  required CategoryDialogMode mode,
+  Category? category, // null nếu thêm mới
+  required Function(Category) onSave,
+}) {
+  final nameController = TextEditingController(text: category?.name ?? '');
+  final descriptionController = TextEditingController(
+    text: category?.description ?? '',
+  );
+  String selectedIcon = category?.icon ?? '🌱';
+  String selectedColor = category?.color ?? '#4CAF50';
 
-    final icons = ['🌱', '🌾', '🥬', '🍎', '🌳', '🐟', '🐄', '🌿', '🌽', '🥕'];
-    final colors = [
-      '#4CAF50',
-      '#FF9800',
-      '#2196F3',
-      '#9C27B0',
-      '#795548',
-      '#607D8B',
-      '#E91E63',
-      '#FF5722',
-      '#00BCD4',
-      '#8BC34A',
-    ];
+  final icons = ['🌱', '🌾', '🥬', '🍎', '🌳', '🐟', '🐄', '🌿', '🌽', '🥕'];
+  final colors = [
+    '#4CAF50',
+    '#FF9800',
+    '#2196F3',
+    '#9C27B0',
+    '#795548',
+    '#607D8B',
+    '#E91E63',
+    '#FF5722',
+    '#00BCD4',
+    '#8BC34A',
+  ];
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Text(
-                'Thêm danh mục mới',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-              ),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextFormField(
-                      controller: nameController,
-                      decoration: InputDecoration(
-                        labelText: 'Tên danh mục',
-                        labelStyle: GoogleFonts.inter(
-                          color: const Color(0xFF88C0D0),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+  final isView = mode == CategoryDialogMode.view;
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: Text(
+              mode == CategoryDialogMode.add
+                  ? 'Thêm danh mục mới'
+                  : mode == CategoryDialogMode.edit
+                  ? 'Chỉnh sửa danh mục'
+                  : 'Chi tiết danh mục',
+              style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: nameController,
+                    enabled: !isView,
+                    decoration: InputDecoration(
+                      labelText: 'Tên danh mục',
+                      labelStyle: GoogleFonts.inter(
+                        color: const Color(0xFF88C0D0),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: descriptionController,
-                      maxLines: 2,
-                      decoration: InputDecoration(
-                        labelText: 'Mô tả',
-                        labelStyle: GoogleFonts.inter(
-                          color: const Color(0xFF88C0D0),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Chọn icon:',
-                      style: GoogleFonts.inter(fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      children: icons.map((icon) {
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedIcon = icon;
-                            });
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: selectedIcon == icon
-                                  ? const Color(
-                                      0xFF5E81AC,
-                                    ).withValues(alpha: .1)
-                                  : Colors.grey.withValues(alpha: .1),
-                              borderRadius: BorderRadius.circular(8),
-                              border: selectedIcon == icon
-                                  ? Border.all(color: const Color(0xFF5E81AC))
-                                  : null,
-                            ),
-                            child: Text(
-                              icon,
-                              style: const TextStyle(fontSize: 24),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Chọn màu:',
-                      style: GoogleFonts.inter(fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      children: colors.map((color) {
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedColor = color;
-                            });
-                          },
-                          child: Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: Color(
-                                int.parse(color.replaceFirst('#', '0xFF')),
-                              ),
-                              borderRadius: BorderRadius.circular(16),
-                              border: selectedColor == color
-                                  ? Border.all(color: Colors.white, width: 2)
-                                  : null,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text(
-                    'Hủy',
-                    style: GoogleFonts.inter(color: Colors.grey[600]),
                   ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: descriptionController,
+                    enabled: !isView,
+                    maxLines: 2,
+                    decoration: InputDecoration(
+                      labelText: 'Mô tả',
+                      labelStyle: GoogleFonts.inter(
+                        color: const Color(0xFF88C0D0),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Chọn icon:',
+                    style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: icons.map((icon) {
+                      return GestureDetector(
+                        onTap: isView
+                            ? null
+                            : () {
+                                setState(() {
+                                  selectedIcon = icon;
+                                });
+                              },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: selectedIcon == icon
+                                ? const Color(0xFF5E81AC).withValues(alpha: .1)
+                                : Colors.grey.withValues(alpha: .1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: selectedIcon == icon
+                                ? Border.all(
+                                    color: const Color(0xFF5E81AC),
+                                    strokeAlign: BorderSide.strokeAlignOutside,
+                                  )
+                                : null,
+                          ),
+                          child: Text(
+                            icon,
+                            style: const TextStyle(fontSize: 24),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Chọn màu:',
+                    style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: colors.map((color) {
+                      return GestureDetector(
+                        onTap: isView
+                            ? null
+                            : () {
+                                setState(() {
+                                  selectedColor = color;
+                                });
+                              },
+                        child: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: Color(
+                              int.parse(color.replaceFirst('#', '0xFF')),
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            border: selectedColor == color
+                                ? Border.all(
+                                    color: Colors.white,
+                                    width: 2,
+                                    strokeAlign: BorderSide.strokeAlignOutside,
+                                  )
+                                : null,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(
+                  'Đóng',
+                  style: GoogleFonts.inter(color: Colors.grey[600]),
                 ),
+              ),
+              if (!isView)
                 ElevatedButton(
                   onPressed: () {
                     if (nameController.text.isNotEmpty) {
-                      final newCategory = {
-                        'id': DateTime.now().millisecondsSinceEpoch.toString(),
-                        'name': nameController.text,
-                        'description': descriptionController.text,
-                        'icon': selectedIcon,
-                        'color': selectedColor,
-                        'createdAt': DateTime.now(),
-                        'updatedAt': DateTime.now(),
-                        'isActive': true,
-                        'subCategories': <String>[],
-                      };
-
-                      // Add category logic here
+                      final Category newCategory = Category(
+                        id: Uuid().v4(),
+                        name: nameController.text,
+                        description: descriptionController.text,
+                        icon: selectedIcon,
+                        color: selectedColor,
+                        createdAt: DateTime.now(),
+                        updatedAt: DateTime.now(),
+                      );
+                      // onSave(newCategory);
+                      context.read<CategoryProvider>().addCategory(newCategory);
                       Navigator.of(context).pop();
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            'Đã thêm danh mục thành công',
+                            mode == CategoryDialogMode.add
+                                ? 'Đã thêm danh mục thành công'
+                                : 'Đã cập nhật danh mục thành công',
                             style: GoogleFonts.inter(),
                           ),
                           backgroundColor: const Color(0xFFA3BE8C),
@@ -283,21 +327,20 @@ class CategoriesScreen extends StatelessWidget {
                     backgroundColor: const Color(0xFF5E81AC),
                   ),
                   child: Text(
-                    'Thêm',
+                    mode == CategoryDialogMode.add ? 'Thêm' : 'Cập nhật',
                     style: GoogleFonts.inter(color: Colors.white),
                   ),
                 ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
+            ],
+          );
+        },
+      );
+    },
+  );
 }
 
 class CategoryCard extends StatelessWidget {
-  final dynamic category;
+  final Category category;
 
   const CategoryCard({super.key, required this.category});
 
@@ -320,7 +363,12 @@ class CategoryCard extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {
-            // Navigate to category detail
+            _showCategoryDialog(
+              context,
+              mode: CategoryDialogMode.view,
+              category: category,
+              onSave: (_) {}, // không dùng
+            );
           },
           child: Padding(
             padding: const EdgeInsets.all(20),
