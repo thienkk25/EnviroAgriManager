@@ -39,7 +39,7 @@ class CategoryProvider with ChangeNotifier {
   }
 
   // Thêm danh mục mới
-  Future<void> addCategory(Category category) async {
+  Future<bool> addCategory(Category category) async {
     _isLoading = true;
     notifyListeners();
 
@@ -47,8 +47,10 @@ class CategoryProvider with ChangeNotifier {
       await _categoryService.addCategory(category);
       _categories.add(category);
       _error = '';
+      return true;
     } catch (e) {
       _error = 'Lỗi khi thêm danh mục: ${e.toString()}';
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -56,7 +58,7 @@ class CategoryProvider with ChangeNotifier {
   }
 
   // Cập nhật danh mục
-  Future<void> updateCategory(Category category) async {
+  Future<bool> updateCategory(Category category) async {
     _isLoading = true;
     notifyListeners();
 
@@ -68,8 +70,10 @@ class CategoryProvider with ChangeNotifier {
         _categories[index] = category;
       }
       _error = '';
+      return true;
     } catch (e) {
       _error = 'Lỗi khi cập nhật danh mục: ${e.toString()}';
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -77,7 +81,7 @@ class CategoryProvider with ChangeNotifier {
   }
 
   // Xóa danh mục
-  Future<void> deleteCategory(String id) async {
+  Future<bool> deleteCategory(String id) async {
     _isLoading = true;
     notifyListeners();
 
@@ -86,8 +90,14 @@ class CategoryProvider with ChangeNotifier {
 
       _categories.removeWhere((category) => category.id == id);
       _error = '';
+      return true;
     } catch (e) {
-      _error = 'Lỗi khi xóa danh mục: ${e.toString()}';
+      if (e.toString().contains('Không thể xóa')) {
+        _error = 'Danh mục này có sản phẩm liên quan, không thể xóa!';
+      } else {
+        _error = 'Lỗi khi xóa danh mục: ${e.toString()}';
+      }
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -105,7 +115,7 @@ class CategoryProvider with ChangeNotifier {
 
   // Lấy danh mục chính (không có parent)
   List<Category> getMainCategories() {
-    return _categories.where((category) => category.parentId.isEmpty).toList();
+    return _categories.where((category) => category.parentId == null).toList();
   }
 
   // Lấy danh mục con

@@ -53,9 +53,7 @@ class RoleService {
   /// Lấy danh sách tất cả users kèm role (chỉ admin mới xem được nhờ policy)
   Future<List<Map<String, dynamic>>> getAllUsersWithRoles() async {
     try {
-      final response = await _supabase
-          .from('users_with_profiles')
-          .select(); // dùng view
+      final response = await _supabase.rpc('get_all_users_with_roles');
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
       throw Exception('Lỗi lấy danh sách users: $e');

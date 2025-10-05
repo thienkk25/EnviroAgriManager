@@ -4,7 +4,7 @@ class Category {
   final String description;
   final String icon;
   final String color;
-  final String parentId; // Để hỗ trợ danh mục con
+  final String? parentId; // nullable
   final List<String> subCategories;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -16,7 +16,7 @@ class Category {
     required this.description,
     required this.icon,
     required this.color,
-    this.parentId = '',
+    this.parentId,
     this.subCategories = const [],
     required this.createdAt,
     required this.updatedAt,
@@ -24,13 +24,19 @@ class Category {
   });
 
   factory Category.fromJson(Map<String, dynamic> json) {
+    final rawParent = json['parent_id'];
+    final String? parent =
+        (rawParent == null || (rawParent is String && rawParent.trim().isEmpty))
+        ? null
+        : rawParent as String;
+
     return Category(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
       description: json['description'] ?? '',
       icon: json['icon'] ?? '🌱',
       color: json['color'] ?? '#4CAF50',
-      parentId: json['parent_id'] ?? '',
+      parentId: parent,
       subCategories: List<String>.from(json['sub_categories'] ?? []),
       createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
       updatedAt: DateTime.tryParse(json['updated_at'] ?? '') ?? DateTime.now(),
@@ -39,7 +45,7 @@ class Category {
   }
 
   Map<String, dynamic> toJson() {
-    return {
+    final Map<String, dynamic> data = {
       'id': id,
       'name': name,
       'description': description,
@@ -51,6 +57,8 @@ class Category {
       'updated_at': updatedAt.toIso8601String(),
       'is_active': isActive,
     };
+
+    return data;
   }
 
   Category copyWith({

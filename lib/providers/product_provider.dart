@@ -39,16 +39,21 @@ class ProductProvider with ChangeNotifier {
   }
 
   // Thêm sản phẩm mới
-  Future<void> addProduct(Product product) async {
+  Future<bool> addProduct(Product product) async {
     _isLoading = true;
     notifyListeners();
-
     try {
       await _productService.addProduct(product);
       _products.add(product);
       _error = '';
+      return true;
     } catch (e) {
-      _error = 'Lỗi khi thêm sản phẩm: ${e.toString()}';
+      if (e.toString().contains('Không thể thêm/cập nhật')) {
+        _error = 'Danh mục này đang tạm dừng, không thể thêm sản phẩm!';
+      } else {
+        _error = 'Lỗi khi thêm sản phẩm: ${e.toString()}';
+      }
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -56,10 +61,9 @@ class ProductProvider with ChangeNotifier {
   }
 
   // Cập nhật sản phẩm
-  Future<void> updateProduct(Product product) async {
+  Future<bool> updateProduct(Product product) async {
     _isLoading = true;
     notifyListeners();
-
     try {
       await _productService.updateProduct(product);
       final index = _products.indexWhere((p) => p.id == product.id);
@@ -67,8 +71,14 @@ class ProductProvider with ChangeNotifier {
         _products[index] = product;
       }
       _error = '';
+      return true;
     } catch (e) {
-      _error = 'Lỗi khi cập nhật sản phẩm: ${e.toString()}';
+      if (e.toString().contains('Không thể thêm/cập nhật')) {
+        _error = 'Danh mục này đang tạm dừng, không thể cập nhật sản phẩm!';
+      } else {
+        _error = 'Lỗi khi cập nhật sản phẩm: ${e.toString()}';
+      }
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -76,7 +86,7 @@ class ProductProvider with ChangeNotifier {
   }
 
   // Xóa sản phẩm
-  Future<void> deleteProduct(String productId) async {
+  Future<bool> deleteProduct(String productId) async {
     _isLoading = true;
     notifyListeners();
 
@@ -84,8 +94,10 @@ class ProductProvider with ChangeNotifier {
       await _productService.deleteProduct(productId);
       _products.removeWhere((product) => product.id == productId);
       _error = '';
+      return true;
     } catch (e) {
       _error = 'Lỗi khi xóa sản phẩm: ${e.toString()}';
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();

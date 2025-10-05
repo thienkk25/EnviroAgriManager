@@ -1,3 +1,4 @@
+import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -209,12 +210,15 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showAddDataDialog();
-        },
-        backgroundColor: const Color(0xFF5E81AC),
-        child: const Icon(Icons.add, color: Colors.white),
+      floatingActionButton: RoleBasedActionButton(
+        permission: 'edit',
+        child: FloatingActionButton(
+          onPressed: () {
+            _showAddDataDialog();
+          },
+          backgroundColor: const Color(0xFF5E81AC),
+          child: const Icon(Icons.add, color: Colors.white),
+        ),
       ),
     );
   }

@@ -284,7 +284,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
-  void _showDeleteDialog(BuildContext context, dynamic product) {
+  void _showDeleteDialog(BuildContext context, Product product) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -306,16 +306,23 @@ class _ProductsScreenState extends State<ProductsScreen> {
               ),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
+                final result = await context
+                    .read<ProductProvider>()
+                    .deleteProduct(product.id);
+                if (!context.mounted) return;
                 Navigator.of(context).pop();
-                context.read<ProductProvider>().deleteProduct(product.id);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      'Xóa sản phẩm thành công',
+                      result
+                          ? 'Xóa sản phẩm thành công'
+                          : 'Có lỗi xảy ra vui lòng thử lại!',
                       style: GoogleFonts.inter(),
                     ),
-                    backgroundColor: const Color(0xFFA3BE8C),
+                    backgroundColor: result
+                        ? const Color(0xFFA3BE8C)
+                        : Colors.red,
                   ),
                 );
               },
@@ -750,9 +757,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
             TextButton(
               onPressed: () {
                 if (isAdd) {
-                  _addProduct();
+                  _addProduct(context);
                 } else {
-                  _updateProduct(widget.product!);
+                  _updateProduct(context, widget.product!);
                 }
               },
 
@@ -934,9 +941,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (isAdd) {
-                        _addProduct();
+                        _addProduct(context);
                       } else {
-                        _updateProduct(widget.product!);
+                        _updateProduct(context, widget.product!);
                       }
                     },
 
@@ -989,7 +996,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     );
   }
 
-  void _addProduct() {
+  Future<void> _addProduct(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       final Product product = Product(
         id: Uuid().v4(),
@@ -1005,22 +1012,24 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         status: _selectedStatus,
       );
 
-      context.read<ProductProvider>().addProduct(product);
+      final result = await context.read<ProductProvider>().addProduct(product);
+      if (!context.mounted) return;
       Navigator.of(context).pop();
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Đã thêm sản phẩm thành công',
+            result
+                ? 'Đã thêm sản phẩm thành công'
+                : 'Có lỗi xảy ra khi thêm sản phẩm',
             style: GoogleFonts.inter(),
           ),
-          backgroundColor: const Color(0xFFA3BE8C),
+          backgroundColor: result ? const Color(0xFFA3BE8C) : Colors.red,
         ),
       );
     }
   }
 
-  void _updateProduct(Product oldProduct) {
+  Future<void> _updateProduct(BuildContext context, Product oldProduct) async {
     if (_formKey.currentState!.validate()) {
       final updatedProduct = oldProduct.copyWith(
         name: _nameController.text,
@@ -1034,16 +1043,20 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         status: _selectedStatus,
       );
 
-      context.read<ProductProvider>().updateProduct(updatedProduct);
+      final result = await context.read<ProductProvider>().updateProduct(
+        updatedProduct,
+      );
+      if (!context.mounted) return;
       Navigator.of(context).pop();
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Đã cập nhật sản phẩm thành công',
+            result
+                ? 'Đã cập nhật sản phẩm thành công'
+                : 'Có lỗi xảy ra vui lòng thử lại!',
             style: GoogleFonts.inter(),
           ),
-          backgroundColor: const Color(0xFFA3BE8C),
+          backgroundColor: result ? const Color(0xFFA3BE8C) : Colors.red,
         ),
       );
     }
