@@ -1,6 +1,6 @@
 {
-    "name": "product_thien",
-    "short_name": "product_thien",
+    "name": "enviro_agri_manager",
+    "short_name": "enviro_agri_manager",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
