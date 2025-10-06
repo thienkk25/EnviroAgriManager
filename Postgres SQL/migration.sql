@@ -455,3 +455,68 @@ $$;
 
 revoke execute on function get_users_with_roles() from public;
 grant execute on function get_users_with_roles() to authenticated;
+
+
+-- ======================================
+-- FUNCTION: LẤY DỮ LIỆU MÔI TRƯỜNG THEO KHU VỰC VÀ CÁC KHU VỰC CON AND THEO KHOẢNG THỜI GIAN
+-- ======================================
+
+CREATE OR REPLACE FUNCTION get_environmental_data_filtered(
+    v_region_id uuid,
+    v_start_date timestamp with time zone,
+    v_end_date timestamp with time zone
+)
+RETURNS TABLE (
+    id uuid,
+    region_id uuid,
+    location text,
+    temperature numeric,
+    humidity numeric,
+    ph numeric,
+    soil_moisture numeric,
+    light_intensity numeric,
+    co2_level numeric,
+    nitrogen numeric,
+    phosphorus numeric,
+    potassium numeric,
+    weather_condition text,
+    notes text,
+    recorded_at timestamp with time zone
+) AS $$
+BEGIN
+    RETURN QUERY
+    WITH RECURSIVE region_hierarchy AS (
+        -- lấy region cha và tất cả con
+        SELECT r.id AS cte_id
+        FROM regions r
+        WHERE r.id = v_region_id
+
+        UNION ALL
+
+        SELECT r.id AS cte_id
+        FROM regions r
+        INNER JOIN region_hierarchy rh ON r.parent_id = rh.cte_id
+    )
+    SELECT 
+        ed.id,
+        ed.region_id,
+        ed.location,
+        ed.temperature,
+        ed.humidity,
+        ed.ph,
+        ed.soil_moisture,
+        ed.light_intensity,
+        ed.co2_level,
+        ed.nitrogen,
+        ed.phosphorus,
+        ed.potassium,
+        ed.weather_condition,
+        ed.notes,
+        ed.recorded_at
+    FROM environmental_data ed
+    WHERE ed.region_id IN (SELECT cte_id FROM region_hierarchy)
+      AND ed.recorded_at >= v_start_date
+      AND ed.recorded_at <= v_end_date
+    ORDER BY ed.recorded_at DESC;
+END;
+$$ LANGUAGE plpgsql;

@@ -1,6 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
-
 class Region {
   final String id;
   final String name;
@@ -9,6 +6,7 @@ class Region {
   final bool isActive;
   final DateTime createdAt;
   final DateTime updatedAt;
+
   Region({
     required this.id,
     required this.name,
@@ -19,6 +17,33 @@ class Region {
     required this.updatedAt,
   });
 
+  // Convert từ JSON (Map) sang Region
+  factory Region.fromJson(Map<String, dynamic> json) {
+    return Region(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      description: json['description'] ?? '',
+      parentId: json['parent_id'],
+      isActive: json['is_active'] as bool,
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
+    );
+  }
+
+  // Convert Region sang JSON (Map)
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'parent_id': parentId,
+      'is_active': isActive,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+    };
+  }
+
+  // copyWith tiện cho update
   Region copyWith({
     String? id,
     String? name,
@@ -37,63 +62,5 @@ class Region {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
-  }
-
-  Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'id': id,
-      'name': name,
-      'description': description,
-      'parentId': parentId,
-      'isActive': isActive,
-      'createdAt': createdAt.millisecondsSinceEpoch,
-      'updatedAt': updatedAt.millisecondsSinceEpoch,
-    };
-  }
-
-  factory Region.fromMap(Map<String, dynamic> map) {
-    return Region(
-      id: map['id'] as String,
-      name: map['name'] as String,
-      description: map['description'] as String,
-      parentId: map['parentId'] != null ? map['parentId'] as String : null,
-      isActive: map['isActive'] as bool,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updatedAt'] as int),
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory Region.fromJson(String source) =>
-      Region.fromMap(json.decode(source) as Map<String, dynamic>);
-
-  @override
-  String toString() {
-    return 'Region(id: $id, name: $name, description: $description, parentId: $parentId, isActive: $isActive, createdAt: $createdAt, updatedAt: $updatedAt)';
-  }
-
-  @override
-  bool operator ==(covariant Region other) {
-    if (identical(this, other)) return true;
-
-    return other.id == id &&
-        other.name == name &&
-        other.description == description &&
-        other.parentId == parentId &&
-        other.isActive == isActive &&
-        other.createdAt == createdAt &&
-        other.updatedAt == updatedAt;
-  }
-
-  @override
-  int get hashCode {
-    return id.hashCode ^
-        name.hashCode ^
-        description.hashCode ^
-        parentId.hashCode ^
-        isActive.hashCode ^
-        createdAt.hashCode ^
-        updatedAt.hashCode;
   }
 }

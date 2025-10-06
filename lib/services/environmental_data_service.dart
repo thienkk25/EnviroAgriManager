@@ -25,7 +25,7 @@ class EnvironmentalDataService {
       if (response == null) {
         throw Exception('Dữ liệu môi trường không tồn tại');
       }
-      return EnvironmentalData.fromMap(response);
+      return EnvironmentalData.fromJson(response);
     } catch (e) {
       throw Exception('Lỗi lấy dữ liệu môi trường: $e');
     }
@@ -47,7 +47,7 @@ class EnvironmentalDataService {
     try {
       await _supabase
           .from('environmental_data')
-          .update(environmentalData.toMap())
+          .update(environmentalData.toJson())
           .eq('id', environmentalData.id);
     } catch (e) {
       throw Exception('Lỗi cập nhật dữ liệu môi trường: $e');

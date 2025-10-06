@@ -1,4 +1,5 @@
 import 'package:enviro_agri_manager/models/environmental_data.dart';
+import 'package:enviro_agri_manager/models/region.dart';
 import 'package:enviro_agri_manager/services/environmental_data_service.dart';
 import 'package:flutter/material.dart';
 
@@ -126,21 +127,44 @@ class EnvironmentalDataProvider with ChangeNotifier {
 
   // Lọc dữ liệu
   List<EnvironmentalData> getFilteredData(
-    String selectedLocation,
+    String? selectedProvince,
+    String? selectedDistrict,
+    String? selectedWard,
     String selectedTimeRange,
+    List<Region> regions,
   ) {
-    List<EnvironmentalData> filteredEnvimentalData = _environmentalData;
-    if (selectedLocation != 'Tất cả') {
-      filteredEnvimentalData = filteredEnvimentalData
-          .where((e) => e.location == selectedLocation)
+    List<EnvironmentalData> filteredData = _environmentalData;
+
+    // Hàm đệ quy lấy tất cả id con
+    Set<String> getAllChildIds(String parentId) {
+      final children = regions.where((r) => r.parentId == parentId).toList();
+      final result = <String>{parentId};
+      for (var child in children) {
+        result.addAll(getAllChildIds(child.id));
+      }
+      return result;
+    }
+
+    Set<String> filterIds = {};
+
+    if (selectedWard != null) {
+      filterIds = getAllChildIds(selectedWard);
+    } else if (selectedDistrict != null) {
+      filterIds = getAllChildIds(selectedDistrict);
+    } else if (selectedProvince != null) {
+      filterIds = getAllChildIds(selectedProvince);
+    }
+
+    if (filterIds.isNotEmpty) {
+      filteredData = filteredData
+          .where((e) => filterIds.contains(e.regionId))
           .toList();
     }
 
-    // Filter by time range (simplified)
+    // Lọc theo thời gian
     final now = DateTime.now();
-
     if (selectedTimeRange == 'Hôm nay') {
-      filteredEnvimentalData = filteredEnvimentalData
+      filteredData = filteredData
           .where(
             (e) =>
                 e.recordedAt.year == now.year &&
@@ -150,16 +174,27 @@ class EnvironmentalDataProvider with ChangeNotifier {
           .toList();
     } else if (selectedTimeRange == '7 ngày trước') {
       final sevenDaysAgo = now.subtract(const Duration(days: 7));
-      filteredEnvimentalData = filteredEnvimentalData
+      filteredData = filteredData
           .where((e) => e.recordedAt.isAfter(sevenDaysAgo))
           .toList();
     } else if (selectedTimeRange == '30 ngày trước') {
       final thirtyDaysAgo = now.subtract(const Duration(days: 30));
-      filteredEnvimentalData = filteredEnvimentalData
+      filteredData = filteredData
           .where((e) => e.recordedAt.isAfter(thirtyDaysAgo))
           .toList();
     }
 
-    return filteredEnvimentalData;
+    return filteredData;
+  }
+
+  List<String> getRegionIds(String regionId, List<Region> regions) {
+    final region = regions.firstWhere((r) => r.id == regionId);
+    if (region.parentId == null) {
+      // Đây là province (cấp cao nhất)
+      return [region.id];
+    } else {
+      // Gọi đệ quy lên trên và thêm tên hiện tại
+      return [...getRegionIds(region.parentId!, regions), region.id];
+    }
   }
 }

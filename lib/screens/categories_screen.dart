@@ -40,11 +40,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         backgroundColor: const Color(0xFF5E81AC),
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              _showCategoryDialog(context, mode: CategoryDialogMode.add);
-            },
+          RoleBasedActionButton(
+            permission: 'edit',
+            child: IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                _showCategoryDialog(context, mode: CategoryDialogMode.add);
+              },
+            ),
           ),
         ],
       ),
@@ -118,7 +121,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               final category = categories[index];
               return CategoryCard(
                 category: category,
-                onTap: () {
+                onTap: () {},
+                onLongPress: () {
                   _showCategoryDialog(
                     context,
                     mode: CategoryDialogMode.view,

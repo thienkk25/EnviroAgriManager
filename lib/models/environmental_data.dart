@@ -1,6 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
-
 class EnvironmentalData {
   final String id;
   final String regionId;
@@ -22,6 +19,7 @@ class EnvironmentalData {
   final DateTime recordedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
+
   EnvironmentalData({
     required this.id,
     required this.regionId,
@@ -41,6 +39,50 @@ class EnvironmentalData {
     required this.createdAt,
     required this.updatedAt,
   });
+
+  factory EnvironmentalData.fromJson(Map<String, dynamic> json) {
+    return EnvironmentalData(
+      id: json['id'] as String,
+      regionId: json['region_id'] as String,
+      location: json['location'] as String?,
+      temperature: (json['temperature'] as num?)?.toDouble(),
+      humidity: (json['humidity'] as num?)?.toDouble(),
+      ph: (json['ph'] as num?)?.toDouble(),
+      soilMoisture: (json['soil_moisture'] as num?)?.toDouble(),
+      lightIntensity: (json['light_intensity'] as num?)?.toDouble(),
+      co2Level: (json['co2_level'] as num?)?.toDouble(),
+      nitrogen: (json['nitrogen'] as num?)?.toDouble(),
+      phosphorus: (json['phosphorus'] as num?)?.toDouble(),
+      potassium: (json['potassium'] as num?)?.toDouble(),
+      weatherCondition: json['weather_condition'] as String?,
+      notes: json['notes'] as String?,
+      recordedAt: DateTime.parse(json['recorded_at']),
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'region_id': regionId,
+      'location': location,
+      'temperature': temperature,
+      'humidity': humidity,
+      'ph': ph,
+      'soil_moisture': soilMoisture,
+      'light_intensity': lightIntensity,
+      'co2_level': co2Level,
+      'nitrogen': nitrogen,
+      'phosphorus': phosphorus,
+      'potassium': potassium,
+      'weather_condition': weatherCondition,
+      'notes': notes,
+      'recorded_at': recordedAt.toIso8601String(),
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+    };
+  }
 
   EnvironmentalData copyWith({
     String? id,
@@ -80,113 +122,5 @@ class EnvironmentalData {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
-  }
-
-  Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'id': id,
-      'regionId': regionId,
-      'location': location,
-      'temperature': temperature,
-      'humidity': humidity,
-      'ph': ph,
-      'soilMoisture': soilMoisture,
-      'lightIntensity': lightIntensity,
-      'co2Level': co2Level,
-      'nitrogen': nitrogen,
-      'phosphorus': phosphorus,
-      'potassium': potassium,
-      'weatherCondition': weatherCondition,
-      'notes': notes,
-      'recordedAt': recordedAt.millisecondsSinceEpoch,
-      'createdAt': createdAt.millisecondsSinceEpoch,
-      'updatedAt': updatedAt.millisecondsSinceEpoch,
-    };
-  }
-
-  factory EnvironmentalData.fromMap(Map<String, dynamic> map) {
-    return EnvironmentalData(
-      id: map['id'] as String,
-      regionId: map['regionId'] as String,
-      location: map['location'] != null ? map['location'] as String : null,
-      temperature: map['temperature'] != null
-          ? map['temperature'] as double
-          : null,
-      humidity: map['humidity'] != null ? map['humidity'] as double : null,
-      ph: map['ph'] != null ? map['ph'] as double : null,
-      soilMoisture: map['soilMoisture'] != null
-          ? map['soilMoisture'] as double
-          : null,
-      lightIntensity: map['lightIntensity'] != null
-          ? map['lightIntensity'] as double
-          : null,
-      co2Level: map['co2Level'] != null ? map['co2Level'] as double : null,
-      nitrogen: map['nitrogen'] != null ? map['nitrogen'] as double : null,
-      phosphorus: map['phosphorus'] != null
-          ? map['phosphorus'] as double
-          : null,
-      potassium: map['potassium'] != null ? map['potassium'] as double : null,
-      weatherCondition: map['weatherCondition'] != null
-          ? map['weatherCondition'] as String
-          : null,
-      notes: map['notes'] != null ? map['notes'] as String : null,
-      recordedAt: DateTime.fromMillisecondsSinceEpoch(map['recordedAt'] as int),
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updatedAt'] as int),
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory EnvironmentalData.fromJson(String source) =>
-      EnvironmentalData.fromMap(json.decode(source) as Map<String, dynamic>);
-
-  @override
-  String toString() {
-    return 'EnvironmentalData(id: $id, regionId: $regionId, location: $location, temperature: $temperature, humidity: $humidity, ph: $ph, soilMoisture: $soilMoisture, lightIntensity: $lightIntensity, co2Level: $co2Level, nitrogen: $nitrogen, phosphorus: $phosphorus, potassium: $potassium, weatherCondition: $weatherCondition, notes: $notes, recordedAt: $recordedAt, createdAt: $createdAt, updatedAt: $updatedAt)';
-  }
-
-  @override
-  bool operator ==(covariant EnvironmentalData other) {
-    if (identical(this, other)) return true;
-
-    return other.id == id &&
-        other.regionId == regionId &&
-        other.location == location &&
-        other.temperature == temperature &&
-        other.humidity == humidity &&
-        other.ph == ph &&
-        other.soilMoisture == soilMoisture &&
-        other.lightIntensity == lightIntensity &&
-        other.co2Level == co2Level &&
-        other.nitrogen == nitrogen &&
-        other.phosphorus == phosphorus &&
-        other.potassium == potassium &&
-        other.weatherCondition == weatherCondition &&
-        other.notes == notes &&
-        other.recordedAt == recordedAt &&
-        other.createdAt == createdAt &&
-        other.updatedAt == updatedAt;
-  }
-
-  @override
-  int get hashCode {
-    return id.hashCode ^
-        regionId.hashCode ^
-        location.hashCode ^
-        temperature.hashCode ^
-        humidity.hashCode ^
-        ph.hashCode ^
-        soilMoisture.hashCode ^
-        lightIntensity.hashCode ^
-        co2Level.hashCode ^
-        nitrogen.hashCode ^
-        phosphorus.hashCode ^
-        potassium.hashCode ^
-        weatherCondition.hashCode ^
-        notes.hashCode ^
-        recordedAt.hashCode ^
-        createdAt.hashCode ^
-        updatedAt.hashCode;
   }
 }

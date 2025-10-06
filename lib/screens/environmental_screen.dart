@@ -1,6 +1,7 @@
 import 'package:enviro_agri_manager/models/environmental_data.dart';
 import 'package:enviro_agri_manager/providers/environmental_data_provider.dart';
 import 'package:enviro_agri_manager/providers/region_provider.dart';
+import 'package:enviro_agri_manager/screens/region_manager_screen.dart';
 import 'package:enviro_agri_manager/widgets/environmental_data_card.dart';
 import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
@@ -22,13 +23,17 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<EnvironmentalDataProvider>().fetchEnvironmentalData();
+      context.read<RegionProvider>().fetchRegions();
     });
 
     super.initState();
   }
 
-  String _selectedLocation = 'Tất cả';
   String _selectedTimeRange = 'Tất cả';
+
+  String? _selectedProvince;
+  String? _selectedDistrict;
+  String? _selectedWard;
 
   @override
   Widget build(BuildContext context) {
@@ -45,12 +50,22 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
         backgroundColor: const Color(0xFF5E81AC),
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: Colors.white),
+            child: Row(
+              children: [
+                const Icon(Icons.location_on),
+                Text(
+                  "Các địa điểm hoạt động",
+                  style: GoogleFonts.inter(fontSize: 14),
+                ),
+              ],
+            ),
+
             onPressed: () {
-              _showDataDialog(
-                context: context,
-                mode: EnvironmentalDialogMode.add,
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => RegionManagerScreen()),
               );
             },
           ),
@@ -79,37 +94,130 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                     Expanded(
                       child: Consumer<RegionProvider>(
                         builder: (context, regionProvider, child) {
-                          final regions = regionProvider.regions;
-
-                          return DropdownButton<String>(
-                            value: _selectedLocation,
-                            dropdownColor: const Color(0xFF5E81AC),
-                            style: GoogleFonts.inter(color: Colors.white),
-                            underline: Container(),
-                            isExpanded: true,
-                            items: [
-                              const DropdownMenuItem(
-                                value: 'Tất cả',
-                                child: Text(
-                                  'Tất cả',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                              ...regions.map(
-                                (region) => DropdownMenuItem(
-                                  value: region.name,
-                                  child: Text(
-                                    region.name,
-                                    style: const TextStyle(color: Colors.white),
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // ==== Tỉnh ====
+                              DropdownButton<String>(
+                                value: _selectedProvince,
+                                hint: Text("Chọn tỉnh"),
+                                dropdownColor: Color(0xFF5E81AC),
+                                style: GoogleFonts.inter(color: Colors.white),
+                                items: [
+                                  const DropdownMenuItem(
+                                    value: null,
+                                    child: Text(
+                                      'Tất cả',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
                                   ),
-                                ),
+                                  ...regionProvider.getMainRegions().map((
+                                    province,
+                                  ) {
+                                    return DropdownMenuItem(
+                                      value: province.id,
+                                      child: Text(province.name),
+                                    );
+                                  }),
+                                ],
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedProvince = value;
+                                    _selectedDistrict = null;
+                                    _selectedWard = null;
+                                  });
+                                },
                               ),
+
+                              // ==== Xã ====
+                              ?_selectedProvince == null
+                                  ? null
+                                  : DropdownButton<String>(
+                                      value: _selectedDistrict,
+                                      hint: Text(
+                                        "Chọn xã",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      dropdownColor: Color(0xFF5E81AC),
+                                      style: GoogleFonts.inter(
+                                        color: Colors.white,
+                                      ),
+                                      items: _selectedProvince == null
+                                          ? null
+                                          : [
+                                              const DropdownMenuItem(
+                                                value: null,
+                                                child: Text(
+                                                  'Tất cả',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                              ...regionProvider
+                                                  .getSubRegions(
+                                                    _selectedProvince!,
+                                                  )
+                                                  .map((district) {
+                                                    return DropdownMenuItem(
+                                                      value: district.id,
+                                                      child: Text(
+                                                        district.name,
+                                                      ),
+                                                    );
+                                                  }),
+                                            ],
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _selectedDistrict = value;
+                                          _selectedWard = null;
+                                        });
+                                      },
+                                    ),
+
+                              ?_selectedDistrict == null
+                                  ? null
+                                  : DropdownButton<String>(
+                                      value: _selectedWard,
+                                      hint: Text(
+                                        "Chọn",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      dropdownColor: Color(0xFF5E81AC),
+                                      style: GoogleFonts.inter(
+                                        color: Colors.white,
+                                      ),
+                                      items: _selectedDistrict == null
+                                          ? null
+                                          : [
+                                              const DropdownMenuItem(
+                                                value: null,
+                                                child: Text(
+                                                  'Tất cả',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                              ...regionProvider
+                                                  .getSubRegions(
+                                                    _selectedDistrict!,
+                                                  )
+                                                  .map((ward) {
+                                                    return DropdownMenuItem(
+                                                      value: ward.id,
+                                                      child: Text(ward.name),
+                                                    );
+                                                  }),
+                                            ],
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _selectedWard = value;
+                                        });
+                                      },
+                                    ),
                             ],
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedLocation = value!;
-                              });
-                            },
                           );
                         },
                       ),
@@ -199,8 +307,11 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                 }
                 List<EnvironmentalData> filteredEnvimentalData =
                     environmentalDataProvider.getFilteredData(
-                      _selectedLocation,
+                      _selectedProvince,
+                      _selectedDistrict,
+                      _selectedWard,
                       _selectedTimeRange,
+                      context.read<RegionProvider>().regions,
                     );
                 if (filteredEnvimentalData.isEmpty) {
                   return Center(
@@ -382,6 +493,20 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
 
     final isView = mode == EnvironmentalDialogMode.view;
     String selectedWeather = 'Nắng';
+    String? selectedProvince;
+    String? selectedDistrict;
+    String? selectedWard;
+    if (!(mode == EnvironmentalDialogMode.add)) {
+      final getRegionIds = context
+          .read<EnvironmentalDataProvider>()
+          .getRegionIds(
+            environmentalData!.regionId,
+            context.read<RegionProvider>().regions,
+          );
+      selectedProvince = getRegionIds.isNotEmpty ? getRegionIds[0] : null;
+      selectedDistrict = getRegionIds.length > 1 ? getRegionIds[1] : null;
+      selectedWard = getRegionIds.length > 2 ? getRegionIds[2] : null;
+    }
 
     showDialog(
       context: context,
@@ -402,8 +527,117 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
+                    spacing: 12,
                     children: [
                       SizedBox(height: 8),
+                      Consumer<RegionProvider>(
+                        builder: (context, regionProvider, child) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            spacing: 8,
+                            children: [
+                              // ==== Tỉnh ====
+                              DropdownButtonFormField<String>(
+                                initialValue: selectedProvince,
+                                decoration: InputDecoration(
+                                  labelText: 'Chọn tỉnh',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                items: regionProvider.getMainRegions().map((
+                                  province,
+                                ) {
+                                  return DropdownMenuItem(
+                                    value: province.id,
+                                    child: Text(province.name),
+                                  );
+                                }).toList(),
+                                onChanged: isView
+                                    ? null
+                                    : (value) {
+                                        setState(() {
+                                          selectedProvince = value;
+                                          selectedDistrict = null;
+                                          selectedWard = null;
+                                        });
+                                      },
+                              ),
+
+                              // ==== Xã ====
+                              ?selectedProvince == null
+                                  ? null
+                                  : DropdownButtonFormField<String>(
+                                      initialValue: selectedDistrict,
+                                      decoration: InputDecoration(
+                                        labelText: 'Chọn xã',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                      ),
+                                      items: selectedProvince == null
+                                          ? null
+                                          : regionProvider
+                                                .getSubRegions(
+                                                  selectedProvince!,
+                                                )
+                                                .map((district) {
+                                                  return DropdownMenuItem(
+                                                    value: district.id,
+                                                    child: Text(district.name),
+                                                  );
+                                                })
+                                                .toList(),
+                                      onChanged: isView
+                                          ? null
+                                          : (value) {
+                                              setState(() {
+                                                selectedDistrict = value;
+                                                selectedWard = null;
+                                              });
+                                            },
+                                    ),
+
+                              ?selectedDistrict == null
+                                  ? null
+                                  : DropdownButtonFormField<String>(
+                                      initialValue: selectedWard,
+                                      decoration: InputDecoration(
+                                        labelText: '---------',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                      ),
+                                      items: selectedDistrict == null
+                                          ? null
+                                          : regionProvider
+                                                .getSubRegions(
+                                                  selectedDistrict!,
+                                                )
+                                                .map((ward) {
+                                                  return DropdownMenuItem(
+                                                    value: ward.id,
+                                                    child: Text(ward.name),
+                                                  );
+                                                })
+                                                .toList(),
+                                      onChanged: isView
+                                          ? null
+                                          : (value) {
+                                              setState(() {
+                                                selectedWard = value;
+                                              });
+                                            },
+                                    ),
+                            ],
+                          );
+                        },
+                      ),
                       Row(
                         children: [
                           Expanded(
@@ -443,7 +677,6 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
                       Row(
                         children: [
                           Expanded(
@@ -483,7 +716,6 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
                       Row(
                         children: [
                           Expanded(
@@ -523,7 +755,6 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
                       Row(
                         children: [
                           Expanded(
@@ -563,7 +794,6 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
                       Row(
                         children: [
                           Expanded(
@@ -583,27 +813,8 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                   : null,
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: TextFormField(
-                              controller: locationController,
-                              enabled: (mode == EnvironmentalDialogMode.add),
-                              keyboardType: TextInputType.text,
-                              decoration: InputDecoration(
-                                labelText: 'Vị trí',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              validator: (value) =>
-                                  value == null || value.isEmpty
-                                  ? 'Vui lòng nhập vị trí'
-                                  : null,
-                            ),
-                          ),
                         ],
                       ),
-                      const SizedBox(height: 12),
                       Row(
                         children: [
                           Expanded(
@@ -642,7 +853,17 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: locationController,
+                        enabled: !isView,
+                        maxLines: 2,
+                        decoration: InputDecoration(
+                          labelText: 'Mô tả vị trí',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
                       TextFormField(
                         controller: notesController,
                         enabled: !isView,
@@ -696,7 +917,11 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                 weatherCondition: selectedWeather,
                                 notes: notesController.text,
                                 recordedAt: DateTime.now(),
-                                regionId: '',
+                                regionId:
+                                    selectedWard ??
+                                    selectedDistrict ??
+                                    selectedProvince ??
+                                    '',
                                 createdAt: DateTime.now(),
                                 updatedAt: DateTime.now(),
                               );
@@ -757,6 +982,11 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                     location: locationController.text,
                                     weatherCondition: selectedWeather,
                                     notes: notesController.text,
+                                    regionId:
+                                        selectedWard ??
+                                        selectedDistrict ??
+                                        selectedProvince ??
+                                        environmentalData.regionId,
                                     recordedAt: environmentalData.recordedAt,
                                     updatedAt: DateTime.now(),
                                   );

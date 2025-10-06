@@ -1,4 +1,5 @@
 import 'package:enviro_agri_manager/models/environmental_data.dart';
+import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -226,17 +227,23 @@ class EnvironmentalDataCard extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit, size: 16),
-                      onPressed: onEdit,
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.delete,
-                        size: 16,
-                        color: Colors.red,
+                    RoleBasedActionButton(
+                      permission: 'edit',
+                      child: IconButton(
+                        icon: const Icon(Icons.edit, size: 16),
+                        onPressed: onEdit,
                       ),
-                      onPressed: onDelete,
+                    ),
+                    RoleBasedActionButton(
+                      permission: 'delete',
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.delete,
+                          size: 16,
+                          color: Colors.red,
+                        ),
+                        onPressed: onDelete,
+                      ),
                     ),
                   ],
                 ),

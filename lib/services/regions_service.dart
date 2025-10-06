@@ -7,7 +7,7 @@ class RegionService {
   Future<List<Region>> fetchRegions() async {
     try {
       final response = await _supabase.from('regions').select();
-      return (response as List).map((item) => Region.fromMap(item)).toList();
+      return (response as List).map((item) => Region.fromJson(item)).toList();
     } catch (e) {
       throw Exception('Lỗi lấy regions: $e');
     }
@@ -23,7 +23,7 @@ class RegionService {
       if (response == null) {
         throw Exception('Region không tồn tại');
       }
-      return Region.fromMap(response);
+      return Region.fromJson(response);
     } catch (e) {
       throw Exception('Lỗi lấy region: $e');
     }
@@ -31,7 +31,7 @@ class RegionService {
 
   Future<void> addRegion(Region region) async {
     try {
-      await _supabase.from('regions').insert(region.toMap());
+      await _supabase.from('regions').insert(region.toJson());
     } catch (e) {
       throw Exception('Lỗi thêm region: $e');
     }
@@ -41,7 +41,7 @@ class RegionService {
     try {
       await _supabase
           .from('regions')
-          .update(region.toMap())
+          .update(region.toJson())
           .eq('id', region.id);
     } catch (e) {
       throw Exception('Lỗi cập nhật regions: $e');

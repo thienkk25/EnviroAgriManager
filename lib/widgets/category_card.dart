@@ -1,5 +1,6 @@
 import 'package:enviro_agri_manager/models/category.dart';
 import 'package:enviro_agri_manager/providers/auth_provider.dart';
+import 'package:enviro_agri_manager/providers/category_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +10,7 @@ class CategoryCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
+  final VoidCallback? onLongPress;
 
   const CategoryCard({
     super.key,
@@ -16,6 +18,7 @@ class CategoryCard extends StatelessWidget {
     this.onTap,
     this.onEdit,
     this.onDelete,
+    this.onLongPress,
   });
 
   @override
@@ -37,6 +40,7 @@ class CategoryCard extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: onTap,
+          onLongPress: onLongPress,
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Stack(
@@ -72,7 +76,7 @@ class CategoryCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${category.subCategories.length} loại',
+                        '${context.read<CategoryProvider>().getSubCategories(category.id.toString()).length} loại',
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           color: const Color(0xFF88C0D0),
