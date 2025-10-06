@@ -1,3 +1,5 @@
+import 'package:enviro_agri_manager/providers/environmental_data_provider.dart';
+import 'package:enviro_agri_manager/providers/region_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -33,6 +35,8 @@ class MainApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
+        ChangeNotifierProvider(create: (_) => EnvironmentalDataProvider()),
+        ChangeNotifierProvider(create: (_) => RegionProvider()),
       ],
       child: MaterialApp(
         title: 'Hệ thống Quản lý Danh mục Nông nghiệp & Môi trường',

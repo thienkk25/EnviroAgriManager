@@ -1,9 +1,12 @@
+import 'package:enviro_agri_manager/models/product.dart';
+import 'package:enviro_agri_manager/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class ProductCard extends StatelessWidget {
-  final dynamic product;
+  final Product product;
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
@@ -25,7 +28,7 @@ class ProductCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: .05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -49,7 +52,7 @@ class ProductCard extends StatelessWidget {
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF5E81AC).withValues(alpha: 0.1),
+                        color: const Color(0xFF5E81AC).withValues(alpha: .1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: ClipRRect(
@@ -68,7 +71,7 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 16),
-                    
+
                     // Product Info
                     Expanded(
                       child: Column(
@@ -98,13 +101,18 @@ class ProductCard extends StatelessWidget {
                           Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFA3BE8C).withValues(alpha: 0.1),
+                                  color: const Color(
+                                    0xFFA3BE8C,
+                                  ).withValues(alpha: .1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
-                                  product.category,
+                                  product.unit,
                                   style: GoogleFonts.inter(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
@@ -114,9 +122,14 @@ class ProductCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: _getStatusColor(product.status).withValues(alpha: 0.1),
+                                  color: _getStatusColor(
+                                    product.status,
+                                  ).withValues(alpha: .1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
@@ -133,47 +146,87 @@ class ProductCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    
+
                     // Actions Menu
-                    PopupMenuButton<String>(
-                      onSelected: (value) {
-                        switch (value) {
-                          case 'edit':
-                            onEdit?.call();
-                            break;
-                          case 'delete':
-                            onDelete?.call();
-                            break;
+                    Consumer<AuthProvider>(
+                      builder: (context, authProvider, child) {
+                        final canEdit = authProvider.hasPermission('edit');
+                        final canDelete = authProvider.hasPermission('delete');
+
+                        if (!canEdit && !canDelete) {
+                          return const SizedBox.shrink();
                         }
+
+                        return PopupMenuButton<String>(
+                          onSelected: (value) {
+                            switch (value) {
+                              case 'edit':
+                                onEdit?.call();
+                                break;
+                              case 'delete':
+                                onDelete?.call();
+                                break;
+                            }
+                          },
+                          itemBuilder: (BuildContext context) {
+                            final items = <PopupMenuItem<String>>[];
+
+                            if (canEdit) {
+                              items.add(
+                                PopupMenuItem<String>(
+                                  value: 'edit',
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.edit,
+                                        size: 20,
+                                        color: Color(0xFF5E81AC),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Chỉnh sửa',
+                                        style: GoogleFonts.inter(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
+
+                            if (canDelete) {
+                              items.add(
+                                PopupMenuItem<String>(
+                                  value: 'delete',
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.delete,
+                                        size: 20,
+                                        color: Colors.red,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Xóa',
+                                        style: GoogleFonts.inter(
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
+
+                            return items;
+                          },
+                        );
                       },
-                      itemBuilder: (BuildContext context) => [
-                        PopupMenuItem<String>(
-                          value: 'edit',
-                          child: Row(
-                            children: [
-                              const Icon(Icons.edit, size: 20, color: Color(0xFF5E81AC)),
-                              const SizedBox(width: 8),
-                              Text('Chỉnh sửa', style: GoogleFonts.inter()),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem<String>(
-                          value: 'delete',
-                          child: Row(
-                            children: [
-                              const Icon(Icons.delete, size: 20, color: Colors.red),
-                              const SizedBox(width: 8),
-                              Text('Xóa', style: GoogleFonts.inter(color: Colors.red)),
-                            ],
-                          ),
-                        ),
-                      ],
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Price and Quantity Info
                 Row(
                   children: [
@@ -189,7 +242,10 @@ class ProductCard extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(product.price),
+                            NumberFormat.currency(
+                              locale: 'vi_VN',
+                              symbol: '₫',
+                            ).format(product.price),
                             style: GoogleFonts.inter(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,

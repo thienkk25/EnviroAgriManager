@@ -25,7 +25,7 @@ class EnvironmentalDataService {
       if (response == null) {
         throw Exception('Dữ liệu môi trường không tồn tại');
       }
-      return EnvironmentalData.fromJson(response);
+      return EnvironmentalData.fromMap(response);
     } catch (e) {
       throw Exception('Lỗi lấy dữ liệu môi trường: $e');
     }
@@ -33,12 +33,9 @@ class EnvironmentalDataService {
 
   Future<void> addEnvironmentalData(EnvironmentalData environmentalData) async {
     try {
-      final response = await _supabase
+      await _supabase
           .from('environmental_data')
           .insert(environmentalData.toJson());
-      if (response == null) {
-        throw Exception('Thêm dữ liệu môi trường thất bại');
-      }
     } catch (e) {
       throw Exception('Lỗi thêm dữ liệu môi trường: $e');
     }
@@ -48,13 +45,10 @@ class EnvironmentalDataService {
     EnvironmentalData environmentalData,
   ) async {
     try {
-      final response = await _supabase
+      await _supabase
           .from('environmental_data')
-          .update(environmentalData.toJson())
+          .update(environmentalData.toMap())
           .eq('id', environmentalData.id);
-      if ((response as List).isEmpty) {
-        throw Exception('Cập nhật dữ liệu môi trường thất bại!');
-      }
     } catch (e) {
       throw Exception('Lỗi cập nhật dữ liệu môi trường: $e');
     }
@@ -62,13 +56,7 @@ class EnvironmentalDataService {
 
   Future<void> deleteEnvironmentalData(String id) async {
     try {
-      final response = await _supabase
-          .from('environmental_data')
-          .delete()
-          .eq('id', id);
-      if ((response as List).isEmpty) {
-        throw Exception('Xóa dữ liệu môi trường thất bại!');
-      }
+      await _supabase.from('environmental_data').delete().eq('id', id);
     } catch (e) {
       throw Exception('Lỗi xóa dữ liệu môi trường: $e');
     }

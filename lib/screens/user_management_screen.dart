@@ -120,7 +120,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                         ),
                       ),
                       title: Text(
-                        user == userData['user_id'] ? "Tôi" : fullName,
+                        user == userData['id'] ? "Tôi" : fullName,
                         style: GoogleFonts.inter(fontWeight: FontWeight.w600),
                       ),
                       subtitle: Column(
@@ -210,7 +210,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               final authProvider = context.read<AuthProvider>();
 
               final success = await authProvider.updateUserRole(
-                userData['user_id'] as String,
+                userData['id'],
                 newRole,
               );
 

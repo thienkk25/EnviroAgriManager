@@ -1,9 +1,4 @@
 -- ======================================
--- EXTENSIONS
--- ======================================
-create extension if not exists "uuid-ossp";
-
--- ======================================
 -- ENUM TYPE: PRODUCT STATUS
 -- ======================================
 drop type if exists product_status cascade;
@@ -46,6 +41,27 @@ create trigger trg_update_profiles_updated_at
 before update on public.profiles
 for each row execute function update_profiles_updated_at();
 
+-- trigger tạo profile khi có user mới
+create or replace function handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, full_name, role_id)
+  values (
+    new.id,
+    new.raw_user_meta_data->>'full_name', -- lấy full_name nếu có trong metadata
+    (select id from public.roles where name = 'viewer' limit 1) -- mặc định gán role viewer
+  );
+  return new;
+end;
+$$ language plpgsql security definer;
+
+-- Gắn trigger vào bảng auth.users
+drop trigger if exists trg_handle_new_user on auth.users;
+create trigger trg_handle_new_user
+after insert on auth.users
+for each row execute function handle_new_user();
+
+
 -- ======================================
 -- HELPER FUNCTIONS: ROLE CHECK
 -- ======================================
@@ -80,7 +96,7 @@ $$ language sql stable;
 -- BẢNG CATEGORIES
 -- ======================================
 create table if not exists public.categories (
-  id uuid primary key default gen_random_uuid(),
+  id uuid primary key,
   name text not null,
   description text,
   icon text default '🌱',
@@ -110,7 +126,7 @@ for each row execute function update_categories_updated_at();
 -- BẢNG PRODUCTS
 -- ======================================
 create table if not exists public.products (
-  id uuid primary key default gen_random_uuid(),
+  id uuid primary key,
   name text not null,
   description text,
   category_id uuid references public.categories(id) on delete set null,
@@ -172,25 +188,62 @@ for each row
 execute function check_category_active_for_product();
 
 -- ======================================
+-- BẢNG REGIONS (KHU VỰC)
+-- ======================================
+create table public.regions (
+    id uuid primary key,
+    name text not null,             -- Tên khu vực (VD: "Huyện Cần Giờ", "Nông trại A")
+    description text,               -- Mô tả thêm
+    parent_id uuid references public.regions(id) on delete cascade, -- hỗ trợ phân cấp (tỉnh -> huyện -> xã -> farm)
+    is_active boolean default true, -- trạng thái hoạt động
+
+    created_at timestamptz default now(),
+    updated_at timestamptz default now()
+);
+-- Trigger auto update recorded_at
+create or replace function update_regions_updated_at()
+returns trigger as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists update_regions_updated_at on public.regions;
+create trigger update_regions_updated_at
+before update on public.regions
+for each row execute function update_regions_updated_at();
+
+-- ======================================
 -- BẢNG ENVIRONMENTAL DATA
 -- ======================================
-create table if not exists public.environmental_data (
-  id uuid primary key default gen_random_uuid(),
-  product_id uuid references public.products(id) on delete cascade,
-  temperature numeric,
-  humidity numeric,
-  ph numeric,
-  soil_moisture numeric,
-  light_intensity numeric,
-  co2_level numeric,
-  nitrogen numeric,
-  phosphorus numeric,
-  potassium numeric,
-  weather_condition text,
-  location text,
-  recorded_at timestamptz default now(),
-  notes text
+create table public.environmental_data (
+    id uuid primary key,
+
+    -- Liên kết khu vực
+    region_id uuid not null references public.regions(id) on delete cascade,
+    location text, -- chi tiết hơn: tọa độ GPS, mô tả địa điểm...
+
+    -- Thông số môi trường
+    temperature numeric,       -- nhiệt độ (°C)
+    humidity numeric,          -- độ ẩm (%)
+    ph numeric,                -- độ pH
+    soil_moisture numeric,     -- độ ẩm đất
+    light_intensity numeric,   -- cường độ ánh sáng
+    co2_level numeric,         -- nồng độ CO2
+    nitrogen numeric,          -- N
+    phosphorus numeric,        -- P
+    potassium numeric,         -- K
+    weather_condition text,    -- thời tiết tổng quát
+    notes text,
+
+    -- Thời gian
+    recorded_at timestamptz default now(),
+    created_at timestamptz default now(),
+    updated_at timestamptz default now()
 );
+create index if not exists idx_environmental_data_region_id on public.environmental_data(region_id);
+
 
 -- Trigger auto update recorded_at
 create or replace function update_environmental_data_updated_at()
@@ -290,50 +343,115 @@ create policy "Admins can manage all products"
 on public.products for all
 using (is_admin(auth.uid()));
 
+--- Regions
+alter table public.regions enable row level security;
+
+-- Viewer: chỉ xem các vùng đang active
+create policy "Viewers can view active regions"
+on public.regions
+for select
+using (
+  is_viewer(auth.uid())
+  and is_active = true
+);
+
+-- Editor: được xem tất cả
+create policy "Editors can view all regions"
+on public.regions
+for select
+using (is_editor(auth.uid()));
+
+-- Editor: được insert
+create policy "Editors can insert regions"
+on public.regions
+for insert
+with check (is_editor(auth.uid()));
+
+-- Editor: được update
+create policy "Editors can update regions"
+on public.regions
+for update
+using (is_editor(auth.uid()))
+with check (is_editor(auth.uid()));
+
+-- Admin: toàn quyền
+create policy "Admins can manage all regions"
+on public.regions
+for all
+using (is_admin(auth.uid()))
+with check (is_admin(auth.uid()));
+
+
 -- Environmental data
 alter table public.environmental_data enable row level security;
 
-create policy "Viewers can view environmental data"
-on public.environmental_data for select
+-- Viewer/Editor/Admin: được SELECT
+create policy "All roles can view environmental data"
+on public.environmental_data
+for select
 using (
-  exists (
-    select 1
-    from public.products p
-    join public.categories c on c.id = p.category_id
-    where p.id = environmental_data.product_id
-      and p.status = 'active'
-      and c.is_active = true
-  )
+  is_viewer(auth.uid())
+  or is_editor(auth.uid())
+  or is_admin(auth.uid())
 );
 
+-- Editor: được INSERT
 create policy "Editors can insert environmental data"
-on public.environmental_data for insert
-with check (
-  is_editor(auth.uid())
-  and exists (
-    select 1
-    from public.products p
-    join public.categories c on c.id = p.category_id
-    where p.id = environmental_data.product_id
-      and p.status = 'active'
-      and c.is_active = true
-  )
-);
+on public.environmental_data
+for insert
+with check (is_editor(auth.uid()));
 
+-- Editor: được UPDATE
 create policy "Editors can update environmental data"
-on public.environmental_data for update
-using (
-  is_editor(auth.uid())
-  and exists (
-    select 1
-    from public.products p
-    join public.categories c on c.id = p.category_id
-    where p.id = environmental_data.product_id
-      and p.status = 'active'
-      and c.is_active = true
-  )
-);
+on public.environmental_data
+for update
+using (is_editor(auth.uid()))
+with check (is_editor(auth.uid()));
 
+-- Admin: full quyền (SELECT, INSERT, UPDATE, DELETE…)
 create policy "Admins can manage all environmental data"
-on public.environmental_data for all
-using (is_admin(auth.uid()));
+on public.environmental_data
+for all
+using (is_admin(auth.uid()))
+with check (is_admin(auth.uid()));
+
+-- ======================================
+-- VIEW: USERS WITH ROLES
+-- ======================================
+create or replace function get_users_with_roles()
+returns table (
+  id uuid,
+  email text,
+  full_name text,
+  role_name text,
+  user_created_at timestamptz,
+  profile_created_at timestamptz,
+  profile_updated_at timestamptz
+)
+language plpgsql
+security definer
+set search_path = public, auth
+as $$
+begin
+  -- Chỉ admin mới được xem
+  if not is_admin(auth.uid()) then
+    raise exception 'Chỉ admin mới có quyền xem danh sách users';
+  end if;
+
+  return query
+  select 
+    u.id,
+    u.email::text,
+    p.full_name,
+    r.name::text as role_name,
+    u.created_at as user_created_at,
+    p.created_at as profile_created_at,
+    p.updated_at as profile_updated_at
+  from auth.users u
+  left join public.profiles p on u.id = p.id
+  left join public.roles r on r.id = p.role_id;
+end;
+$$;
+
+revoke execute on function get_users_with_roles() from public;
+grant execute on function get_users_with_roles() to authenticated;
