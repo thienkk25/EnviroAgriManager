@@ -55,12 +55,12 @@ class RegionProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> updateRegion(Region region) async {
+  Future<bool> updateRegion(Region region, bool level) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      await _regionService.updateRegion(region);
+      await _regionService.updateRegion(region, level);
 
       final index = _regions.indexWhere((c) => c.id == region.id);
       if (index != -1) {

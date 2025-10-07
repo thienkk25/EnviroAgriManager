@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:enviro_agri_manager/models/region.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -37,12 +39,18 @@ class RegionService {
     }
   }
 
-  Future<void> updateRegion(Region region) async {
+  Future<void> updateRegion(Region region, bool level) async {
     try {
       await _supabase
           .from('regions')
           .update(region.toJson())
           .eq('id', region.id);
+      if (level) {
+        await _supabase
+            .from('regions')
+            .update({'parent_id': jsonDecode('null')})
+            .eq('id', region.id);
+      }
     } catch (e) {
       throw Exception('Lỗi cập nhật regions: $e');
     }
