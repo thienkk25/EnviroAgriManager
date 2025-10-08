@@ -1,5 +1,4 @@
 import 'package:enviro_agri_manager/models/region.dart';
-import 'package:enviro_agri_manager/providers/environmental_data_provider.dart';
 import 'package:enviro_agri_manager/providers/region_provider.dart';
 import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
@@ -248,9 +247,9 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
 
     if (!isAdd) {
       nameController.text = region!.name;
-      final getRegionIds = context
-          .read<EnvironmentalDataProvider>()
-          .getRegionIds(region.id, context.read<RegionProvider>().regions);
+      final getRegionIds = context.read<RegionProvider>().getRegionIds(
+        region.id,
+      );
       selectedLocationFirstLevel = getRegionIds.isNotEmpty
           ? getRegionIds[0]
           : null;

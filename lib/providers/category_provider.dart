@@ -104,15 +104,6 @@ class CategoryProvider with ChangeNotifier {
     }
   }
 
-  // Lấy danh mục theo ID
-  Category? getCategoryById(String id) {
-    try {
-      return _categories.firstWhere((category) => category.id == id);
-    } catch (e) {
-      return null;
-    }
-  }
-
   // Lấy danh mục chính (không có parent)
   List<Category> getMainCategories() {
     return _categories.where((category) => category.parentId == null).toList();
@@ -133,5 +124,16 @@ class CategoryProvider with ChangeNotifier {
       return category.name.toLowerCase().contains(query.toLowerCase()) ||
           category.description.toLowerCase().contains(query.toLowerCase());
     }).toList();
+  }
+
+  List<String> getCategoryIds(String categoryId) {
+    final category = _categories.firstWhere((c) => c.id == categoryId);
+    if (category.parentId == null) {
+      // Đây là danh mục gốc
+      return [category.id];
+    } else {
+      // Gọi đệ quy lên trên và thêm id hiện tại
+      return [...getCategoryIds(category.parentId!), category.id];
+    }
   }
 }

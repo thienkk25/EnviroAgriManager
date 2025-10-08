@@ -186,15 +186,4 @@ class EnvironmentalDataProvider with ChangeNotifier {
 
     return filteredData;
   }
-
-  List<String> getRegionIds(String regionId, List<Region> regions) {
-    final region = regions.firstWhere((r) => r.id == regionId);
-    if (region.parentId == null) {
-      // Đây là province (cấp cao nhất)
-      return [region.id];
-    } else {
-      // Gọi đệ quy lên trên và thêm tên hiện tại
-      return [...getRegionIds(region.parentId!, regions), region.id];
-    }
-  }
 }

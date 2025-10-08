@@ -497,12 +497,9 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
     String? selectedDistrict;
     String? selectedWard;
     if (!(mode == EnvironmentalDialogMode.add)) {
-      final getRegionIds = context
-          .read<EnvironmentalDataProvider>()
-          .getRegionIds(
-            environmentalData!.regionId,
-            context.read<RegionProvider>().regions,
-          );
+      final getRegionIds = context.read<RegionProvider>().getRegionIds(
+        environmentalData!.regionId,
+      );
       selectedProvince = getRegionIds.isNotEmpty ? getRegionIds[0] : null;
       selectedDistrict = getRegionIds.length > 1 ? getRegionIds[1] : null;
       selectedWard = getRegionIds.length > 2 ? getRegionIds[2] : null;
