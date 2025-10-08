@@ -101,7 +101,7 @@ create table if not exists public.categories (
   description text,
   icon text default '🌱',
   color text default '#4CAF50',
-  parent_id uuid references public.categories(id) on delete set null,
+  parent_id uuid references public.categories(id) on delete cascade,
   sub_categories text[] default '{}',
   created_at timestamptz default now(),
   updated_at timestamptz default now(),

@@ -1,4 +1,5 @@
 import 'package:enviro_agri_manager/models/category.dart';
+import 'package:enviro_agri_manager/utils/constants.dart';
 import 'package:enviro_agri_manager/widgets/category_card.dart';
 import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
@@ -27,11 +28,97 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return Consumer<CategoryProvider>(
+      builder: (context, categoryProvider, child) {
+        if (categoryProvider.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (categoryProvider.error.isNotEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
+                const SizedBox(height: 16),
+                Text(
+                  categoryProvider.error,
+                  style: GoogleFonts.inter(color: Colors.grey[600]),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => categoryProvider.fetchCategories(),
+                  child: const Text('Thử lại'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        final categories = categoryProvider.getMainCategories();
+
+        if (categories.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.category_outlined,
+                  size: 64,
+                  color: Colors.grey[400],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Chưa có danh mục nào',
+                  style: GoogleFonts.inter(
+                    fontSize: 18,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Thêm danh mục đầu tiên để bắt đầu',
+                  style: GoogleFonts.inter(color: Colors.grey[500]),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return CategoryScreen(startFirst: true);
+      },
+    );
+  }
+}
+
+class CategoryScreen extends StatelessWidget {
+  final String? parentId;
+  final String? title;
+  final bool startFirst;
+
+  const CategoryScreen({
+    super.key,
+    this.parentId,
+    this.title,
+    required this.startFirst,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final categoryProvider = context.watch<CategoryProvider>();
+    List<Category> subCategories;
+    if (startFirst) {
+      subCategories = categoryProvider.getMainCategories();
+    } else {
+      subCategories = categoryProvider.getSubCategories(parentId!);
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         title: Text(
-          'Quản lý Danh mục',
+          title ?? 'Quản lý Danh mục',
           style: GoogleFonts.inter(
             fontWeight: FontWeight.w600,
             color: Colors.white,
@@ -51,99 +138,53 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           ),
         ],
       ),
-      body: Consumer<CategoryProvider>(
-        builder: (context, categoryProvider, child) {
-          if (categoryProvider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (categoryProvider.error.isNotEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
-                  const SizedBox(height: 16),
-                  Text(
-                    categoryProvider.error,
-                    style: GoogleFonts.inter(color: Colors.grey[600]),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => categoryProvider.fetchCategories(),
-                    child: const Text('Thử lại'),
-                  ),
-                ],
+      body: subCategories.isEmpty
+          ? const Center(child: Text('Không có danh mục con'))
+          : GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
               ),
-            );
-          }
-
-          final categories = categoryProvider.getMainCategories();
-
-          if (categories.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.category_outlined,
-                    size: 64,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Chưa có danh mục nào',
-                    style: GoogleFonts.inter(
-                      fontSize: 18,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Thêm danh mục đầu tiên để bắt đầu',
-                    style: GoogleFonts.inter(color: Colors.grey[500]),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return GridView.builder(
-            padding: const EdgeInsets.all(16),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
+              itemCount: subCategories.length,
+              itemBuilder: (context, index) {
+                final category = subCategories[index];
+                return CategoryCard(
+                  category: category,
+                  onTap: () {
+                    // Đệ quy gọi lại chính CategoryScreen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CategoryScreen(
+                          parentId: category.id,
+                          title: category.name,
+                          startFirst: false,
+                        ),
+                      ),
+                    );
+                  },
+                  onLongPress: () {
+                    _showCategoryDialog(
+                      context,
+                      mode: CategoryDialogMode.view,
+                      category: category,
+                    );
+                  },
+                  onEdit: () {
+                    _showCategoryDialog(
+                      context,
+                      mode: CategoryDialogMode.edit,
+                      category: category,
+                    );
+                  },
+                  onDelete: () {
+                    _showDeleteDialog(context, category);
+                  },
+                );
+              },
             ),
-            itemCount: categories.length,
-            itemBuilder: (context, index) {
-              final category = categories[index];
-              return CategoryCard(
-                category: category,
-                onTap: () {},
-                onLongPress: () {
-                  _showCategoryDialog(
-                    context,
-                    mode: CategoryDialogMode.view,
-                    category: category,
-                  );
-                },
-                onEdit: () {
-                  _showCategoryDialog(
-                    context,
-                    mode: CategoryDialogMode.edit,
-                    category: category,
-                  );
-                },
-                onDelete: () {
-                  _showDeleteDialog(context, category);
-                },
-              );
-            },
-          );
-        },
-      ),
       floatingActionButton: RoleBasedActionButton(
         permission: 'edit',
         child: FloatingActionButton(
@@ -169,20 +210,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     );
     String selectedIcon = category?.icon ?? '🌱';
     String selectedColor = category?.color ?? '#4CAF50';
-
-    const icons = ['🌱', '🌾', '🥬', '🍎', '🌳', '🐟', '🐄', '🌿', '🌽', '🥕'];
-    const colors = [
-      '#4CAF50',
-      '#FF9800',
-      '#2196F3',
-      '#9C27B0',
-      '#795548',
-      '#607D8B',
-      '#E91E63',
-      '#FF5722',
-      '#00BCD4',
-      '#8BC34A',
-    ];
 
     final isView = mode == CategoryDialogMode.view;
     bool selectedIsActive = category?.isActive ?? true;
@@ -245,7 +272,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children: icons.map((icon) {
+                        children: categoryIcons.map((icon) {
                           return GestureDetector(
                             onTap: isView
                                 ? null
@@ -286,7 +313,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children: colors.map((color) {
+                        children: categoryColors.map((color) {
                           return GestureDetector(
                             onTap: isView
                                 ? null
@@ -370,6 +397,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             icon: selectedIcon,
                             color: selectedColor,
                             isActive: selectedIsActive,
+                            parentId: startFirst ? null : parentId,
                             createdAt: DateTime.now(),
                             updatedAt: DateTime.now(),
                           );
@@ -447,7 +475,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             style: GoogleFonts.inter(fontWeight: FontWeight.w600),
           ),
           content: Text(
-            'Bạn có chắc chắn muốn xóa danh mục "${category.name}"?',
+            'Bạn có chắc chắn muốn xóa danh mục "${category.name}"? Tất cả danh mục con sẽ bị xóa (Nếu có).',
             style: GoogleFonts.inter(),
           ),
           actions: [
