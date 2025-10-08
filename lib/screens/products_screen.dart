@@ -1,5 +1,6 @@
 import 'package:enviro_agri_manager/models/product.dart';
 import 'package:enviro_agri_manager/providers/category_provider.dart';
+import 'package:enviro_agri_manager/widgets/category_selector.dart';
 import 'package:enviro_agri_manager/widgets/product_card.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -362,8 +363,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   late TextEditingController _quantityController;
   late TextEditingController _unitController;
 
-  String _selectedCategoryParent = '';
-  String _selectedCategoryChild = '';
+  String _selectedCategory = '';
   String _imageUrl = 'https://via.placeholder.com/150';
   String _selectedStatus = 'active';
 
@@ -385,15 +385,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       text: p != null ? p.quantity.toString() : '',
     );
     _unitController = TextEditingController(text: p?.unit ?? '');
-    final getCategoryIds = p?.categoryId == null
-        ? []
-        : context.read<CategoryProvider>().getCategoryIds(p!.categoryId);
-    if (!isAdd) {
-      _selectedCategoryParent = getCategoryIds[0];
-      _selectedCategoryChild = getCategoryIds.length == 2
-          ? getCategoryIds[1]
-          : '';
-    }
+
+    _selectedCategory = p?.categoryId ?? '';
+
     _selectedStatus = p?.status ?? 'active';
   }
 
@@ -560,68 +554,13 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   spacing: 16,
                   children: [
                     _sectionTitle('Phân loại'),
-                    Consumer<CategoryProvider>(
-                      builder: (context, categoryProvider, child) {
-                        final categories = categoryProvider.getMainCategories();
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          spacing: 16,
-                          children: [
-                            // --- Dropdown Cha ---
-                            DropdownButtonFormField<String>(
-                              initialValue: _selectedCategoryParent.isEmpty
-                                  ? null
-                                  : _selectedCategoryParent,
-                              decoration: _inputDecoration('Danh mục cha *'),
-                              items: categories
-                                  .map(
-                                    (c) => DropdownMenuItem(
-                                      value: c.id,
-                                      child: Text(c.name),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: isView
-                                  ? null
-                                  : (v) {
-                                      setState(() {
-                                        _selectedCategoryParent = v ?? '';
-                                        // Reset danh mục con khi đổi danh mục cha
-                                        _selectedCategoryChild = '';
-                                      });
-                                    },
-                              validator: (v) => (v == null || v.isEmpty)
-                                  ? 'Vui lòng chọn danh mục cha'
-                                  : null,
-                            ),
-
-                            // --- Dropdown Con ---
-                            DropdownButtonFormField<String>(
-                              initialValue: _selectedCategoryChild.isEmpty
-                                  ? null
-                                  : _selectedCategoryChild,
-                              decoration: _inputDecoration('Danh mục con *'),
-                              items: categoryProvider
-                                  .getSubCategories(_selectedCategoryParent)
-                                  .map(
-                                    (c) => DropdownMenuItem(
-                                      value: c.id,
-                                      child: Text(c.name),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: isView
-                                  ? null
-                                  : (v) => setState(
-                                      () => _selectedCategoryChild = v ?? '',
-                                    ),
-                              validator: (v) => (v == null || v.isEmpty)
-                                  ? 'Vui lòng chọn danh mục con'
-                                  : null,
-                            ),
-                          ],
-                        );
-                      },
+                    CategorySelector(
+                      isView: isView,
+                      isAdd: isAdd,
+                      selectedCategoryId: _selectedCategory,
+                      onChanged: (value) => setState(() {
+                        _selectedCategory = value;
+                      }),
                     ),
 
                     DropdownButtonFormField<String>(
@@ -713,9 +652,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         id: Uuid().v4(),
         name: _nameController.text,
         description: _descriptionController.text,
-        categoryId: _selectedCategoryChild.isEmpty
-            ? _selectedCategoryParent
-            : _selectedCategoryChild,
+        categoryId: _selectedCategory,
         price: double.parse(_priceController.text),
         quantity: int.parse(_quantityController.text),
         unit: _unitController.text,
@@ -747,9 +684,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       final updatedProduct = oldProduct.copyWith(
         name: _nameController.text,
         description: _descriptionController.text,
-        categoryId: _selectedCategoryChild.isEmpty
-            ? _selectedCategoryParent
-            : _selectedCategoryChild,
+        categoryId: _selectedCategory,
         price: double.parse(_priceController.text),
         quantity: int.parse(_quantityController.text),
         unit: _unitController.text,
