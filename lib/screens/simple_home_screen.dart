@@ -23,6 +23,7 @@ class SimpleHomeScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             // Header
             Container(
@@ -72,39 +73,43 @@ class SimpleHomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 1.2,
-              children: [
-                _FeatureCard(
-                  icon: Icons.inventory_2,
-                  title: 'Quản lý Sản phẩm',
-                  description: 'Thêm, sửa, xóa sản phẩm nông nghiệp',
-                  color: const Color(0xFF5E81AC),
-                ),
-                _FeatureCard(
-                  icon: Icons.category,
-                  title: 'Quản lý Danh mục',
-                  description: 'Phân loại sản phẩm theo loại',
-                  color: const Color(0xFFA3BE8C),
-                ),
-                _FeatureCard(
-                  icon: Icons.eco,
-                  title: 'Giám sát Môi trường',
-                  description: 'Theo dõi dữ liệu môi trường',
-                  color: const Color(0xFF88C0D0),
-                ),
-                _FeatureCard(
-                  icon: Icons.analytics,
-                  title: 'Báo cáo Thống kê',
-                  description: 'Biểu đồ và thống kê chi tiết',
-                  color: const Color(0xFFD08770),
-                ),
-              ],
+            LayoutBuilder(
+              builder: (context, constraints) {
+                return GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: constraints.maxWidth < 600 ? 2 : 4,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: constraints.maxWidth < 600 ? .8 : 1.1,
+                  children: [
+                    _FeatureCard(
+                      icon: Icons.inventory_2,
+                      title: 'Quản lý Sản phẩm',
+                      description: 'Thêm, sửa, xóa sản phẩm nông nghiệp',
+                      color: const Color(0xFF5E81AC),
+                    ),
+                    _FeatureCard(
+                      icon: Icons.category,
+                      title: 'Quản lý Danh mục',
+                      description: 'Phân loại sản phẩm theo loại',
+                      color: const Color(0xFFA3BE8C),
+                    ),
+                    _FeatureCard(
+                      icon: Icons.eco,
+                      title: 'Giám sát Môi trường',
+                      description: 'Theo dõi dữ liệu môi trường',
+                      color: const Color(0xFF88C0D0),
+                    ),
+                    _FeatureCard(
+                      icon: Icons.analytics,
+                      title: 'Báo cáo Thống kê',
+                      description: 'Biểu đồ và thống kê chi tiết',
+                      color: const Color(0xFFD08770),
+                    ),
+                  ],
+                );
+              },
             ),
 
             const SizedBox(height: 24),
@@ -245,6 +250,7 @@ class _FeatureCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
+
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -258,6 +264,7 @@ class _FeatureCard extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             padding: const EdgeInsets.all(12),

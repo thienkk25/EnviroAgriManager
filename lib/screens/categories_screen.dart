@@ -140,47 +140,52 @@ class CategoryScreen extends StatelessWidget {
       ),
       body: subCategories.isEmpty
           ? const Center(child: Text('Không có danh mục con'))
-          : GridView.builder(
-              padding: const EdgeInsets.all(16),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-              ),
-              itemCount: subCategories.length,
-              itemBuilder: (context, index) {
-                final category = subCategories[index];
-                return CategoryCard(
-                  category: category,
-                  onTap: () {
-                    // Đệ quy gọi lại chính CategoryScreen
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => CategoryScreen(
-                          parentId: category.id,
-                          title: category.name,
-                          startFirst: false,
-                        ),
-                      ),
-                    );
-                  },
-                  onLongPress: () {
-                    _showCategoryDialog(
-                      context,
-                      mode: CategoryDialogMode.view,
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                return GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: constraints.maxWidth < 600 ? 2 : 4,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: constraints.maxWidth < 600 ? .7 : 1.1,
+                  ),
+                  itemCount: subCategories.length,
+                  itemBuilder: (context, index) {
+                    final category = subCategories[index];
+                    return CategoryCard(
                       category: category,
+                      onTap: () {
+                        // Đệ quy gọi lại chính CategoryScreen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => CategoryScreen(
+                              parentId: category.id,
+                              title: category.name,
+                              startFirst: false,
+                            ),
+                          ),
+                        );
+                      },
+                      onLongPress: () {
+                        _showCategoryDialog(
+                          context,
+                          mode: CategoryDialogMode.view,
+                          category: category,
+                        );
+                      },
+                      onEdit: () {
+                        _showCategoryDialog(
+                          context,
+                          mode: CategoryDialogMode.edit,
+                          category: category,
+                        );
+                      },
+                      onDelete: () {
+                        _showDeleteDialog(context, category);
+                      },
                     );
-                  },
-                  onEdit: () {
-                    _showCategoryDialog(
-                      context,
-                      mode: CategoryDialogMode.edit,
-                      category: category,
-                    );
-                  },
-                  onDelete: () {
-                    _showDeleteDialog(context, category);
                   },
                 );
               },

@@ -109,7 +109,7 @@ class CategoryCard extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  right: 0,
+                  right: MediaQuery.sizeOf(context).width < 600 ? -20 : 0,
                   child: Consumer<AuthProvider>(
                     builder: (context, authProvider, child) {
                       final canEdit = authProvider.hasPermission('edit');
