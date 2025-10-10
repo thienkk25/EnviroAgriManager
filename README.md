@@ -73,35 +73,6 @@ lib/
 - **HTTP**: API communication
 - **Image Picker**: Quản lý hình ảnh
 
-## Cài đặt và chạy
-
-1. Clone repository:
-```bash
-git clone <repository-url>
-cd enviro_agri_manager
-```
-
-2. Cài đặt dependencies:
-```bash
-flutter pub get
-```
-
-3. Chạy ứng dụng:
-```bash
-flutter run
-```
-
-## Cấu hình
-
-### Dependencies chính:
-- `provider: ^6.1.2` - State management
-- `google_fonts: ^6.2.1` - Typography
-- `fl_chart: ^0.69.0` - Charts và graphs
-- `shared_preferences: ^2.3.2` - Local storage
-- `http: ^1.2.2` - HTTP requests
-- `image_picker: ^1.1.2` - Image handling
-- `intl: ^0.19.0` - Internationalization
-
 ## Tính năng môi trường
 
 Hệ thống tích hợp theo dõi các yếu tố môi trường:
@@ -137,15 +108,3 @@ Hệ thống tích hợp theo dõi các yếu tố môi trường:
 1. Vào màn hình "Báo cáo"
 2. Chọn kỳ báo cáo (tuần/tháng/quý/năm)
 3. Xem các biểu đồ và thống kê
-
-## Đóng góp
-
-Mọi đóng góp đều được chào đón! Vui lòng:
-1. Fork repository
-2. Tạo feature branch
-3. Commit changes
-4. Tạo Pull Request
-
-## License
-
-Dự án được phát triển cho mục đích nghiên cứu và học tập.

@@ -560,6 +560,10 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                           selectedWard = null;
                                         });
                                       },
+                                validator: (value) =>
+                                    value == null || value.isEmpty
+                                    ? 'Vui lòng nhập vị trí'
+                                    : null,
                               ),
 
                               // ==== Xã ====

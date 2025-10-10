@@ -10,7 +10,6 @@ class Product {
   final DateTime createdAt;
   final DateTime updatedAt;
   final String status; // 'active', 'inactive', 'discontinued'
-  final Map<String, dynamic> environmentalData; // dữ liệu môi trường (jsonb)
 
   Product({
     required this.id,
@@ -24,7 +23,6 @@ class Product {
     required this.createdAt,
     required this.updatedAt,
     required this.status,
-    this.environmentalData = const {},
   });
 
   /// Parse từ JSON (snake_case -> camelCase)
@@ -41,7 +39,6 @@ class Product {
       createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
       updatedAt: DateTime.tryParse(json['updated_at'] ?? '') ?? DateTime.now(),
       status: json['status'] ?? 'active',
-      environmentalData: json['environmental_data'] ?? {},
     );
   }
 
@@ -59,7 +56,6 @@ class Product {
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
       'status': status,
-      'environmental_data': environmentalData,
     };
   }
 
@@ -90,7 +86,6 @@ class Product {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       status: status ?? this.status,
-      environmentalData: environmentalData ?? this.environmentalData,
     );
   }
 }

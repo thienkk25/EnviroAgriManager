@@ -5,7 +5,6 @@ class Category {
   final String icon;
   final String color;
   final String? parentId; // nullable
-  final List<String> subCategories;
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isActive;
@@ -17,7 +16,6 @@ class Category {
     required this.icon,
     required this.color,
     this.parentId,
-    this.subCategories = const [],
     required this.createdAt,
     required this.updatedAt,
     this.isActive = true,
@@ -37,7 +35,6 @@ class Category {
       icon: json['icon'] ?? '🌱',
       color: json['color'] ?? '#4CAF50',
       parentId: parent,
-      subCategories: List<String>.from(json['sub_categories'] ?? []),
       createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
       updatedAt: DateTime.tryParse(json['updated_at'] ?? '') ?? DateTime.now(),
       isActive: json['is_active'] ?? true,
@@ -52,7 +49,6 @@ class Category {
       'icon': icon,
       'color': color,
       'parent_id': parentId,
-      'sub_categories': subCategories,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
       'is_active': isActive,
@@ -80,7 +76,6 @@ class Category {
       icon: icon ?? this.icon,
       color: color ?? this.color,
       parentId: parentId ?? this.parentId,
-      subCategories: subCategories ?? this.subCategories,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isActive: isActive ?? this.isActive,

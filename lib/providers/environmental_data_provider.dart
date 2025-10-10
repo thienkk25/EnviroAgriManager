@@ -186,4 +186,40 @@ class EnvironmentalDataProvider with ChangeNotifier {
 
     return filteredData;
   }
+
+  // Lấy dữ liệu lọc theo time
+  List<EnvironmentalData> getEnvironmentalDataByTime(String type) {
+    final now = DateTime.now();
+
+    return _environmentalData.where((data) {
+      final recordedDate = data.recordedAt;
+
+      switch (type) {
+        case 'week':
+          // Lọc dữ liệu trong tuần hiện tại
+          final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+          final endOfWeek = startOfWeek.add(const Duration(days: 6));
+          return recordedDate.isAfter(
+                startOfWeek.subtract(const Duration(days: 1)),
+              ) &&
+              recordedDate.isBefore(endOfWeek.add(const Duration(days: 1)));
+
+        case 'month':
+          // Lọc dữ liệu trong tháng hiện tại
+          return recordedDate.year == now.year &&
+              recordedDate.month == now.month;
+
+        case 'quarter':
+          // Lọc dữ liệu trong quý hiện tại
+          final currentQuarter = ((now.month - 1) ~/ 3) + 1;
+          final dataQuarter = ((recordedDate.month - 1) ~/ 3) + 1;
+          return recordedDate.year == now.year && dataQuarter == currentQuarter;
+
+        case 'year':
+        default:
+          // Lọc dữ liệu trong năm hiện tại
+          return recordedDate.year == now.year;
+      }
+    }).toList();
+  }
 }

@@ -116,6 +116,11 @@ class CategoryProvider with ChangeNotifier {
         .toList();
   }
 
+  // Lấy name của danh mục theo id
+  String getCategoryName(String categoryId) {
+    return _categories.firstWhere((category) => category.id == categoryId).name;
+  }
+
   // Tìm kiếm danh mục
   List<Category> searchCategories(String query) {
     if (query.isEmpty) return _categories;
