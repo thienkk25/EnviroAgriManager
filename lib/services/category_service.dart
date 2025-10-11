@@ -1,19 +1,21 @@
-import 'package:enviro_agri_manager/models/category.dart';
+import 'package:enviro_agri_manager/models/category_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CategoryService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  Future<List<Category>> fetchCategories() async {
+  Future<List<CategoryModel>> fetchCategories() async {
     try {
       final response = await _supabase.from('categories').select();
-      return (response as List).map((item) => Category.fromJson(item)).toList();
+      return (response as List)
+          .map((item) => CategoryModel.fromJson(item))
+          .toList();
     } catch (e) {
       throw Exception('Lỗi lấy categories: $e');
     }
   }
 
-  Future<Category> getCategory(String id) async {
+  Future<CategoryModel> getCategory(String id) async {
     try {
       final response = await _supabase
           .from('categories')
@@ -23,13 +25,13 @@ class CategoryService {
       if (response == null) {
         throw Exception('Danh mục không tồn tại');
       }
-      return Category.fromJson(response);
+      return CategoryModel.fromJson(response);
     } catch (e) {
       throw Exception('Lỗi lấy danh mục: $e');
     }
   }
 
-  Future<void> addCategory(Category category) async {
+  Future<void> addCategory(CategoryModel category) async {
     try {
       await _supabase.from('categories').insert(category.toJson());
     } catch (e) {
@@ -37,7 +39,7 @@ class CategoryService {
     }
   }
 
-  Future<void> updateCategory(Category category) async {
+  Future<void> updateCategory(CategoryModel category) async {
     try {
       await _supabase
           .from('categories')

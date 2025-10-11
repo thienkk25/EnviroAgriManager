@@ -1,14 +1,14 @@
 import 'package:enviro_agri_manager/services/category_service.dart';
 import 'package:flutter/material.dart';
-import '../models/category.dart';
+import '../models/category_model.dart';
 
 class CategoryProvider with ChangeNotifier {
   final CategoryService _categoryService = CategoryService();
-  List<Category> _categories = [];
+  List<CategoryModel> _categories = [];
   bool _isLoading = false;
   String _error = '';
 
-  List<Category> get categories => _categories;
+  List<CategoryModel> get categories => _categories;
   bool get isLoading => _isLoading;
   String get error => _error;
 
@@ -39,7 +39,7 @@ class CategoryProvider with ChangeNotifier {
   }
 
   // Thêm danh mục mới
-  Future<bool> addCategory(Category category) async {
+  Future<bool> addCategory(CategoryModel category) async {
     _isLoading = true;
     notifyListeners();
 
@@ -58,7 +58,7 @@ class CategoryProvider with ChangeNotifier {
   }
 
   // Cập nhật danh mục
-  Future<bool> updateCategory(Category category) async {
+  Future<bool> updateCategory(CategoryModel category) async {
     _isLoading = true;
     notifyListeners();
 
@@ -105,12 +105,12 @@ class CategoryProvider with ChangeNotifier {
   }
 
   // Lấy danh mục chính (không có parent)
-  List<Category> getMainCategories() {
+  List<CategoryModel> getMainCategories() {
     return _categories.where((category) => category.parentId == null).toList();
   }
 
   // Lấy danh mục con
-  List<Category> getSubCategories(String parentId) {
+  List<CategoryModel> getSubCategories(String parentId) {
     return _categories
         .where((category) => category.parentId == parentId)
         .toList();
@@ -122,7 +122,7 @@ class CategoryProvider with ChangeNotifier {
   }
 
   // Tìm kiếm danh mục
-  List<Category> searchCategories(String query) {
+  List<CategoryModel> searchCategories(String query) {
     if (query.isEmpty) return _categories;
 
     return _categories.where((category) {

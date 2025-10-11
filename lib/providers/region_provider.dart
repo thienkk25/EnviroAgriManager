@@ -1,14 +1,14 @@
-import 'package:enviro_agri_manager/models/region.dart';
+import 'package:enviro_agri_manager/models/region_model.dart';
 import 'package:enviro_agri_manager/services/regions_service.dart';
 import 'package:flutter/material.dart';
 
 class RegionProvider with ChangeNotifier {
   final RegionService _regionService = RegionService();
-  List<Region> _regions = [];
+  List<RegionModel> _regions = [];
   bool _isLoading = false;
   String _error = '';
 
-  List<Region> get regions => _regions;
+  List<RegionModel> get regions => _regions;
   bool get isLoading => _isLoading;
   String get error => _error;
 
@@ -37,7 +37,7 @@ class RegionProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> addRegion(Region region) async {
+  Future<bool> addRegion(RegionModel region) async {
     _isLoading = true;
     notifyListeners();
 
@@ -55,7 +55,7 @@ class RegionProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> updateRegion(Region region, bool level) async {
+  Future<bool> updateRegion(RegionModel region, bool level) async {
     _isLoading = true;
     notifyListeners();
 
@@ -97,7 +97,7 @@ class RegionProvider with ChangeNotifier {
     }
   }
 
-  Region? getRegionById(String id) {
+  RegionModel? getRegionById(String id) {
     try {
       return _regions.firstWhere((region) => region.id == id);
     } catch (e) {
@@ -106,17 +106,17 @@ class RegionProvider with ChangeNotifier {
   }
 
   // Lấy danh mục chính (không có parent) region
-  List<Region> getMainRegions() {
+  List<RegionModel> getMainRegions() {
     return _regions.where((region) => region.parentId == null).toList();
   }
 
   // Lấy danh mục con region
-  List<Region> getSubRegions(String parentId) {
+  List<RegionModel> getSubRegions(String parentId) {
     return _regions.where((region) => region.parentId == parentId).toList();
   }
 
   // Tìm kiếm region
-  List<Region> searchRegions(String query) {
+  List<RegionModel> searchRegions(String query) {
     if (query.isEmpty) return _regions;
 
     return _regions.where((region) {

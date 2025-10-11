@@ -1,4 +1,4 @@
-import 'package:enviro_agri_manager/models/environmental_data.dart';
+import 'package:enviro_agri_manager/models/environmental_data_model.dart';
 import 'package:enviro_agri_manager/providers/environmental_data_provider.dart';
 import 'package:enviro_agri_manager/providers/region_provider.dart';
 import 'package:enviro_agri_manager/screens/region_manager_screen.dart';
@@ -309,7 +309,7 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                     ),
                   );
                 }
-                List<EnvironmentalData> filteredEnvimentalData =
+                List<EnvironmentalDataModel> filteredEnvimentalData =
                     environmentalDataProvider.getFilteredData(
                       _selectedProvince,
                       _selectedDistrict,
@@ -458,7 +458,7 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
   void _showDataDialog({
     required BuildContext context,
     required EnvironmentalDialogMode mode,
-    EnvironmentalData? environmentalData,
+    EnvironmentalDataModel? environmentalData,
   }) {
     final formKey = GlobalKey<FormState>();
     final temperatureController = TextEditingController(
@@ -897,39 +897,46 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                         onPressed: () async {
                           if (formKey.currentState!.validate()) {
                             if (mode == EnvironmentalDialogMode.add) {
-                              final newEnvironmentalData = EnvironmentalData(
-                                id: Uuid().v4(),
-                                temperature: double.parse(
-                                  temperatureController.text,
-                                ),
-                                humidity: double.parse(humidityController.text),
-                                ph: double.parse(phController.text),
-                                soilMoisture: double.parse(
-                                  soilMoistureController.text,
-                                ),
-                                lightIntensity: double.parse(
-                                  lightIntensityController.text,
-                                ),
-                                co2Level: double.parse(co2LevelController.text),
-                                nitrogen: double.parse(nitrogenController.text),
-                                phosphorus: double.parse(
-                                  phosphorusController.text,
-                                ),
-                                potassium: double.parse(
-                                  potassiumController.text,
-                                ),
-                                location: locationController.text,
-                                weatherCondition: selectedWeather,
-                                notes: notesController.text,
-                                recordedAt: DateTime.now(),
-                                regionId:
-                                    selectedWard ??
-                                    selectedDistrict ??
-                                    selectedProvince ??
-                                    '',
-                                createdAt: DateTime.now(),
-                                updatedAt: DateTime.now(),
-                              );
+                              final newEnvironmentalData =
+                                  EnvironmentalDataModel(
+                                    id: Uuid().v4(),
+                                    temperature: double.parse(
+                                      temperatureController.text,
+                                    ),
+                                    humidity: double.parse(
+                                      humidityController.text,
+                                    ),
+                                    ph: double.parse(phController.text),
+                                    soilMoisture: double.parse(
+                                      soilMoistureController.text,
+                                    ),
+                                    lightIntensity: double.parse(
+                                      lightIntensityController.text,
+                                    ),
+                                    co2Level: double.parse(
+                                      co2LevelController.text,
+                                    ),
+                                    nitrogen: double.parse(
+                                      nitrogenController.text,
+                                    ),
+                                    phosphorus: double.parse(
+                                      phosphorusController.text,
+                                    ),
+                                    potassium: double.parse(
+                                      potassiumController.text,
+                                    ),
+                                    location: locationController.text,
+                                    weatherCondition: selectedWeather,
+                                    notes: notesController.text,
+                                    recordedAt: DateTime.now(),
+                                    regionId:
+                                        selectedWard ??
+                                        selectedDistrict ??
+                                        selectedProvince ??
+                                        '',
+                                    createdAt: DateTime.now(),
+                                    updatedAt: DateTime.now(),
+                                  );
                               final result = await context
                                   .read<EnvironmentalDataProvider>()
                                   .addEnvironmentalData(newEnvironmentalData);

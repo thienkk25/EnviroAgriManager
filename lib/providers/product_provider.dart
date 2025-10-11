@@ -2,15 +2,15 @@ import 'package:enviro_agri_manager/providers/category_provider.dart';
 import 'package:enviro_agri_manager/services/product_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/product.dart';
+import '../models/product_model.dart';
 
 class ProductProvider with ChangeNotifier {
   final ProductService _productService = ProductService();
-  List<Product> _products = [];
+  List<ProductModel> _products = [];
   bool _isLoading = false;
   String _error = '';
 
-  List<Product> get products => _products;
+  List<ProductModel> get products => _products;
   bool get isLoading => _isLoading;
   String get error => _error;
 
@@ -41,7 +41,7 @@ class ProductProvider with ChangeNotifier {
   }
 
   // Thêm sản phẩm mới
-  Future<bool> addProduct(Product product) async {
+  Future<bool> addProduct(ProductModel product) async {
     _isLoading = true;
     notifyListeners();
     try {
@@ -63,7 +63,7 @@ class ProductProvider with ChangeNotifier {
   }
 
   // Cập nhật sản phẩm
-  Future<bool> updateProduct(Product product) async {
+  Future<bool> updateProduct(ProductModel product) async {
     _isLoading = true;
     notifyListeners();
     try {
@@ -107,7 +107,7 @@ class ProductProvider with ChangeNotifier {
   }
 
   // Tìm kiếm sản phẩm
-  List<Product> searchProducts(String query) {
+  List<ProductModel> searchProducts(String query) {
     if (query.isEmpty) return _products;
 
     return _products.where((product) {
@@ -118,14 +118,14 @@ class ProductProvider with ChangeNotifier {
   }
 
   // Lọc sản phẩm theo danh mục
-  List<Product> getProductsByCategory(String categoryId) {
+  List<ProductModel> getProductsByCategory(String categoryId) {
     return _products
         .where((product) => product.categoryId == categoryId)
         .toList();
   }
 
   // Lấy sản phẩm theo ID
-  Product? getProductById(String id) {
+  ProductModel? getProductById(String id) {
     try {
       return _products.firstWhere((product) => product.id == id);
     } catch (e) {

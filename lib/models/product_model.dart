@@ -1,4 +1,4 @@
-class Product {
+class ProductModel {
   final String id;
   final String name;
   final String description;
@@ -11,7 +11,7 @@ class Product {
   final DateTime updatedAt;
   final String status; // 'active', 'inactive', 'discontinued'
 
-  Product({
+  ProductModel({
     required this.id,
     required this.name,
     required this.description,
@@ -26,8 +26,8 @@ class Product {
   });
 
   /// Parse từ JSON (snake_case -> camelCase)
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
+  factory ProductModel.fromJson(Map<String, dynamic> json) {
+    return ProductModel(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
       description: json['description'] ?? '',
@@ -60,7 +60,7 @@ class Product {
   }
 
   /// Copy object để dễ update
-  Product copyWith({
+  ProductModel copyWith({
     String? id,
     String? name,
     String? description,
@@ -74,7 +74,7 @@ class Product {
     String? status,
     Map<String, dynamic>? environmentalData,
   }) {
-    return Product(
+    return ProductModel(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,

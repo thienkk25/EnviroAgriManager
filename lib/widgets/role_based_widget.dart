@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
-import '../models/user_role.dart';
+import '../models/user_role_model.dart';
 
 class RoleBasedWidget extends StatelessWidget {
   final Widget adminChild;
@@ -32,11 +32,11 @@ class RoleBasedWidget extends StatelessWidget {
 
         // Hiển thị widget theo role
         switch (userRole) {
-          case UserRole.admin:
+          case UserRoleModel.admin:
             return adminChild;
-          case UserRole.editor:
+          case UserRoleModel.editor:
             return editorChild ?? adminChild;
-          case UserRole.viewer:
+          case UserRoleModel.viewer:
             return viewerChild ?? editorChild ?? adminChild;
         }
       },

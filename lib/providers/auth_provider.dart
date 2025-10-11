@@ -1,17 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/auth_service.dart';
-import '../models/user_role.dart';
+import '../models/user_role_model.dart';
 
 class AuthProvider with ChangeNotifier {
   final AuthService _authService = AuthService();
   User? _user;
-  UserRole _userRole = UserRole.viewer;
+  UserRoleModel _userRole = UserRoleModel.viewer;
   bool _isLoading = false;
   String? _errorMessage;
 
   User? get user => _user;
-  UserRole get userRole => _userRole;
+  UserRoleModel get userRole => _userRole;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get isSignedIn => _user != null;
@@ -39,10 +39,10 @@ class AuthProvider with ChangeNotifier {
       try {
         _userRole = await _authService.getCurrentUserRole();
       } catch (_) {
-        _userRole = UserRole.viewer;
+        _userRole = UserRoleModel.viewer;
       }
     } else {
-      _userRole = UserRole.viewer;
+      _userRole = UserRoleModel.viewer;
     }
   }
 
@@ -116,7 +116,7 @@ class AuthProvider with ChangeNotifier {
 
       await _authService.signOut();
       _user = null;
-      _userRole = UserRole.viewer;
+      _userRole = UserRoleModel.viewer;
       notifyListeners();
     } catch (e) {
       _setError(e.toString());
@@ -148,7 +148,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   /// Cập nhật role của user được chỉ định
-  Future<bool> updateUserRole(String userId, UserRole newRole) async {
+  Future<bool> updateUserRole(String userId, UserRoleModel newRole) async {
     try {
       await _authService.updateUserRole(userId, newRole);
 

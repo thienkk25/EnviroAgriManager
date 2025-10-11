@@ -1,4 +1,4 @@
-import 'package:enviro_agri_manager/models/category.dart';
+import 'package:enviro_agri_manager/models/category_model.dart';
 import 'package:enviro_agri_manager/providers/auth_provider.dart';
 import 'package:enviro_agri_manager/providers/category_provider.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class CategoryCard extends StatelessWidget {
-  final Category category;
+  final CategoryModel category;
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;

@@ -1,11 +1,11 @@
-import 'package:enviro_agri_manager/models/environmental_data.dart';
+import 'package:enviro_agri_manager/models/environmental_data_model.dart';
 import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class EnvironmentalDataCard extends StatelessWidget {
-  final EnvironmentalData environmentalData;
+  final EnvironmentalDataModel environmentalData;
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;

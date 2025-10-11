@@ -1,4 +1,4 @@
-import 'package:enviro_agri_manager/models/product.dart';
+import 'package:enviro_agri_manager/models/product_model.dart';
 import 'package:enviro_agri_manager/providers/category_provider.dart';
 import 'package:enviro_agri_manager/widgets/category_selector.dart';
 import 'package:enviro_agri_manager/widgets/product_card.dart';
@@ -183,7 +183,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 }
 
                 // Filter products
-                List<Product> filteredProducts = productProvider.products;
+                List<ProductModel> filteredProducts = productProvider.products;
 
                 // Search filter
                 if (_searchController.text.isNotEmpty) {
@@ -287,7 +287,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
-  void _showDeleteDialog(BuildContext context, Product product) {
+  void _showDeleteDialog(BuildContext context, ProductModel product) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -346,7 +346,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
 class ProductFormScreen extends StatefulWidget {
   final ProductFormMode mode;
-  final Product? product;
+  final ProductModel? product;
 
   const ProductFormScreen({super.key, required this.mode, this.product});
 
@@ -648,7 +648,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   Future<void> _addProduct(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
-      final Product product = Product(
+      final ProductModel product = ProductModel(
         id: Uuid().v4(),
         name: _nameController.text,
         description: _descriptionController.text,
@@ -679,7 +679,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     }
   }
 
-  Future<void> _updateProduct(BuildContext context, Product oldProduct) async {
+  Future<void> _updateProduct(
+    BuildContext context,
+    ProductModel oldProduct,
+  ) async {
     if (_formKey.currentState!.validate()) {
       final updatedProduct = oldProduct.copyWith(
         name: _nameController.text,

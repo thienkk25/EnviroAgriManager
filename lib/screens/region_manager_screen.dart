@@ -1,4 +1,4 @@
-import 'package:enviro_agri_manager/models/region.dart';
+import 'package:enviro_agri_manager/models/region_model.dart';
 import 'package:enviro_agri_manager/providers/region_provider.dart';
 import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +16,7 @@ class RegionManagerScreen extends StatefulWidget {
 }
 
 class _RegionManagerScreenState extends State<RegionManagerScreen> {
-  late List<Region> regions;
+  late List<RegionModel> regions;
   @override
   void initState() {
     regions = context.read<RegionProvider>().regions;
@@ -33,7 +33,7 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
   // Map id region -> isExpanded
   final Map<String, bool> _expanded = {};
 
-  List<Region> getChildren(String? parentId) =>
+  List<RegionModel> getChildren(String? parentId) =>
       regions.where((r) => r.parentId == parentId).toList();
 
   // Build tree recursively
@@ -230,7 +230,7 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
   Future<void> showRegionDialog({
     required BuildContext context,
     required RegionDialogMode mode,
-    Region? region,
+    RegionModel? region,
   }) async {
     final nameController = TextEditingController(text: region?.name ?? '');
     final descriptionController = TextEditingController(
@@ -419,7 +419,7 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
                     }
 
                     if (isAdd) {
-                      final newRegion = Region(
+                      final newRegion = RegionModel(
                         id: Uuid().v4(),
                         name: nameController.text,
                         description: descriptionController.text,

@@ -1,16 +1,16 @@
-import 'package:enviro_agri_manager/models/environmental_data.dart';
-import 'package:enviro_agri_manager/models/region.dart';
+import 'package:enviro_agri_manager/models/environmental_data_model.dart';
+import 'package:enviro_agri_manager/models/region_model.dart';
 import 'package:enviro_agri_manager/services/environmental_data_service.dart';
 import 'package:flutter/material.dart';
 
 class EnvironmentalDataProvider with ChangeNotifier {
   final EnvironmentalDataService _environmentalDataService =
       EnvironmentalDataService();
-  List<EnvironmentalData> _environmentalData = [];
+  List<EnvironmentalDataModel> _environmentalData = [];
   bool _isLoading = false;
   String _error = '';
 
-  List<EnvironmentalData> get environmentalData => _environmentalData;
+  List<EnvironmentalDataModel> get environmentalData => _environmentalData;
   bool get isLoading => _isLoading;
   String get error => _error;
 
@@ -41,7 +41,9 @@ class EnvironmentalDataProvider with ChangeNotifier {
   }
 
   // Thêm môi trường mới
-  Future<bool> addEnvironmentalData(EnvironmentalData environmentalData) async {
+  Future<bool> addEnvironmentalData(
+    EnvironmentalDataModel environmentalData,
+  ) async {
     _isLoading = true;
     notifyListeners();
 
@@ -61,7 +63,7 @@ class EnvironmentalDataProvider with ChangeNotifier {
 
   // Cập nhật môi trường
   Future<bool> updateEnvironmentalData(
-    EnvironmentalData environmentalData,
+    EnvironmentalDataModel environmentalData,
   ) async {
     _isLoading = true;
     notifyListeners();
@@ -115,7 +117,7 @@ class EnvironmentalDataProvider with ChangeNotifier {
   }
 
   // Lấy môi trường theo ID
-  EnvironmentalData? getEnvironmentalDataById(String id) {
+  EnvironmentalDataModel? getEnvironmentalDataById(String id) {
     try {
       return _environmentalData.firstWhere(
         (environmentalData) => environmentalData.id == id,
@@ -126,14 +128,14 @@ class EnvironmentalDataProvider with ChangeNotifier {
   }
 
   // Lọc dữ liệu
-  List<EnvironmentalData> getFilteredData(
+  List<EnvironmentalDataModel> getFilteredData(
     String? selectedProvince,
     String? selectedDistrict,
     String? selectedWard,
     String selectedTimeRange,
-    List<Region> regions,
+    List<RegionModel> regions,
   ) {
-    List<EnvironmentalData> filteredData = _environmentalData;
+    List<EnvironmentalDataModel> filteredData = _environmentalData;
 
     // Hàm đệ quy lấy tất cả id con
     Set<String> getAllChildIds(String parentId) {
@@ -188,7 +190,7 @@ class EnvironmentalDataProvider with ChangeNotifier {
   }
 
   // Lấy dữ liệu lọc theo time
-  List<EnvironmentalData> getEnvironmentalDataByTime(String type) {
+  List<EnvironmentalDataModel> getEnvironmentalDataByTime(String type) {
     final now = DateTime.now();
 
     return _environmentalData.where((data) {

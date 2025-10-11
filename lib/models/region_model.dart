@@ -1,4 +1,4 @@
-class Region {
+class RegionModel {
   final String id;
   final String name;
   final String description;
@@ -7,7 +7,7 @@ class Region {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  Region({
+  RegionModel({
     required this.id,
     required this.name,
     required this.description,
@@ -18,8 +18,8 @@ class Region {
   });
 
   // Convert từ JSON (Map) sang Region
-  factory Region.fromJson(Map<String, dynamic> json) {
-    return Region(
+  factory RegionModel.fromJson(Map<String, dynamic> json) {
+    return RegionModel(
       id: json['id'] as String,
       name: json['name'] as String,
       description: json['description'] ?? '',
@@ -44,7 +44,7 @@ class Region {
   }
 
   // copyWith tiện cho update
-  Region copyWith({
+  RegionModel copyWith({
     String? id,
     String? name,
     String? description,
@@ -53,7 +53,7 @@ class Region {
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
-    return Region(
+    return RegionModel(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,

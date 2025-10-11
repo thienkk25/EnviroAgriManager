@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
-import '../models/user_role.dart';
+import '../models/user_role_model.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -699,13 +699,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Color _getRoleColor(UserRole role) {
+  Color _getRoleColor(UserRoleModel role) {
     switch (role) {
-      case UserRole.admin:
+      case UserRoleModel.admin:
         return Colors.red;
-      case UserRole.editor:
+      case UserRoleModel.editor:
         return Colors.orange;
-      case UserRole.viewer:
+      case UserRoleModel.viewer:
         return Colors.blue;
     }
   }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/auth_provider.dart';
-import '../models/user_role.dart';
+import '../models/user_role_model.dart';
 import '../widgets/role_based_widget.dart';
 
 class UserManagementScreen extends StatefulWidget {
@@ -101,7 +101,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 itemCount: users.length,
                 itemBuilder: (context, index) {
                   final userData = Map<String, dynamic>.from(users[index]);
-                  final role = UserRole.fromString(
+                  final role = UserRoleModel.fromString(
                     userData['role_name'] as String? ?? 'viewer',
                   );
                   final fullName =
@@ -194,7 +194,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   }
 
   void _showRoleDialog(BuildContext context, Map<String, dynamic> userData) {
-    final currentRole = UserRole.fromString(
+    final currentRole = UserRoleModel.fromString(
       userData['role_name'] as String? ?? 'viewer',
     );
 
@@ -206,9 +206,9 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             'Cập nhật quyền cho ${userData['email']}',
             style: GoogleFonts.inter(fontWeight: FontWeight.w600),
           ),
-          content: RadioGroup<UserRole>(
+          content: RadioGroup<UserRoleModel>(
             groupValue: currentRole,
-            onChanged: (UserRole? newRole) async {
+            onChanged: (UserRoleModel? newRole) async {
               if (newRole == null) return;
               Navigator.of(dialogContext).pop(); // đóng dialog
               final authProvider = context.read<AuthProvider>();
@@ -231,11 +231,11 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             },
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: UserRole.values.map((role) {
+              children: UserRoleModel.values.map((role) {
                 return ListTile(
                   title: Text(role.displayName),
                   subtitle: Text(role.description),
-                  leading: Radio<UserRole>(value: role),
+                  leading: Radio<UserRoleModel>(value: role),
                 );
               }).toList(),
             ),
@@ -254,24 +254,24 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     );
   }
 
-  Color _getRoleColor(UserRole role) {
+  Color _getRoleColor(UserRoleModel role) {
     switch (role) {
-      case UserRole.admin:
+      case UserRoleModel.admin:
         return Colors.red;
-      case UserRole.editor:
+      case UserRoleModel.editor:
         return Colors.orange;
-      case UserRole.viewer:
+      case UserRoleModel.viewer:
         return Colors.blue;
     }
   }
 
-  IconData _getRoleIcon(UserRole role) {
+  IconData _getRoleIcon(UserRoleModel role) {
     switch (role) {
-      case UserRole.admin:
+      case UserRoleModel.admin:
         return Icons.admin_panel_settings;
-      case UserRole.editor:
+      case UserRoleModel.editor:
         return Icons.edit;
-      case UserRole.viewer:
+      case UserRoleModel.viewer:
         return Icons.visibility;
     }
   }

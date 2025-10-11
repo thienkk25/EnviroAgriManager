@@ -1,21 +1,23 @@
 import 'dart:convert';
 
-import 'package:enviro_agri_manager/models/region.dart';
+import 'package:enviro_agri_manager/models/region_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RegionService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  Future<List<Region>> fetchRegions() async {
+  Future<List<RegionModel>> fetchRegions() async {
     try {
       final response = await _supabase.from('regions').select();
-      return (response as List).map((item) => Region.fromJson(item)).toList();
+      return (response as List)
+          .map((item) => RegionModel.fromJson(item))
+          .toList();
     } catch (e) {
       throw Exception('Lỗi lấy regions: $e');
     }
   }
 
-  Future<Region> getRegion(String id) async {
+  Future<RegionModel> getRegion(String id) async {
     try {
       final response = await _supabase
           .from('regions')
@@ -25,13 +27,13 @@ class RegionService {
       if (response == null) {
         throw Exception('Region không tồn tại');
       }
-      return Region.fromJson(response);
+      return RegionModel.fromJson(response);
     } catch (e) {
       throw Exception('Lỗi lấy region: $e');
     }
   }
 
-  Future<void> addRegion(Region region) async {
+  Future<void> addRegion(RegionModel region) async {
     try {
       await _supabase.from('regions').insert(region.toJson());
     } catch (e) {
@@ -39,7 +41,7 @@ class RegionService {
     }
   }
 
-  Future<void> updateRegion(Region region, bool level) async {
+  Future<void> updateRegion(RegionModel region, bool level) async {
     try {
       await _supabase
           .from('regions')

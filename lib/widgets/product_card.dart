@@ -1,4 +1,4 @@
-import 'package:enviro_agri_manager/models/product.dart';
+import 'package:enviro_agri_manager/models/product_model.dart';
 import 'package:enviro_agri_manager/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class ProductCard extends StatelessWidget {
-  final Product product;
+  final ProductModel product;
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;

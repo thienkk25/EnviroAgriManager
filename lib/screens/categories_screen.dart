@@ -1,4 +1,4 @@
-import 'package:enviro_agri_manager/models/category.dart';
+import 'package:enviro_agri_manager/models/category_model.dart';
 import 'package:enviro_agri_manager/utils/constants.dart';
 import 'package:enviro_agri_manager/widgets/category_card.dart';
 import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
@@ -107,7 +107,7 @@ class CategoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final categoryProvider = context.watch<CategoryProvider>();
-    List<Category> subCategories;
+    List<CategoryModel> subCategories;
     if (startFirst) {
       subCategories = categoryProvider.getMainCategories();
     } else {
@@ -206,7 +206,7 @@ class CategoryScreen extends StatelessWidget {
   void _showCategoryDialog(
     BuildContext context, {
     required CategoryDialogMode mode,
-    Category? category, // null nếu thêm mới
+    CategoryModel? category, // null nếu thêm mới
   }) {
     final formKey = GlobalKey<FormState>();
     final nameController = TextEditingController(text: category?.name ?? '');
@@ -395,7 +395,7 @@ class CategoryScreen extends StatelessWidget {
                     onPressed: () async {
                       if (formKey.currentState!.validate()) {
                         if (mode == CategoryDialogMode.add) {
-                          final Category newCategory = Category(
+                          final CategoryModel newCategory = CategoryModel(
                             id: Uuid().v4(),
                             name: nameController.text,
                             description: descriptionController.text,
@@ -425,14 +425,15 @@ class CategoryScreen extends StatelessWidget {
                             ),
                           );
                         } else {
-                          final Category updateCategory = category!.copyWith(
-                            name: nameController.text,
-                            description: descriptionController.text,
-                            icon: selectedIcon,
-                            color: selectedColor,
-                            isActive: selectedIsActive,
-                            updatedAt: DateTime.now(),
-                          );
+                          final CategoryModel updateCategory = category!
+                              .copyWith(
+                                name: nameController.text,
+                                description: descriptionController.text,
+                                icon: selectedIcon,
+                                color: selectedColor,
+                                isActive: selectedIsActive,
+                                updatedAt: DateTime.now(),
+                              );
                           final result = await context
                               .read<CategoryProvider>()
                               .updateCategory(updateCategory);
@@ -470,7 +471,7 @@ class CategoryScreen extends StatelessWidget {
     );
   }
 
-  void _showDeleteDialog(BuildContext context, Category category) {
+  void _showDeleteDialog(BuildContext context, CategoryModel category) {
     showDialog(
       context: context,
       builder: (BuildContext context) {

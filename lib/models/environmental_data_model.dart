@@ -1,4 +1,4 @@
-class EnvironmentalData {
+class EnvironmentalDataModel {
   final String id;
   final String regionId;
   final String? location;
@@ -20,7 +20,7 @@ class EnvironmentalData {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  EnvironmentalData({
+  EnvironmentalDataModel({
     required this.id,
     required this.regionId,
     this.location,
@@ -40,8 +40,8 @@ class EnvironmentalData {
     required this.updatedAt,
   });
 
-  factory EnvironmentalData.fromJson(Map<String, dynamic> json) {
-    return EnvironmentalData(
+  factory EnvironmentalDataModel.fromJson(Map<String, dynamic> json) {
+    return EnvironmentalDataModel(
       id: json['id'] as String,
       regionId: json['region_id'] as String,
       location: json['location'] as String?,
@@ -84,7 +84,7 @@ class EnvironmentalData {
     };
   }
 
-  EnvironmentalData copyWith({
+  EnvironmentalDataModel copyWith({
     String? id,
     String? regionId,
     String? location,
@@ -103,7 +103,7 @@ class EnvironmentalData {
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
-    return EnvironmentalData(
+    return EnvironmentalDataModel(
       id: id ?? this.id,
       regionId: regionId ?? this.regionId,
       location: location ?? this.location,

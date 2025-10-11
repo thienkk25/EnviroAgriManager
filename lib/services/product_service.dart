@@ -1,19 +1,21 @@
-import 'package:enviro_agri_manager/models/product.dart';
+import 'package:enviro_agri_manager/models/product_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProductService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  Future<List<Product>> fetchProducts() async {
+  Future<List<ProductModel>> fetchProducts() async {
     try {
       final response = await _supabase.from('products').select();
-      return (response as List).map((item) => Product.fromJson(item)).toList();
+      return (response as List)
+          .map((item) => ProductModel.fromJson(item))
+          .toList();
     } catch (e) {
       throw Exception('Lỗi lấy products: $e');
     }
   }
 
-  Future<Product> getProduct(String id) async {
+  Future<ProductModel> getProduct(String id) async {
     try {
       final response = await _supabase
           .from('products')
@@ -23,13 +25,13 @@ class ProductService {
       if (response == null) {
         throw Exception('Sản phẩm không tồn tại');
       }
-      return Product.fromJson(response);
+      return ProductModel.fromJson(response);
     } catch (e) {
       throw Exception('Lỗi lấy sản phẩm: $e');
     }
   }
 
-  Future<void> addProduct(Product product) async {
+  Future<void> addProduct(ProductModel product) async {
     try {
       await _supabase.from('products').insert(product.toJson());
     } catch (e) {
@@ -37,7 +39,7 @@ class ProductService {
     }
   }
 
-  Future<void> updateProduct(Product product) async {
+  Future<void> updateProduct(ProductModel product) async {
     try {
       await _supabase
           .from('products')

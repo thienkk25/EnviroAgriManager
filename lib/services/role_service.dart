@@ -1,11 +1,11 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/user_role.dart';
+import '../models/user_role_model.dart';
 
 class RoleService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
   /// Lấy role của 1 user từ bảng profiles + roles
-  Future<UserRole> getUserRole(String userId) async {
+  Future<UserRoleModel> getUserRole(String userId) async {
     try {
       final response = await _supabase
           .from('profiles')
@@ -14,18 +14,18 @@ class RoleService {
           .maybeSingle();
 
       if (response == null || response['roles'] == null) {
-        return UserRole.viewer; // mặc định viewer
+        return UserRoleModel.viewer; // mặc định viewer
       }
 
       final roleName = response['roles']['name'] as String;
-      return UserRole.fromString(roleName);
+      return UserRoleModel.fromString(roleName);
     } catch (e) {
       throw Exception('Lỗi lấy role: $e');
     }
   }
 
   /// Cập nhật role của user (role_id)
-  Future<void> setUserRole(String userId, UserRole role) async {
+  Future<void> setUserRole(String userId, UserRoleModel role) async {
     try {
       // Lấy role_id theo role.name
       final roleRow = await _supabase

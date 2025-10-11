@@ -1,4 +1,4 @@
-import 'package:enviro_agri_manager/models/category.dart';
+import 'package:enviro_agri_manager/models/category_model.dart';
 import 'package:enviro_agri_manager/providers/category_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -55,7 +55,7 @@ class _CategorySelectorState extends State<CategorySelector> {
 
   List<Widget> _buildRecursiveDropdowns(
     CategoryProvider provider,
-    List<Category> categories,
+    List<CategoryModel> categories,
     int level,
   ) {
     if (categories.isEmpty) return [];

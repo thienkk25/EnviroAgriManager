@@ -1,6 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../config/supabase_config.dart';
-import '../models/user_role.dart';
+import '../models/user_role_model.dart';
 import 'role_service.dart';
 
 class AuthService {
@@ -95,15 +95,15 @@ class AuthService {
   Session? get currentSession => _supabase.auth.currentSession;
 
   // Lấy role của user hiện tại
-  Future<UserRole> getCurrentUserRole() async {
+  Future<UserRoleModel> getCurrentUserRole() async {
     final user = currentUser;
-    if (user == null) return UserRole.viewer;
+    if (user == null) return UserRoleModel.viewer;
 
     return await _roleService.getUserRole(user.id);
   }
 
   // Cập nhật role của user
-  Future<void> updateUserRole(String userId, UserRole role) async {
+  Future<void> updateUserRole(String userId, UserRoleModel role) async {
     try {
       await _roleService.setUserRole(userId, role);
     } catch (error) {

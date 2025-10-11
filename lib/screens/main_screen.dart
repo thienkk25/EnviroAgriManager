@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
-import '../models/user_role.dart';
+import '../models/user_role_model.dart';
 import 'simple_home_screen.dart';
 import 'products_screen.dart';
 import 'categories_screen.dart';
@@ -34,7 +34,7 @@ class _MainScreenState extends State<MainScreen> {
     ];
 
     // Thêm màn hình quản lý user cho admin
-    if (userRole == UserRole.admin) {
+    if (userRole == UserRoleModel.admin) {
       screens.add(const UserManagementScreen());
     }
 
@@ -86,7 +86,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  List<BottomNavigationBarItem> _buildNavigationItems(UserRole userRole) {
+  List<BottomNavigationBarItem> _buildNavigationItems(UserRoleModel userRole) {
     final items = [
       const BottomNavigationBarItem(
         icon: Icon(Icons.dashboard),
@@ -108,7 +108,7 @@ class _MainScreenState extends State<MainScreen> {
     ];
 
     // Thêm menu quản lý user cho admin
-    if (userRole == UserRole.admin) {
+    if (userRole == UserRoleModel.admin) {
       items.add(
         const BottomNavigationBarItem(
           icon: Icon(Icons.people),

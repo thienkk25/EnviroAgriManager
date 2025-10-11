@@ -1,4 +1,4 @@
-class Category {
+class CategoryModel {
   final String id;
   final String name;
   final String description;
@@ -9,7 +9,7 @@ class Category {
   final DateTime updatedAt;
   final bool isActive;
 
-  Category({
+  CategoryModel({
     required this.id,
     required this.name,
     required this.description,
@@ -21,14 +21,14 @@ class Category {
     this.isActive = true,
   });
 
-  factory Category.fromJson(Map<String, dynamic> json) {
+  factory CategoryModel.fromJson(Map<String, dynamic> json) {
     final rawParent = json['parent_id'];
     final String? parent =
         (rawParent == null || (rawParent is String && rawParent.trim().isEmpty))
         ? null
         : rawParent as String;
 
-    return Category(
+    return CategoryModel(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
       description: json['description'] ?? '',
@@ -57,7 +57,7 @@ class Category {
     return data;
   }
 
-  Category copyWith({
+  CategoryModel copyWith({
     String? id,
     String? name,
     String? description,
@@ -69,7 +69,7 @@ class Category {
     DateTime? updatedAt,
     bool? isActive,
   }) {
-    return Category(
+    return CategoryModel(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,

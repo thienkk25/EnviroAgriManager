@@ -1,21 +1,21 @@
-import 'package:enviro_agri_manager/models/environmental_data.dart';
+import 'package:enviro_agri_manager/models/environmental_data_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EnvironmentalDataService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  Future<List<EnvironmentalData>> fetchEnvironmentalData() async {
+  Future<List<EnvironmentalDataModel>> fetchEnvironmentalData() async {
     try {
       final response = await _supabase.from('environmental_data').select();
       return (response as List)
-          .map((item) => EnvironmentalData.fromJson(item))
+          .map((item) => EnvironmentalDataModel.fromJson(item))
           .toList();
     } catch (e) {
       throw Exception('Lỗi lấy environmental_data: $e');
     }
   }
 
-  Future<EnvironmentalData> getEnvironmentalData(String id) async {
+  Future<EnvironmentalDataModel> getEnvironmentalData(String id) async {
     try {
       final response = await _supabase
           .from('environmental_data')
@@ -25,13 +25,13 @@ class EnvironmentalDataService {
       if (response == null) {
         throw Exception('Dữ liệu môi trường không tồn tại');
       }
-      return EnvironmentalData.fromJson(response);
+      return EnvironmentalDataModel.fromJson(response);
     } catch (e) {
       throw Exception('Lỗi lấy dữ liệu môi trường: $e');
     }
   }
 
-  Future<void> addEnvironmentalData(EnvironmentalData environmentalData) async {
+  Future<void> addEnvironmentalData(EnvironmentalDataModel environmentalData) async {
     try {
       await _supabase
           .from('environmental_data')
@@ -42,7 +42,7 @@ class EnvironmentalDataService {
   }
 
   Future<void> updateEnvironmentalData(
-    EnvironmentalData environmentalData,
+    EnvironmentalDataModel environmentalData,
   ) async {
     try {
       await _supabase

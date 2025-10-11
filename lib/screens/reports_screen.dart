@@ -1,4 +1,4 @@
-import 'package:enviro_agri_manager/models/environmental_data.dart';
+import 'package:enviro_agri_manager/models/environmental_data_model.dart';
 import 'package:enviro_agri_manager/providers/environmental_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -17,7 +17,7 @@ class ReportsScreen extends StatefulWidget {
 class _ReportsScreenState extends State<ReportsScreen> {
   String _selectedPeriod = 'Tháng này';
   Map<String, double> _trendData = {};
-  List<EnvironmentalData> _environmentalData = [];
+  List<EnvironmentalDataModel> _environmentalData = [];
   String _selectedEnvMetric =
       'temperature'; // temperature, humidity, ph, light_intensity
 
