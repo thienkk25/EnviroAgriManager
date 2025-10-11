@@ -77,201 +77,199 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
           Container(
             color: const Color(0xFF5E81AC),
             padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              spacing: 8,
+              runAlignment: WrapAlignment.spaceBetween,
+              runSpacing: 8,
               children: [
-                // Location Filter
                 Row(
                   mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  spacing: 8,
+                  spacing: 5,
                   children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on, color: Colors.white),
-                        Text(
-                          'Vị trí: ',
-                          style: GoogleFonts.inter(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
+                    const Icon(Icons.location_on, color: Colors.white),
+                    Text(
+                      'Vị trí: ',
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Consumer<RegionProvider>(
+                      builder: (context, regionProvider, child) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // ==== Tỉnh ====
+                            DropdownButton<String>(
+                              value: _selectedProvince,
+                              hint: Text("Chọn tỉnh"),
+                              dropdownColor: Color(0xFF5E81AC),
+                              style: GoogleFonts.inter(color: Colors.white),
+                              items: [
+                                const DropdownMenuItem(
+                                  value: null,
+                                  child: Text(
+                                    'Tất cả',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                                ...regionProvider.getMainRegions().map((
+                                  province,
+                                ) {
+                                  return DropdownMenuItem(
+                                    value: province.id,
+                                    child: Text(province.name),
+                                  );
+                                }),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedProvince = value;
+                                  _selectedDistrict = null;
+                                  _selectedWard = null;
+                                });
+                              },
+                            ),
+
+                            // ==== Xã ====
+                            ?_selectedProvince == null
+                                ? null
+                                : DropdownButton<String>(
+                                    value: _selectedDistrict,
+                                    hint: Text(
+                                      "Chọn xã",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    dropdownColor: Color(0xFF5E81AC),
+                                    style: GoogleFonts.inter(
+                                      color: Colors.white,
+                                    ),
+                                    items: _selectedProvince == null
+                                        ? null
+                                        : [
+                                            const DropdownMenuItem(
+                                              value: null,
+                                              child: Text(
+                                                'Tất cả',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            ...regionProvider
+                                                .getSubRegions(
+                                                  _selectedProvince!,
+                                                )
+                                                .map((district) {
+                                                  return DropdownMenuItem(
+                                                    value: district.id,
+                                                    child: Text(district.name),
+                                                  );
+                                                }),
+                                          ],
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _selectedDistrict = value;
+                                        _selectedWard = null;
+                                      });
+                                    },
+                                  ),
+
+                            ?_selectedDistrict == null
+                                ? null
+                                : DropdownButton<String>(
+                                    value: _selectedWard,
+                                    hint: Text(
+                                      "Chọn",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    dropdownColor: Color(0xFF5E81AC),
+                                    style: GoogleFonts.inter(
+                                      color: Colors.white,
+                                    ),
+                                    items: _selectedDistrict == null
+                                        ? null
+                                        : [
+                                            const DropdownMenuItem(
+                                              value: null,
+                                              child: Text(
+                                                'Tất cả',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            ...regionProvider
+                                                .getSubRegions(
+                                                  _selectedDistrict!,
+                                                )
+                                                .map((ward) {
+                                                  return DropdownMenuItem(
+                                                    value: ward.id,
+                                                    child: Text(ward.name),
+                                                  );
+                                                }),
+                                          ],
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _selectedWard = value;
+                                      });
+                                    },
+                                  ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 5,
+                  children: [
+                    const Icon(Icons.schedule, color: Colors.white),
+                    DropdownButton<String>(
+                      value: _selectedTimeRange,
+                      dropdownColor: Color(0xFF5E81AC),
+                      style: GoogleFonts.inter(color: Colors.white),
+                      underline: Container(),
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'Tất cả',
+                          child: Text(
+                            'Tất cả',
+                            style: TextStyle(color: Colors.white),
                           ),
                         ),
-                        Consumer<RegionProvider>(
-                          builder: (context, regionProvider, child) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                // ==== Tỉnh ====
-                                DropdownButton<String>(
-                                  value: _selectedProvince,
-                                  hint: Text("Chọn tỉnh"),
-                                  dropdownColor: Color(0xFF5E81AC),
-                                  style: GoogleFonts.inter(color: Colors.white),
-                                  items: [
-                                    const DropdownMenuItem(
-                                      value: null,
-                                      child: Text(
-                                        'Tất cả',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                    ...regionProvider.getMainRegions().map((
-                                      province,
-                                    ) {
-                                      return DropdownMenuItem(
-                                        value: province.id,
-                                        child: Text(province.name),
-                                      );
-                                    }),
-                                  ],
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedProvince = value;
-                                      _selectedDistrict = null;
-                                      _selectedWard = null;
-                                    });
-                                  },
-                                ),
-
-                                // ==== Xã ====
-                                ?_selectedProvince == null
-                                    ? null
-                                    : DropdownButton<String>(
-                                        value: _selectedDistrict,
-                                        hint: Text(
-                                          "Chọn xã",
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        dropdownColor: Color(0xFF5E81AC),
-                                        style: GoogleFonts.inter(
-                                          color: Colors.white,
-                                        ),
-                                        items: _selectedProvince == null
-                                            ? null
-                                            : [
-                                                const DropdownMenuItem(
-                                                  value: null,
-                                                  child: Text(
-                                                    'Tất cả',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                ),
-                                                ...regionProvider
-                                                    .getSubRegions(
-                                                      _selectedProvince!,
-                                                    )
-                                                    .map((district) {
-                                                      return DropdownMenuItem(
-                                                        value: district.id,
-                                                        child: Text(
-                                                          district.name,
-                                                        ),
-                                                      );
-                                                    }),
-                                              ],
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _selectedDistrict = value;
-                                            _selectedWard = null;
-                                          });
-                                        },
-                                      ),
-
-                                ?_selectedDistrict == null
-                                    ? null
-                                    : DropdownButton<String>(
-                                        value: _selectedWard,
-                                        hint: Text(
-                                          "Chọn",
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        dropdownColor: Color(0xFF5E81AC),
-                                        style: GoogleFonts.inter(
-                                          color: Colors.white,
-                                        ),
-                                        items: _selectedDistrict == null
-                                            ? null
-                                            : [
-                                                const DropdownMenuItem(
-                                                  value: null,
-                                                  child: Text(
-                                                    'Tất cả',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                ),
-                                                ...regionProvider
-                                                    .getSubRegions(
-                                                      _selectedDistrict!,
-                                                    )
-                                                    .map((ward) {
-                                                      return DropdownMenuItem(
-                                                        value: ward.id,
-                                                        child: Text(ward.name),
-                                                      );
-                                                    }),
-                                              ],
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _selectedWard = value;
-                                          });
-                                        },
-                                      ),
-                              ],
-                            );
-                          },
+                        DropdownMenuItem(
+                          value: 'Hôm nay',
+                          child: Text(
+                            'Hôm nay',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: '7 ngày',
+                          child: Text(
+                            '7 ngày trước',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: '30 ngày',
+                          child: Text(
+                            '30 ngày trước',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
                       ],
-                    ),
-                    Row(
-                      children: [
-                        const Icon(Icons.schedule, color: Colors.white),
-                        DropdownButton<String>(
-                          value: _selectedTimeRange,
-                          dropdownColor: Color(0xFF5E81AC),
-                          style: GoogleFonts.inter(color: Colors.white),
-                          underline: Container(),
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'Tất cả',
-                              child: Text(
-                                'Tất cả',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                            DropdownMenuItem(
-                              value: 'Hôm nay',
-                              child: Text(
-                                'Hôm nay',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                            DropdownMenuItem(
-                              value: '7 ngày',
-                              child: Text(
-                                '7 ngày trước',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                            DropdownMenuItem(
-                              value: '30 ngày',
-                              child: Text(
-                                '30 ngày trước',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ],
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedTimeRange = value!;
-                            });
-                          },
-                        ),
-                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedTimeRange = value!;
+                        });
+                      },
                     ),
                   ],
                 ),

@@ -151,18 +151,22 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                                   ),
                                 ),
                               ),
-                              Text(
-                                'Tạo: ${_formatDate(userData['profile_created_at'] as String?)}',
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
+                              Expanded(
+                                child: Text(
+                                  'Tạo: ${_formatDate(userData['profile_created_at'] as String?)}',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 10,
+                                    color: Colors.grey[600],
+                                  ),
                                 ),
                               ),
-                              Text(
-                                'Cập nhật: ${_formatDate(userData['profile_updated_at'] as String?)}',
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
+                              Expanded(
+                                child: Text(
+                                  'Cập nhật: ${_formatDate(userData['profile_updated_at'] as String?)}',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 10,
+                                    color: Colors.grey[600],
+                                  ),
                                 ),
                               ),
                             ],

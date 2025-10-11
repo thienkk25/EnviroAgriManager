@@ -61,21 +61,23 @@ class EnvironmentalDataCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFA3BE8C).withValues(alpha: .1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    environmentalData.weatherCondition ?? '',
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFFA3BE8C),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFA3BE8C).withValues(alpha: .1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      environmentalData.weatherCondition ?? '',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFFA3BE8C),
+                      ),
                     ),
                   ),
                 ),
@@ -86,6 +88,7 @@ class EnvironmentalDataCard extends StatelessWidget {
 
             // Environmental Metrics
             Row(
+              spacing: 5,
               children: [
                 Expanded(
                   child: _MetricItem(
@@ -117,6 +120,7 @@ class EnvironmentalDataCard extends StatelessWidget {
             const SizedBox(height: 16),
 
             Row(
+              spacing: 5,
               children: [
                 Expanded(
                   child: _MetricItem(
@@ -158,6 +162,7 @@ class EnvironmentalDataCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Row(
+              spacing: 5,
               children: [
                 Expanded(
                   child: _MetricItem(

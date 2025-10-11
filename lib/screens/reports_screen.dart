@@ -172,41 +172,45 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 1.5,
-              children: [
-                _OverviewCard(
-                  title: 'Tổng sản phẩm',
-                  value: '${stats['totalProducts']}',
-                  icon: Icons.inventory_2,
-                  color: const Color(0xFF5E81AC),
-                ),
-                _OverviewCard(
-                  title: 'Sản phẩm hoạt động',
-                  value: '${stats['activeProducts']}',
-                  icon: Icons.check_circle,
-                  color: const Color(0xFFA3BE8C),
-                ),
-                _OverviewCard(
-                  title: 'Giá trị tổng',
-                  value:
-                      '${(stats['totalValue'] / 1000000).toStringAsFixed(1)}M ₫',
-                  icon: Icons.attach_money,
-                  color: const Color(0xFFD08770),
-                ),
-                _OverviewCard(
-                  title: 'Danh mục cha và con',
-                  value:
-                      '${context.watch<CategoryProvider>().categories.length}',
-                  icon: Icons.category,
-                  color: const Color(0xFFB48EAD),
-                ),
-              ],
+            LayoutBuilder(
+              builder: (context, constraints) {
+                return GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: constraints.maxWidth < 600 ? 2 : 4,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: constraints.maxWidth < 600 ? .8 : 1.5,
+                  children: [
+                    _OverviewCard(
+                      title: 'Tổng sản phẩm',
+                      value: '${stats['totalProducts']}',
+                      icon: Icons.inventory_2,
+                      color: const Color(0xFF5E81AC),
+                    ),
+                    _OverviewCard(
+                      title: 'Sản phẩm hoạt động',
+                      value: '${stats['activeProducts']}',
+                      icon: Icons.check_circle,
+                      color: const Color(0xFFA3BE8C),
+                    ),
+                    _OverviewCard(
+                      title: 'Giá trị tổng',
+                      value:
+                          '${(stats['totalValue'] / 1000000).toStringAsFixed(1)}M ₫',
+                      icon: Icons.attach_money,
+                      color: const Color(0xFFD08770),
+                    ),
+                    _OverviewCard(
+                      title: 'Danh mục cha và con',
+                      value:
+                          '${context.watch<CategoryProvider>().categories.length}',
+                      icon: Icons.category,
+                      color: const Color(0xFFB48EAD),
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         );
