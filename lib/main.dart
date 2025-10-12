@@ -6,7 +6,9 @@ import 'package:enviro_agri_manager/repositories/category_repository.dart';
 import 'package:enviro_agri_manager/repositories/environmental_data_repository.dart';
 import 'package:enviro_agri_manager/repositories/product_repository.dart';
 import 'package:enviro_agri_manager/repositories/region_repository.dart';
+import 'package:enviro_agri_manager/services/auth_service.dart';
 import 'package:enviro_agri_manager/services/category_service.dart';
+import 'package:enviro_agri_manager/services/connectivity_service.dart';
 import 'package:enviro_agri_manager/services/environmental_data_service.dart';
 import 'package:enviro_agri_manager/services/product_service.dart';
 import 'package:enviro_agri_manager/services/regions_service.dart';
@@ -26,28 +28,45 @@ import 'screens/user_management_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final db = AppDatabase();
   await Supabase.initialize(
     url: SupabaseConfig.supabaseUrl,
     anonKey: SupabaseConfig.supabaseAnonKey,
   );
+  final db = AppDatabase();
 
   runApp(
     MultiProvider(
       providers: [
         Provider.value(value: db),
+
+        // Services
+        Provider(create: (_) => AuthService()),
+        Provider(create: (_) => ConnectivityService()),
         Provider(create: (_) => CategoryService()),
         Provider(create: (_) => EnvironmentalDataService()),
         Provider(create: (_) => ProductService()),
         Provider(create: (_) => RegionService()),
 
-        // Category
-        ProxyProvider2<AppDatabase, CategoryService, CategoryRepository>(
-          update: (_, db, service, __) => CategoryRepository(db, service),
+        // Auth
+        ChangeNotifierProxyProvider<AuthService, AuthProvider>(
+          create: (context) => AuthProvider(context.read<AuthService>()),
+          update: (_, authService, provider) => provider!..update(authService),
         ),
 
+        // Connectivity
+        ChangeNotifierProxyProvider<ConnectivityService, ConnectivityProvider>(
+          create: (context) =>
+              ConnectivityProvider(context.read<ConnectivityService>()),
+          update: (_, service, provider) => provider!..update(service),
+        ),
+
+        // Category
+        ProxyProvider2<AppDatabase, CategoryService, CategoryRepository>(
+          update: (_, db, service, _) => CategoryRepository(db, service),
+        ),
         ChangeNotifierProxyProvider<CategoryRepository, CategoryProvider>(
-          create: (_) => CategoryProvider(null),
+          create: (context) =>
+              CategoryProvider(context.read<CategoryRepository>()),
           update: (_, repo, provider) => provider!..update(repo),
         ),
 
@@ -57,38 +76,37 @@ void main() async {
           EnvironmentalDataService,
           EnvironmentalDataRepository
         >(
-          update: (_, db, service, __) =>
+          update: (_, db, service, _) =>
               EnvironmentalDataRepository(db, service),
         ),
-
         ChangeNotifierProxyProvider<
           EnvironmentalDataRepository,
           EnvironmentalDataProvider
         >(
-          create: (_) => EnvironmentalDataProvider(null),
+          create: (context) => EnvironmentalDataProvider(
+            context.read<EnvironmentalDataRepository>(),
+          ),
           update: (_, repo, provider) => provider!..update(repo),
         ),
 
         // Product
         ProxyProvider2<AppDatabase, ProductService, ProductRepository>(
-          update: (_, db, service, __) => ProductRepository(db, service),
+          update: (_, db, service, _) => ProductRepository(db, service),
         ),
         ChangeNotifierProxyProvider<ProductRepository, ProductProvider>(
-          create: (_) => ProductProvider(null),
+          create: (context) =>
+              ProductProvider(context.read<ProductRepository>()),
           update: (_, repo, provider) => provider!..update(repo),
         ),
 
         // Region
         ProxyProvider2<AppDatabase, RegionService, RegionRepository>(
-          update: (_, db, service, __) => RegionRepository(db, service),
+          update: (_, db, service, _) => RegionRepository(db, service),
         ),
         ChangeNotifierProxyProvider<RegionRepository, RegionProvider>(
-          create: (_) => RegionProvider(null),
+          create: (context) => RegionProvider(context.read<RegionRepository>()),
           update: (_, repo, provider) => provider!..update(repo),
         ),
-        //---
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
       ],
       child: const MainApp(),
     ),

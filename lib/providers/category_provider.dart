@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CategoryProvider with ChangeNotifier {
-  CategoryRepository? _categoryRepository;
+  CategoryRepository _categoryRepository;
 
   List<CategoryModel> _categories = [];
   bool _isLoading = false;
@@ -29,7 +29,7 @@ class CategoryProvider with ChangeNotifier {
 
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      _categories = await _categoryRepository!.syncCategories(
+      _categories = await _categoryRepository.syncCategories(
         isOnline: isOnline,
       );
     } catch (e) {
@@ -44,7 +44,7 @@ class CategoryProvider with ChangeNotifier {
   Future<void> refreshCategories(BuildContext context) async {
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      _categories = await _categoryRepository!.syncCategories(
+      _categories = await _categoryRepository.syncCategories(
         isOnline: isOnline,
       );
 
@@ -63,7 +63,7 @@ class CategoryProvider with ChangeNotifier {
 
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _categoryRepository!.add(category, isOnline: isOnline);
+      await _categoryRepository.add(category, isOnline: isOnline);
       _categories.add(category);
       _error = '';
       return true;
@@ -86,7 +86,7 @@ class CategoryProvider with ChangeNotifier {
 
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _categoryRepository!.update(category, isOnline: isOnline);
+      await _categoryRepository.update(category, isOnline: isOnline);
 
       final index = _categories.indexWhere((c) => c.id == category.id);
       if (index != -1) {
@@ -110,7 +110,7 @@ class CategoryProvider with ChangeNotifier {
 
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _categoryRepository!.delete(id, isOnline: isOnline);
+      await _categoryRepository.delete(id, isOnline: isOnline);
 
       _categories.removeWhere((category) => category.id == id);
       _error = '';

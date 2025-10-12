@@ -4,7 +4,7 @@ import '../services/auth_service.dart';
 import '../models/user_role_model.dart';
 
 class AuthProvider with ChangeNotifier {
-  final AuthService _authService = AuthService();
+  AuthService _authService;
   User? _user;
   UserRoleModel _userRole = UserRoleModel.viewer;
   bool _isLoading = false;
@@ -16,8 +16,12 @@ class AuthProvider with ChangeNotifier {
   String? get errorMessage => _errorMessage;
   bool get isSignedIn => _user != null;
 
-  AuthProvider() {
+  AuthProvider(this._authService) {
     _initializeAuth();
+  }
+  void update(AuthService authService) {
+    _authService = authService;
+    notifyListeners();
   }
 
   /// Khởi tạo auth state

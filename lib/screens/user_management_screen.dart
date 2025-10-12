@@ -70,7 +70,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             }
 
             final users = snapshot.data ?? [];
-            final user = AuthProvider().user?.id;
+            final user = context.read<AuthProvider>().user?.id;
             if (users.isEmpty) {
               return Center(
                 child: Column(

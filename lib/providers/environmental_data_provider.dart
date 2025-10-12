@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class EnvironmentalDataProvider with ChangeNotifier {
-  EnvironmentalDataRepository? _environmentalDataRepository;
+  EnvironmentalDataRepository _environmentalDataRepository;
 
   List<EnvironmentalDataModel> _environmentalData = [];
   bool _isLoading = false;
@@ -29,7 +29,7 @@ class EnvironmentalDataProvider with ChangeNotifier {
     notifyListeners();
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      _environmentalData = await _environmentalDataRepository!
+      _environmentalData = await _environmentalDataRepository
           .syncEnvironmentalData(isOnline: isOnline);
     } catch (e) {
       _error = 'Lỗi khi tải danh sách danh mục: ${e.toString()}';
@@ -42,7 +42,7 @@ class EnvironmentalDataProvider with ChangeNotifier {
   Future<void> refreshEnvironmentalData(BuildContext context) async {
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      _environmentalData = await _environmentalDataRepository!
+      _environmentalData = await _environmentalDataRepository
           .syncEnvironmentalData(isOnline: isOnline);
 
       _error = '';
@@ -62,7 +62,7 @@ class EnvironmentalDataProvider with ChangeNotifier {
     notifyListeners();
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _environmentalDataRepository!.add(
+      await _environmentalDataRepository.add(
         environmentalData,
         isOnline: isOnline,
       );
@@ -87,7 +87,7 @@ class EnvironmentalDataProvider with ChangeNotifier {
     notifyListeners();
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _environmentalDataRepository!.update(
+      await _environmentalDataRepository.update(
         environmentalData,
         isOnline: isOnline,
       );
@@ -115,7 +115,7 @@ class EnvironmentalDataProvider with ChangeNotifier {
     notifyListeners();
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _environmentalDataRepository!.delete(id, isOnline: isOnline);
+      await _environmentalDataRepository.delete(id, isOnline: isOnline);
 
       _environmentalData.removeWhere(
         (environmentalData) => environmentalData.id == id,

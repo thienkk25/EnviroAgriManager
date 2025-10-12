@@ -368,7 +368,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   late TextEditingController _unitController;
 
   String _selectedCategory = '';
-  final String _imageUrl = '';
+  final String _imageUrl = 'https://example.com/image2.jpg';
   String _selectedStatus = 'active';
 
   bool get isView => widget.mode == ProductFormMode.view;

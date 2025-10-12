@@ -442,7 +442,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         );
                       }).toList();
                     },
-                    tooltipRoundedRadius: 8,
+                    tooltipBorderRadius: BorderRadius.circular(8),
                     tooltipPadding: const EdgeInsets.all(8),
                   ),
                   handleBuiltInTouches: true,

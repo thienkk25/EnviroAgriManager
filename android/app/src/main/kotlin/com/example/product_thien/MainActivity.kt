@@ -1,4 +1,4 @@
-package com.example.product_thien
+package com.vn.enviro_agri_manager
 
 import io.flutter.embedding.android.FlutterActivity
 

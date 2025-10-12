@@ -1,6 +1,6 @@
+import 'package:enviro_agri_manager/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
 import 'login_screen.dart';
 import 'main_screen.dart';
 

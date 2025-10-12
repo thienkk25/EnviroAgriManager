@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class RegionProvider with ChangeNotifier {
-  RegionRepository? _regionRepository;
+  RegionRepository _regionRepository;
   RegionProvider(this._regionRepository);
   void update(RegionRepository repo) {
     _regionRepository = repo;
@@ -26,7 +26,7 @@ class RegionProvider with ChangeNotifier {
     notifyListeners();
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      _regions = await _regionRepository!.syncRegions(isOnline: isOnline);
+      _regions = await _regionRepository.syncRegions(isOnline: isOnline);
     } catch (e) {
       _error = 'Lỗi khi tải danh sách: ${e.toString()}';
     } finally {
@@ -38,7 +38,7 @@ class RegionProvider with ChangeNotifier {
   Future<void> refreshRegions(BuildContext context) async {
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      _regions = await _regionRepository!.syncRegions(isOnline: isOnline);
+      _regions = await _regionRepository.syncRegions(isOnline: isOnline);
 
       _error = '';
     } catch (e) {
@@ -53,7 +53,7 @@ class RegionProvider with ChangeNotifier {
     notifyListeners();
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _regionRepository!.add(region, isOnline: isOnline);
+      await _regionRepository.add(region, isOnline: isOnline);
       _regions.add(region);
       _error = '';
       return true;
@@ -75,7 +75,7 @@ class RegionProvider with ChangeNotifier {
     notifyListeners();
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _regionRepository!.update(region, level, isOnline: isOnline);
+      await _regionRepository.update(region, level, isOnline: isOnline);
 
       final index = _regions.indexWhere((c) => c.id == region.id);
       if (index != -1) {
@@ -97,7 +97,7 @@ class RegionProvider with ChangeNotifier {
     notifyListeners();
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _regionRepository!.delete(id, isOnline: isOnline);
+      await _regionRepository.delete(id, isOnline: isOnline);
 
       _regions.removeWhere((region) => region.id == id);
       _error = '';

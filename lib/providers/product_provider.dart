@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import '../models/product_model.dart';
 
 class ProductProvider with ChangeNotifier {
-  ProductRepository? _productRepository;
+  ProductRepository _productRepository;
 
   ProductProvider(this._productRepository);
   void update(ProductRepository repo) {
@@ -29,7 +29,7 @@ class ProductProvider with ChangeNotifier {
     notifyListeners();
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      _products = await _productRepository!.syncProducts(isOnline: isOnline);
+      _products = await _productRepository.syncProducts(isOnline: isOnline);
     } catch (e) {
       _error = 'Lỗi khi tải danh sách sản phẩm: ${e.toString()}';
     } finally {
@@ -41,7 +41,7 @@ class ProductProvider with ChangeNotifier {
   Future<void> refreshProducts(BuildContext context) async {
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      _products = await _productRepository!.syncProducts(isOnline: isOnline);
+      _products = await _productRepository.syncProducts(isOnline: isOnline);
 
       _error = '';
     } catch (e) {
@@ -57,7 +57,7 @@ class ProductProvider with ChangeNotifier {
     notifyListeners();
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _productRepository!.add(product, isOnline: isOnline);
+      await _productRepository.add(product, isOnline: isOnline);
       _products.add(product);
       _error = '';
       return true;
@@ -80,7 +80,7 @@ class ProductProvider with ChangeNotifier {
     notifyListeners();
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _productRepository!.update(product, isOnline: isOnline);
+      await _productRepository.update(product, isOnline: isOnline);
       final index = _products.indexWhere((p) => p.id == product.id);
       if (index != -1) {
         _products[index] = product;
@@ -106,7 +106,7 @@ class ProductProvider with ChangeNotifier {
     notifyListeners();
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _productRepository!.delete(productId, isOnline: isOnline);
+      await _productRepository.delete(productId, isOnline: isOnline);
       _products.removeWhere((product) => product.id == productId);
       _error = '';
       return true;

@@ -3,12 +3,12 @@ import 'package:enviro_agri_manager/services/connectivity_service.dart';
 
 /// Provider để quản lý và thông báo trạng thái mạng online/offline
 class ConnectivityProvider with ChangeNotifier {
-  final ConnectivityService _connectivityService = ConnectivityService();
+  ConnectivityService _connectivityService;
   bool _isOnline = true;
 
   bool get isOnline => _isOnline;
 
-  ConnectivityProvider() {
+  ConnectivityProvider(this._connectivityService) {
     // Lắng nghe thay đổi mạng realtime
     _connectivityService.connectionStatusStream.listen((status) {
       _isOnline = status;
@@ -17,6 +17,10 @@ class ConnectivityProvider with ChangeNotifier {
 
     // Kiểm tra mạng lần đầu khi khởi tạo
     _init();
+  }
+  void update(ConnectivityService connectivityService) {
+    _connectivityService = connectivityService;
+    notifyListeners();
   }
 
   Future<void> _init() async {
