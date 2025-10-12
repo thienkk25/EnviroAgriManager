@@ -22,8 +22,8 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<EnvironmentalDataProvider>().fetchEnvironmentalData();
-      context.read<RegionProvider>().fetchRegions();
+      context.read<EnvironmentalDataProvider>().fetchEnvironmentalData(context);
+      context.read<RegionProvider>().fetchRegions(context);
     });
 
     super.initState();
@@ -302,7 +302,7 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                         const SizedBox(height: 16),
                         ElevatedButton(
                           onPressed: () => environmentalDataProvider
-                              .fetchEnvironmentalData(),
+                              .fetchEnvironmentalData(context),
                           child: const Text('Thử lại'),
                         ),
                       ],
@@ -389,6 +389,7 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                   final result = await context
                                       .read<EnvironmentalDataProvider>()
                                       .deleteEnvironmentalData(
+                                        context,
                                         filteredEnvimentalData[index].id,
                                       );
 
@@ -939,7 +940,10 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                   );
                               final result = await context
                                   .read<EnvironmentalDataProvider>()
-                                  .addEnvironmentalData(newEnvironmentalData);
+                                  .addEnvironmentalData(
+                                    context,
+                                    newEnvironmentalData,
+                                  );
                               if (!context.mounted) return;
                               Navigator.of(context).pop();
                               if (result) {
@@ -1005,6 +1009,7 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                               final result = await context
                                   .read<EnvironmentalDataProvider>()
                                   .updateEnvironmentalData(
+                                    context,
                                     newEnvironmentalData,
                                   );
                               if (!context.mounted) return;

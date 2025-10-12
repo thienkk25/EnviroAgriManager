@@ -21,7 +21,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<CategoryProvider>().fetchCategories();
+      context.read<CategoryProvider>().fetchCategories(context);
     });
     super.initState();
   }
@@ -48,7 +48,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () => categoryProvider.fetchCategories(),
+                  onPressed: () => categoryProvider.fetchCategories(context),
                   child: const Text('Thử lại'),
                 ),
               ],
@@ -86,7 +86,10 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           );
         }
 
-        return CategoryScreen(startFirst: true);
+        return RefreshIndicator(
+          onRefresh: () => categoryProvider.refreshCategories(context),
+          child: CategoryScreen(startFirst: true),
+        );
       },
     );
   }
@@ -408,7 +411,7 @@ class CategoryScreen extends StatelessWidget {
                           );
                           final result = await context
                               .read<CategoryProvider>()
-                              .addCategory(newCategory);
+                              .addCategory(context, newCategory);
                           if (!context.mounted) return;
                           Navigator.of(context).pop();
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -436,7 +439,7 @@ class CategoryScreen extends StatelessWidget {
                               );
                           final result = await context
                               .read<CategoryProvider>()
-                              .updateCategory(updateCategory);
+                              .updateCategory(context, updateCategory);
                           if (!context.mounted) return;
                           Navigator.of(context).pop();
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -496,7 +499,7 @@ class CategoryScreen extends StatelessWidget {
               onPressed: () async {
                 final result = await context
                     .read<CategoryProvider>()
-                    .deleteCategory(category.id);
+                    .deleteCategory(context, category.id);
                 if (!context.mounted) return;
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(

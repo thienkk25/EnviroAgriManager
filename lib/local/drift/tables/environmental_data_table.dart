@@ -34,6 +34,10 @@ class EnvironmentalDataTable extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 
+  // Đồng bộ
+  BoolColumn get isSynced => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get deletedAt => dateTime().nullable()();
+
   // Khóa chính
   @override
   Set<Column> get primaryKey => {id};

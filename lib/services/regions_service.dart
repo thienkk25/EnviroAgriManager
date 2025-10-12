@@ -65,4 +65,13 @@ class RegionService {
       throw Exception('Lỗi xóa region: $e');
     }
   }
+
+  Future<void> uploadRegions(List<RegionModel> regions) async {
+    try {
+      final data = regions.map((c) => c.toJson()).toList();
+      await _supabase.from('regions').upsert(data);
+    } catch (e) {
+      throw Exception('Lỗi upload regions: $e');
+    }
+  }
 }

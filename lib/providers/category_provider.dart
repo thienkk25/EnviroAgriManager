@@ -1,9 +1,12 @@
-import 'package:enviro_agri_manager/services/category_service.dart';
+import 'package:enviro_agri_manager/models/category_model.dart';
+import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
+import 'package:enviro_agri_manager/repositories/category_repository.dart';
 import 'package:flutter/material.dart';
-import '../models/category_model.dart';
+import 'package:provider/provider.dart';
 
 class CategoryProvider with ChangeNotifier {
-  final CategoryService _categoryService = CategoryService();
+  CategoryRepository? _categoryRepository;
+
   List<CategoryModel> _categories = [];
   bool _isLoading = false;
   String _error = '';
@@ -12,24 +15,25 @@ class CategoryProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String get error => _error;
 
-  // Khởi tạo dữ liệu mẫu
-  void initializeSampleData() {
-    _categories = [];
+  CategoryProvider(this._categoryRepository);
+  void update(CategoryRepository repo) {
+    _categoryRepository = repo;
     notifyListeners();
   }
 
   // Lấy danh sách danh mục
-  Future<void> fetchCategories() async {
+  Future<void> fetchCategories(BuildContext context) async {
     _isLoading = true;
     _error = '';
     notifyListeners();
 
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      final data = await _categoryService.fetchCategories();
-      _categories = data;
-      // if (_categories.isEmpty) {
-      //   initializeSampleData();
-      // }
+      _categories = await _categoryRepository!.syncCategories(
+        isOnline: isOnline,
+      );
+
+      _error = '';
     } catch (e) {
       _error = 'Lỗi khi tải danh sách danh mục: ${e.toString()}';
     } finally {
@@ -38,13 +42,30 @@ class CategoryProvider with ChangeNotifier {
     }
   }
 
+  // Làm mới danh sách danh mục
+  Future<void> refreshCategories(BuildContext context) async {
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
+    try {
+      _categories = await _categoryRepository!.syncCategories(
+        isOnline: isOnline,
+      );
+
+      _error = '';
+    } catch (e) {
+      _error = 'Lỗi khi tải danh sách danh mục: ${e.toString()}';
+    } finally {
+      notifyListeners();
+    }
+  }
+
   // Thêm danh mục mới
-  Future<bool> addCategory(CategoryModel category) async {
+  Future<bool> addCategory(BuildContext context, CategoryModel category) async {
     _isLoading = true;
     notifyListeners();
 
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _categoryService.addCategory(category);
+      await _categoryRepository!.add(category, isOnline: isOnline);
       _categories.add(category);
       _error = '';
       return true;
@@ -58,12 +79,16 @@ class CategoryProvider with ChangeNotifier {
   }
 
   // Cập nhật danh mục
-  Future<bool> updateCategory(CategoryModel category) async {
+  Future<bool> updateCategory(
+    BuildContext context,
+    CategoryModel category,
+  ) async {
     _isLoading = true;
     notifyListeners();
 
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _categoryService.updateCategory(category);
+      await _categoryRepository!.update(category, isOnline: isOnline);
 
       final index = _categories.indexWhere((c) => c.id == category.id);
       if (index != -1) {
@@ -81,12 +106,13 @@ class CategoryProvider with ChangeNotifier {
   }
 
   // Xóa danh mục
-  Future<bool> deleteCategory(String id) async {
+  Future<bool> deleteCategory(BuildContext context, String id) async {
     _isLoading = true;
     notifyListeners();
 
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _categoryService.deleteCategory(id);
+      await _categoryRepository!.delete(id, isOnline: isOnline);
 
       _categories.removeWhere((category) => category.id == id);
       _error = '';

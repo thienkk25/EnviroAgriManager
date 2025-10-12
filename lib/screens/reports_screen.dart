@@ -28,8 +28,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
   void refreshData() {
     setState(() {
-      context.read<ProductProvider>().fetchProducts();
-      context.read<EnvironmentalDataProvider>().fetchEnvironmentalData();
+      context.read<ProductProvider>().fetchProducts(context);
+      context.read<EnvironmentalDataProvider>().fetchEnvironmentalData(context);
       _trendData = context.read<ProductProvider>().getTrendByCategory(
         context,
         _selectedPeriod,

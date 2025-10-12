@@ -24,7 +24,7 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
   }
 
   Future<void> reset() async {
-    await context.read<RegionProvider>().fetchRegions();
+    await context.read<RegionProvider>().fetchRegions(context);
     setState(() {
       regions = context.read<RegionProvider>().regions;
     });
@@ -109,7 +109,7 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
                                 onPressed: () async {
                                   final result = await context
                                       .read<RegionProvider>()
-                                      .deleteRegion(child.id);
+                                      .deleteRegion(context, child.id);
                                   if (!context.mounted) return;
                                   Navigator.pop(ctx);
                                   ScaffoldMessenger.of(ctx).showSnackBar(
@@ -174,7 +174,7 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => regionProvider.fetchRegions(),
+                    onPressed: () => regionProvider.fetchRegions(context),
                     child: const Text('Thử lại'),
                   ),
                 ],
@@ -432,7 +432,7 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
                       );
                       final result = await context
                           .read<RegionProvider>()
-                          .addRegion(newRegion);
+                          .addRegion(context, newRegion);
                       if (!context.mounted) return;
                       Navigator.pop(ctx);
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -459,12 +459,12 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
                       if (selectedLocationFirstLevel == null) {
                         result = await context
                             .read<RegionProvider>()
-                            .updateRegion(newRegion, true);
+                            .updateRegion(context, newRegion, true);
                         await reset();
                       } else {
                         result = await context
                             .read<RegionProvider>()
-                            .updateRegion(newRegion, false);
+                            .updateRegion(context, newRegion, false);
                       }
 
                       if (!context.mounted) return;

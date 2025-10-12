@@ -31,7 +31,9 @@ class EnvironmentalDataService {
     }
   }
 
-  Future<void> addEnvironmentalData(EnvironmentalDataModel environmentalData) async {
+  Future<void> addEnvironmentalData(
+    EnvironmentalDataModel environmentalData,
+  ) async {
     try {
       await _supabase
           .from('environmental_data')
@@ -59,6 +61,17 @@ class EnvironmentalDataService {
       await _supabase.from('environmental_data').delete().eq('id', id);
     } catch (e) {
       throw Exception('Lỗi xóa dữ liệu môi trường: $e');
+    }
+  }
+
+  Future<void> uploadEnvironmentalData(
+    List<EnvironmentalDataModel> environmentalData,
+  ) async {
+    try {
+      final data = environmentalData.map((c) => c.toJson()).toList();
+      await _supabase.from('environmental_data').upsert(data);
+    } catch (e) {
+      throw Exception('Lỗi upload environmental_data: $e');
     }
   }
 }

@@ -1,11 +1,13 @@
 import 'package:enviro_agri_manager/models/environmental_data_model.dart';
 import 'package:enviro_agri_manager/models/region_model.dart';
-import 'package:enviro_agri_manager/services/environmental_data_service.dart';
+import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
+import 'package:enviro_agri_manager/repositories/environmental_data_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class EnvironmentalDataProvider with ChangeNotifier {
-  final EnvironmentalDataService _environmentalDataService =
-      EnvironmentalDataService();
+  EnvironmentalDataRepository? _environmentalDataRepository;
+
   List<EnvironmentalDataModel> _environmentalData = [];
   bool _isLoading = false;
   String _error = '';
@@ -14,24 +16,22 @@ class EnvironmentalDataProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String get error => _error;
 
-  // Khởi tạo dữ liệu mẫu
-  void initializeSampleData() {
-    _environmentalData = [];
+  EnvironmentalDataProvider(this._environmentalDataRepository);
+  void update(EnvironmentalDataRepository repo) {
+    _environmentalDataRepository = repo;
     notifyListeners();
   }
 
   // Lấy danh sách môi trường
-  Future<void> fetchEnvironmentalData() async {
+  Future<void> fetchEnvironmentalData(BuildContext context) async {
     _isLoading = true;
     _error = '';
     notifyListeners();
-
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      final data = await _environmentalDataService.fetchEnvironmentalData();
-      _environmentalData = data;
-      // if (_environmentalData.isEmpty) {
-      //   initializeSampleData();
-      // }
+      _environmentalData = await _environmentalDataRepository!
+          .syncEnvironmentalData(isOnline: isOnline);
+      _error = '';
     } catch (e) {
       _error = 'Lỗi khi tải danh sách danh mục: ${e.toString()}';
     } finally {
@@ -40,15 +40,33 @@ class EnvironmentalDataProvider with ChangeNotifier {
     }
   }
 
+  Future<void> refreshEnvironmentalData(BuildContext context) async {
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
+    try {
+      _environmentalData = await _environmentalDataRepository!
+          .syncEnvironmentalData(isOnline: isOnline);
+
+      _error = '';
+    } catch (e) {
+      _error = 'Lỗi khi tải danh sách danh mục: ${e.toString()}';
+    } finally {
+      notifyListeners();
+    }
+  }
+
   // Thêm môi trường mới
   Future<bool> addEnvironmentalData(
+    BuildContext context,
     EnvironmentalDataModel environmentalData,
   ) async {
     _isLoading = true;
     notifyListeners();
-
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _environmentalDataService.addEnvironmentalData(environmentalData);
+      await _environmentalDataRepository!.add(
+        environmentalData,
+        isOnline: isOnline,
+      );
       _environmentalData.add(environmentalData);
       _error = '';
       return true;
@@ -63,14 +81,16 @@ class EnvironmentalDataProvider with ChangeNotifier {
 
   // Cập nhật môi trường
   Future<bool> updateEnvironmentalData(
+    BuildContext context,
     EnvironmentalDataModel environmentalData,
   ) async {
     _isLoading = true;
     notifyListeners();
-
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _environmentalDataService.updateEnvironmentalData(
+      await _environmentalDataRepository!.update(
         environmentalData,
+        isOnline: isOnline,
       );
 
       final index = _environmentalData.indexWhere(
@@ -91,12 +111,12 @@ class EnvironmentalDataProvider with ChangeNotifier {
   }
 
   // Xóa môi trường
-  Future<bool> deleteEnvironmentalData(String id) async {
+  Future<bool> deleteEnvironmentalData(BuildContext context, String id) async {
     _isLoading = true;
     notifyListeners();
-
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _environmentalDataService.deleteEnvironmentalData(id);
+      await _environmentalDataRepository!.delete(id, isOnline: isOnline);
 
       _environmentalData.removeWhere(
         (environmentalData) => environmentalData.id == id,

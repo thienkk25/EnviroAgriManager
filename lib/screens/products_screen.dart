@@ -26,8 +26,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ProductProvider>().fetchProducts();
-      context.read<CategoryProvider>().fetchCategories();
+      context.read<ProductProvider>().fetchProducts(context);
+      context.read<CategoryProvider>().fetchCategories(context);
     });
   }
 
@@ -174,7 +174,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton(
-                          onPressed: () => productProvider.fetchProducts(),
+                          onPressed: () =>
+                              productProvider.fetchProducts(context),
                           child: const Text('Thử lại'),
                         ),
                       ],
@@ -312,7 +313,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
               onPressed: () async {
                 final result = await context
                     .read<ProductProvider>()
-                    .deleteProduct(product.id);
+                    .deleteProduct(context, product.id);
                 if (!context.mounted) return;
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -662,7 +663,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         status: _selectedStatus,
       );
 
-      final result = await context.read<ProductProvider>().addProduct(product);
+      final result = await context.read<ProductProvider>().addProduct(
+        context,
+        product,
+      );
       if (!context.mounted) return;
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -697,6 +701,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       );
 
       final result = await context.read<ProductProvider>().updateProduct(
+        context,
         updatedProduct,
       );
       if (!context.mounted) return;

@@ -57,4 +57,13 @@ class ProductService {
       throw Exception('Lỗi xóa sản phẩm: $e');
     }
   }
+
+  Future<void> uploadProducts(List<ProductModel> products) async {
+    try {
+      final data = products.map((c) => c.toJson()).toList();
+      await _supabase.from('products').upsert(data);
+    } catch (e) {
+      throw Exception('Lỗi upload products: $e');
+    }
+  }
 }

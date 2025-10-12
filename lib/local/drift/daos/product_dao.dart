@@ -30,15 +30,29 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
 
   // READ
   Future<List<ProductModel>> getAllProducts() async {
-    final rows = await select(productTable).get();
+    final rows = await (select(
+      productTable,
+    )..where((tbl) => tbl.deletedAt.isNull())).get();
     return rows.map(_mapToModel).toList();
   }
 
-  Future<ProductModel?> getProductById(String id) async {
-    final row = await (select(
+  Future<List<ProductModel>> getUnsyncedProductsAsModels() async {
+    final rows = await (select(
       productTable,
-    )..where((p) => p.id.equals(id))).getSingleOrNull();
-    return row != null ? _mapToModel(row) : null;
+    )..where((t) => t.isSynced.equals(false))).get();
+    return rows.map(_mapToModel).toList();
+  }
+
+  Future<void> insertOrUpdateProduct(ProductTableCompanion entry) {
+    return into(
+      productTable,
+    ).insertOnConflictUpdate(entry.copyWith(isSynced: Value(false)));
+  }
+
+  Future<void> markAsSynced(List<String> ids) {
+    return (update(productTable)..where((t) => t.id.isIn(ids))).write(
+      ProductTableCompanion(isSynced: Value(true)),
+    );
   }
 
   // UPDATE
@@ -66,27 +80,46 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
   }
 
   // SYNC
-  Future<void> syncFromSupabase(List<Map<String, dynamic>> remoteData) async {
+  Future<void> syncFromSupabase(List<ProductModel> remoteData) async {
     await batch((batch) {
       batch.insertAllOnConflictUpdate(
         productTable,
-        remoteData.map((data) {
+        remoteData.map((p) {
           return ProductTableCompanion(
-            id: Value(data['id']),
-            name: Value(data['name']),
-            description: Value(data['description']),
-            categoryId: Value(data['category_id']),
-            price: Value((data['price'] ?? 0).toDouble()),
-            quantity: Value(data['quantity'] ?? 0),
-            unit: Value(data['unit'] ?? ''),
-            imageUrl: Value(data['image_url'] ?? ''),
-            createdAt: Value(DateTime.parse(data['created_at'])),
-            updatedAt: Value(DateTime.parse(data['updated_at'])),
-            status: Value(data['status'] ?? 'active'),
+            id: Value(p.id),
+            name: Value(p.name),
+            description: Value(p.description),
+            categoryId: Value(p.categoryId),
+            price: Value(p.price),
+            quantity: Value(p.quantity),
+            unit: Value(p.unit),
+            imageUrl: Value(p.imageUrl),
+            createdAt: Value(p.createdAt),
+            updatedAt: Value(p.updatedAt),
+            status: Value(p.status),
           );
         }).toList(),
       );
     });
+  }
+
+  Future<void> softDeleteProduct(String id) async {
+    await (update(productTable)..where((t) => t.id.equals(id))).write(
+      ProductTableCompanion(
+        deletedAt: Value(DateTime.now()),
+        isSynced: Value(false), // Đánh dấu chưa sync
+      ),
+    );
+  }
+
+  Future<List<ProductModel>> getDeletedUnsyncedProducts() async {
+    final rows =
+        await (select(productTable)..where(
+              (t) => t.deletedAt.isNotNull() & t.isSynced
+                ..equals(false),
+            ))
+            .get();
+    return rows.map(_mapToModel).toList();
   }
 
   ProductModel _mapToModel(ProductTableData row) {

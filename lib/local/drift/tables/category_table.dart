@@ -28,6 +28,12 @@ class CategoryTable extends Table {
   // Trạng thái hoạt động
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
 
+  // Kiểm tra đồng bộ chưa
+  BoolColumn get isSynced => boolean().withDefault(const Constant(false))();
+
+  // Kiểm tra xóa
+  DateTimeColumn get deletedAt => dateTime().nullable()();
+
   // Khóa chính
   @override
   Set<Column> get primaryKey => {id};

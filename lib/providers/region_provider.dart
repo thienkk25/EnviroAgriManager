@@ -1,9 +1,17 @@
 import 'package:enviro_agri_manager/models/region_model.dart';
-import 'package:enviro_agri_manager/services/regions_service.dart';
+import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
+import 'package:enviro_agri_manager/repositories/region_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RegionProvider with ChangeNotifier {
-  final RegionService _regionService = RegionService();
+  RegionRepository? _regionRepository;
+  RegionProvider(this._regionRepository);
+  void update(RegionRepository repo) {
+    _regionRepository = repo;
+    notifyListeners();
+  }
+
   List<RegionModel> _regions = [];
   bool _isLoading = false;
   String _error = '';
@@ -12,23 +20,13 @@ class RegionProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String get error => _error;
 
-  // Khởi tạo dữ liệu mẫu
-  void initializeSampleData() {
-    _regions = [];
-    notifyListeners();
-  }
-
-  Future<void> fetchRegions() async {
+  Future<void> fetchRegions(BuildContext context) async {
     _isLoading = true;
     _error = '';
     notifyListeners();
-
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      final data = await _regionService.fetchRegions();
-      _regions = data;
-      // if (_regions.isEmpty) {
-      //   initializeSampleData();
-      // }
+      _regions = await _regionRepository!.syncRegions(isOnline: isOnline);
     } catch (e) {
       _error = 'Lỗi khi tải danh sách: ${e.toString()}';
     } finally {
@@ -37,12 +35,12 @@ class RegionProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> addRegion(RegionModel region) async {
+  Future<bool> addRegion(BuildContext context, RegionModel region) async {
     _isLoading = true;
     notifyListeners();
-
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _regionService.addRegion(region);
+      await _regionRepository!.add(region, isOnline: isOnline);
       _regions.add(region);
       _error = '';
       return true;
@@ -55,12 +53,16 @@ class RegionProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> updateRegion(RegionModel region, bool level) async {
+  Future<bool> updateRegion(
+    BuildContext context,
+    RegionModel region,
+    bool level,
+  ) async {
     _isLoading = true;
     notifyListeners();
-
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _regionService.updateRegion(region, level);
+      await _regionRepository!.update(region, level, isOnline: isOnline);
 
       final index = _regions.indexWhere((c) => c.id == region.id);
       if (index != -1) {
@@ -77,12 +79,12 @@ class RegionProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> deleteRegion(String id) async {
+  Future<bool> deleteRegion(BuildContext context, String id) async {
     _isLoading = true;
     notifyListeners();
-
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _regionService.deleteRegion(id);
+      await _regionRepository!.delete(id, isOnline: isOnline);
 
       _regions.removeWhere((region) => region.id == id);
       _error = '';

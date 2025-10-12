@@ -1,11 +1,19 @@
 import 'package:enviro_agri_manager/providers/category_provider.dart';
-import 'package:enviro_agri_manager/services/product_service.dart';
+import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
+import 'package:enviro_agri_manager/repositories/product_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/product_model.dart';
 
 class ProductProvider with ChangeNotifier {
-  final ProductService _productService = ProductService();
+  ProductRepository? _productRepository;
+
+  ProductProvider(this._productRepository);
+  void update(ProductRepository repo) {
+    _productRepository = repo;
+    notifyListeners();
+  }
+
   List<ProductModel> _products = [];
   bool _isLoading = false;
   String _error = '';
@@ -14,24 +22,16 @@ class ProductProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String get error => _error;
 
-  // Khởi tạo dữ liệu mẫu
-  void initializeSampleData() {
-    _products = [];
-    notifyListeners();
-  }
-
   // Lấy danh sách sản phẩm
-  Future<void> fetchProducts() async {
+  Future<void> fetchProducts(BuildContext context) async {
     _isLoading = true;
     _error = '';
     notifyListeners();
-
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      final data = await _productService.fetchProducts();
-      _products = data;
-      // if (_products.isEmpty) {
-      //   initializeSampleData();
-      // }
+      _products = await _productRepository!.syncProducts(isOnline: isOnline);
+
+      _error = '';
     } catch (e) {
       _error = 'Lỗi khi tải danh sách sản phẩm: ${e.toString()}';
     } finally {
@@ -41,11 +41,12 @@ class ProductProvider with ChangeNotifier {
   }
 
   // Thêm sản phẩm mới
-  Future<bool> addProduct(ProductModel product) async {
+  Future<bool> addProduct(BuildContext context, ProductModel product) async {
     _isLoading = true;
     notifyListeners();
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _productService.addProduct(product);
+      await _productRepository!.add(product, isOnline: isOnline);
       _products.add(product);
       _error = '';
       return true;
@@ -63,11 +64,12 @@ class ProductProvider with ChangeNotifier {
   }
 
   // Cập nhật sản phẩm
-  Future<bool> updateProduct(ProductModel product) async {
+  Future<bool> updateProduct(BuildContext context, ProductModel product) async {
     _isLoading = true;
     notifyListeners();
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _productService.updateProduct(product);
+      await _productRepository!.update(product, isOnline: isOnline);
       final index = _products.indexWhere((p) => p.id == product.id);
       if (index != -1) {
         _products[index] = product;
@@ -88,12 +90,12 @@ class ProductProvider with ChangeNotifier {
   }
 
   // Xóa sản phẩm
-  Future<bool> deleteProduct(String productId) async {
+  Future<bool> deleteProduct(BuildContext context, String productId) async {
     _isLoading = true;
     notifyListeners();
-
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _productService.deleteProduct(productId);
+      await _productRepository!.delete(productId, isOnline: isOnline);
       _products.removeWhere((product) => product.id == productId);
       _error = '';
       return true;

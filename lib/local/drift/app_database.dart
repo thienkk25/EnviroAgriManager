@@ -23,8 +23,5 @@ class AppDatabase extends _$AppDatabase {
 }
 
 QueryExecutor _openConnection() {
-  return driftDatabase(
-    name: 'app_database',
-    native: DriftNativeOptions(shareAcrossIsolates: true),
-  );
+  return driftDatabase(name: 'app_database', native: DriftNativeOptions());
 }

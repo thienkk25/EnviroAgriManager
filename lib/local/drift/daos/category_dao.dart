@@ -29,22 +29,32 @@ class CategoryDao extends DatabaseAccessor<AppDatabase>
 
   // --- READ ---
   Future<List<CategoryModel>> getAllCategories() async {
-    final rows = await select(categoryTable).get();
-    return rows.map(_mapToModel).toList();
-  }
-
-  Future<CategoryModel?> getCategoryById(String id) async {
-    final row = await (select(
-      categoryTable,
-    )..where((c) => c.id.equals(id))).getSingleOrNull();
-    return row != null ? _mapToModel(row) : null;
-  }
-
-  Future<List<CategoryModel>> getSubCategories(String? parentId) async {
     final rows = await (select(
       categoryTable,
-    )..where((c) => c.parentId.equals(parentId!))).get();
+    )..where((t) => t.deletedAt.isNull())).get();
     return rows.map(_mapToModel).toList();
+  }
+
+  // Lấy danh mục chưa đồng bộ sang model
+  Future<List<CategoryModel>> getUnsyncedCategoriesAsModels() async {
+    final rows = await (select(
+      categoryTable,
+    )..where((t) => t.isSynced.equals(false))).get();
+    return rows.map(_mapToModel).toList();
+  }
+
+  // Thêm / Cập nhật danh mục và đánh dấu chưa sync
+  Future<void> insertOrUpdateCategory(CategoryTableCompanion entry) {
+    return into(
+      categoryTable,
+    ).insertOnConflictUpdate(entry.copyWith(isSynced: Value(false)));
+  }
+
+  // Đánh dấu danh mục đã sync
+  Future<void> markAsSynced(List<String> ids) {
+    return (update(categoryTable)..where((t) => t.id.isIn(ids))).write(
+      CategoryTableCompanion(isSynced: Value(true)),
+    );
   }
 
   // --- UPDATE ---
@@ -70,25 +80,45 @@ class CategoryDao extends DatabaseAccessor<AppDatabase>
   }
 
   // --- SYNC (ví dụ khi nhận data từ Supabase) ---
-  Future<void> syncFromSupabase(List<Map<String, dynamic>> remoteData) async {
+  Future<void> syncFromSupabase(List<CategoryModel> remoteData) async {
     await batch((batch) {
       batch.insertAllOnConflictUpdate(
         categoryTable,
-        remoteData.map((data) {
+        remoteData.map((e) {
           return CategoryTableCompanion(
-            id: Value(data['id']),
-            name: Value(data['name']),
-            description: Value(data['description']),
-            icon: Value(data['icon']),
-            color: Value(data['color']),
-            parentId: Value(data['parent_id']),
-            createdAt: Value(DateTime.parse(data['created_at'])),
-            updatedAt: Value(DateTime.parse(data['updated_at'])),
-            isActive: Value(data['is_active'] ?? true),
+            id: Value(e.id),
+            name: Value(e.name),
+            description: Value(e.description),
+            icon: Value(e.icon),
+            color: Value(e.color),
+            parentId: Value(e.parentId),
+            createdAt: Value(e.createdAt),
+            updatedAt: Value(e.updatedAt),
+            isActive: Value(e.isActive),
           );
         }).toList(),
       );
     });
+  }
+
+  Future<void> softDeleteCategory(String id) async {
+    await (update(categoryTable)..where((t) => t.id.equals(id))).write(
+      CategoryTableCompanion(
+        deletedAt: Value(DateTime.now()),
+        isSynced: Value(false), // Đánh dấu chưa sync
+      ),
+    );
+  }
+
+  // Lấy categories đã xóa chưa sync
+  Future<List<CategoryModel>> getDeletedUnsyncedCategories() async {
+    final rows =
+        await (select(categoryTable)..where(
+              (t) => t.deletedAt.isNotNull() & t.isSynced
+                ..equals(false),
+            ))
+            .get();
+    return rows.map(_mapToModel).toList();
   }
 
   // --- Helper ---

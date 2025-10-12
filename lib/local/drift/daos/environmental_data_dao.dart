@@ -35,15 +35,32 @@ class EnvironmentalDataDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<List<EnvironmentalDataModel>> getAll() async {
-    final rows = await select(environmentalDataTable).get();
+    final rows = await (select(
+      environmentalDataTable,
+    )..where((tbl) => tbl.deletedAt.isNull())).get();
     return rows.map(_mapToModel).toList();
   }
 
-  Future<EnvironmentalDataModel?> getById(String id) async {
-    final row = await (select(
+  Future<List<EnvironmentalDataModel>>
+  getUnsyncedEnvironmentalDataAsModels() async {
+    final rows = await (select(
       environmentalDataTable,
-    )..where((e) => e.id.equals(id))).getSingleOrNull();
-    return row != null ? _mapToModel(row) : null;
+    )..where((t) => t.isSynced.equals(false))).get();
+    return rows.map(_mapToModel).toList();
+  }
+
+  Future<void> insertOrUpdateEnvironmentalData(
+    EnvironmentalDataTableCompanion entry,
+  ) {
+    return into(
+      environmentalDataTable,
+    ).insertOnConflictUpdate(entry.copyWith(isSynced: Value(false)));
+  }
+
+  Future<void> markAsSynced(List<String> ids) {
+    return (update(environmentalDataTable)..where((t) => t.id.isIn(ids))).write(
+      EnvironmentalDataTableCompanion(isSynced: Value(true)),
+    );
   }
 
   Future<bool> updateData(EnvironmentalDataModel model) async {
@@ -74,33 +91,53 @@ class EnvironmentalDataDao extends DatabaseAccessor<AppDatabase>
     return (delete(environmentalDataTable)..where((e) => e.id.equals(id))).go();
   }
 
-  Future<void> syncFromSupabase(List<Map<String, dynamic>> remoteData) async {
+  Future<void> syncFromSupabase(List<EnvironmentalDataModel> remoteData) async {
     await batch((batch) {
       batch.insertAllOnConflictUpdate(
         environmentalDataTable,
         remoteData.map((data) {
           return EnvironmentalDataTableCompanion(
-            id: Value(data['id']),
-            regionId: Value(data['region_id']),
-            location: Value(data['location']),
-            temperature: Value((data['temperature'] ?? 0).toDouble()),
-            humidity: Value((data['humidity'] ?? 0).toDouble()),
-            ph: Value((data['ph'] ?? 0).toDouble()),
-            soilMoisture: Value((data['soil_moisture'] ?? 0).toDouble()),
-            lightIntensity: Value((data['light_intensity'] ?? 0).toDouble()),
-            co2Level: Value((data['co2_level'] ?? 0).toDouble()),
-            nitrogen: Value((data['nitrogen'] ?? 0).toDouble()),
-            phosphorus: Value((data['phosphorus'] ?? 0).toDouble()),
-            potassium: Value((data['potassium'] ?? 0).toDouble()),
-            weatherCondition: Value(data['weather_condition']),
-            notes: Value(data['notes']),
-            recordedAt: Value(DateTime.parse(data['recorded_at'])),
-            createdAt: Value(DateTime.parse(data['created_at'])),
-            updatedAt: Value(DateTime.parse(data['updated_at'])),
+            id: Value(data.id),
+            regionId: Value(data.regionId),
+            location: Value(data.location),
+            temperature: Value(data.temperature),
+            humidity: Value(data.humidity),
+            ph: Value(data.ph),
+            soilMoisture: Value(data.soilMoisture),
+            lightIntensity: Value(data.lightIntensity),
+            co2Level: Value(data.co2Level),
+            nitrogen: Value(data.nitrogen),
+            phosphorus: Value(data.phosphorus),
+            potassium: Value(data.potassium),
+            weatherCondition: Value(data.weatherCondition),
+            notes: Value(data.notes),
+            recordedAt: Value(data.recordedAt),
+            createdAt: Value(data.createdAt),
+            updatedAt: Value(data.updatedAt),
           );
         }).toList(),
       );
     });
+  }
+
+  Future<void> softDeleteEnvironmentalData(String id) async {
+    await (update(environmentalDataTable)..where((t) => t.id.equals(id))).write(
+      EnvironmentalDataTableCompanion(
+        deletedAt: Value(DateTime.now()),
+        isSynced: Value(false), // Đánh dấu chưa sync
+      ),
+    );
+  }
+
+  Future<List<EnvironmentalDataModel>>
+  getDeletedUnsyncedEnvironmentalData() async {
+    final rows =
+        await (select(environmentalDataTable)..where(
+              (t) => t.deletedAt.isNotNull() & t.isSynced
+                ..equals(false),
+            ))
+            .get();
+    return rows.map(_mapToModel).toList();
   }
 
   EnvironmentalDataModel _mapToModel(EnvironmentalDataTableData row) =>

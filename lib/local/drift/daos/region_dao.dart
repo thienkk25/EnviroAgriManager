@@ -26,22 +26,29 @@ class RegionDao extends DatabaseAccessor<AppDatabase> with _$RegionDaoMixin {
 
   // --- READ ---
   Future<List<RegionModel>> getAllRegions() async {
-    final rows = await select(regionTable).get();
-    return rows.map(_mapToModel).toList();
-  }
-
-  Future<RegionModel?> getRegionById(String id) async {
-    final row = await (select(
-      regionTable,
-    )..where((r) => r.id.equals(id))).getSingleOrNull();
-    return row != null ? _mapToModel(row) : null;
-  }
-
-  Future<List<RegionModel>> getSubRegions(String? parentId) async {
     final rows = await (select(
       regionTable,
-    )..where((r) => r.parentId.equals(parentId!))).get();
+    )..where((tbl) => tbl.deletedAt.isNull())).get();
     return rows.map(_mapToModel).toList();
+  }
+
+  Future<List<RegionModel>> getUnsyncedRegionsAsModels() async {
+    final rows = await (select(
+      regionTable,
+    )..where((t) => t.isSynced.equals(false))).get();
+    return rows.map(_mapToModel).toList();
+  }
+
+  Future<void> insertOrUpdateRegion(RegionTableCompanion entry) {
+    return into(
+      regionTable,
+    ).insertOnConflictUpdate(entry.copyWith(isSynced: Value(false)));
+  }
+
+  Future<void> markAsSynced(List<String> ids) {
+    return (update(regionTable)..where((t) => t.id.isIn(ids))).write(
+      RegionTableCompanion(isSynced: Value(true)),
+    );
   }
 
   // --- UPDATE ---
@@ -65,23 +72,42 @@ class RegionDao extends DatabaseAccessor<AppDatabase> with _$RegionDaoMixin {
   }
 
   // --- SYNC (Supabase → Local) ---
-  Future<void> syncFromSupabase(List<Map<String, dynamic>> remoteData) async {
+  Future<void> syncFromSupabase(List<RegionModel> remoteData) async {
     await batch((batch) {
       batch.insertAllOnConflictUpdate(
         regionTable,
-        remoteData.map((data) {
+        remoteData.map((r) {
           return RegionTableCompanion(
-            id: Value(data['id']),
-            name: Value(data['name']),
-            description: Value(data['description']),
-            parentId: Value(data['parent_id']),
-            isActive: Value(data['is_active'] ?? true),
-            createdAt: Value(DateTime.parse(data['created_at'])),
-            updatedAt: Value(DateTime.parse(data['updated_at'])),
+            id: Value(r.id),
+            name: Value(r.name),
+            description: Value(r.description),
+            parentId: Value(r.parentId),
+            isActive: Value(r.isActive),
+            createdAt: Value(r.createdAt),
+            updatedAt: Value(r.updatedAt),
           );
         }).toList(),
       );
     });
+  }
+
+  Future<void> softDeleteRegion(String id) async {
+    await (update(regionTable)..where((t) => t.id.equals(id))).write(
+      RegionTableCompanion(
+        deletedAt: Value(DateTime.now()),
+        isSynced: Value(false), // Đánh dấu chưa sync
+      ),
+    );
+  }
+
+  Future<List<RegionModel>> getDeletedUnsyncedRegions() async {
+    final rows =
+        await (select(regionTable)..where(
+              (t) => t.deletedAt.isNotNull() & t.isSynced
+                ..equals(false),
+            ))
+            .get();
+    return rows.map(_mapToModel).toList();
   }
 
   // --- Helper mapping ---

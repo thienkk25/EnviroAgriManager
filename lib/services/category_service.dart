@@ -57,4 +57,13 @@ class CategoryService {
       throw Exception('Lỗi xóa danh mục: $e');
     }
   }
+
+  Future<void> uploadCategories(List<CategoryModel> categories) async {
+    try {
+      final data = categories.map((c) => c.toJson()).toList();
+      await _supabase.from('categories').upsert(data);
+    } catch (e) {
+      throw Exception('Lỗi upload categories: $e');
+    }
+  }
 }
