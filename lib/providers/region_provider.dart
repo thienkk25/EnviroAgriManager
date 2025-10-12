@@ -35,6 +35,19 @@ class RegionProvider with ChangeNotifier {
     }
   }
 
+  Future<void> refreshRegions(BuildContext context) async {
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
+    try {
+      _regions = await _regionRepository!.syncRegions(isOnline: isOnline);
+
+      _error = '';
+    } catch (e) {
+      _error = 'Lỗi khi tải danh sách danh mục: ${e.toString()}';
+    } finally {
+      notifyListeners();
+    }
+  }
+
   Future<bool> addRegion(BuildContext context, RegionModel region) async {
     _isLoading = true;
     notifyListeners();

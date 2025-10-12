@@ -230,40 +230,43 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   );
                 }
 
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: filteredProducts.length,
-                  itemBuilder: (context, index) {
-                    final product = filteredProducts[index];
-                    return ProductCard(
-                      product: product,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ProductFormScreen(
-                              mode: ProductFormMode.view,
-                              product: product,
+                return RefreshIndicator(
+                  onRefresh: () => productProvider.refreshProducts(context),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: filteredProducts.length,
+                    itemBuilder: (context, index) {
+                      final product = filteredProducts[index];
+                      return ProductCard(
+                        product: product,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ProductFormScreen(
+                                mode: ProductFormMode.view,
+                                product: product,
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                      onEdit: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ProductFormScreen(
-                              mode: ProductFormMode.edit,
-                              product: product,
+                          );
+                        },
+                        onEdit: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ProductFormScreen(
+                                mode: ProductFormMode.edit,
+                                product: product,
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                      onDelete: () {
-                        _showDeleteDialog(context, product);
-                      },
-                    );
-                  },
+                          );
+                        },
+                        onDelete: () {
+                          _showDeleteDialog(context, product);
+                        },
+                      );
+                    },
+                  ),
                 );
               },
             ),

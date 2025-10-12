@@ -30,12 +30,23 @@ class ProductProvider with ChangeNotifier {
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
       _products = await _productRepository!.syncProducts(isOnline: isOnline);
-
-      _error = '';
     } catch (e) {
       _error = 'Lỗi khi tải danh sách sản phẩm: ${e.toString()}';
     } finally {
       _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> refreshProducts(BuildContext context) async {
+    final isOnline = context.read<ConnectivityProvider>().isOnline;
+    try {
+      _products = await _productRepository!.syncProducts(isOnline: isOnline);
+
+      _error = '';
+    } catch (e) {
+      _error = 'Lỗi khi tải danh sách danh mục: ${e.toString()}';
+    } finally {
       notifyListeners();
     }
   }

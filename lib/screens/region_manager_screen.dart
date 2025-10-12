@@ -211,7 +211,10 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
               ),
             );
           }
-          return ListView(children: buildRegionTree(null, 0));
+          return RefreshIndicator(
+            onRefresh: () => regionProvider.refreshRegions(context),
+            child: ListView(children: buildRegionTree(null, 0)),
+          );
         },
       ),
       floatingActionButton: RoleBasedActionButton(

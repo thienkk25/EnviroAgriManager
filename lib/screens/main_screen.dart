@@ -47,7 +47,7 @@ class _MainScreenState extends State<MainScreen> {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
         return Scaffold(
-          body: _screens[_currentIndex],
+          body: IndexedStack(index: _currentIndex, children: _screens),
           bottomNavigationBar: Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -71,11 +71,11 @@ class _MainScreenState extends State<MainScreen> {
               selectedItemColor: const Color(0xFF5E81AC),
               unselectedItemColor: const Color(0xFF88C0D0),
               selectedLabelStyle: GoogleFonts.inter(
-                fontSize: 12,
+                fontSize: 10,
                 fontWeight: FontWeight.w600,
               ),
               unselectedLabelStyle: GoogleFonts.inter(
-                fontSize: 12,
+                fontSize: 10,
                 fontWeight: FontWeight.w500,
               ),
               items: _buildNavigationItems(authProvider.userRole),
@@ -88,39 +88,42 @@ class _MainScreenState extends State<MainScreen> {
 
   List<BottomNavigationBarItem> _buildNavigationItems(UserRoleModel userRole) {
     final items = [
-      const BottomNavigationBarItem(
-        icon: Icon(Icons.dashboard),
-        label: 'Trang chủ',
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.dashboard),
+        label: _currentIndex == 0 ? 'Trang chủ' : '',
       ),
-      const BottomNavigationBarItem(
+      BottomNavigationBarItem(
         icon: Icon(Icons.inventory_2),
-        label: 'Sản phẩm',
+        label: _currentIndex == 1 ? 'Sản phẩm' : '',
       ),
-      const BottomNavigationBarItem(
+      BottomNavigationBarItem(
         icon: Icon(Icons.category),
-        label: 'Danh mục',
+        label: _currentIndex == 2 ? 'Danh mục' : '',
       ),
-      const BottomNavigationBarItem(icon: Icon(Icons.eco), label: 'Môi trường'),
-      const BottomNavigationBarItem(
+      BottomNavigationBarItem(
+        icon: Icon(Icons.eco),
+        label: _currentIndex == 3 ? 'Môi trường' : '',
+      ),
+      BottomNavigationBarItem(
         icon: Icon(Icons.analytics),
-        label: 'Báo cáo',
+        label: _currentIndex == 4 ? 'Báo cáo' : '',
       ),
     ];
 
     // Thêm menu quản lý user cho admin
     if (userRole == UserRoleModel.admin) {
       items.add(
-        const BottomNavigationBarItem(
+        BottomNavigationBarItem(
           icon: Icon(Icons.people),
-          label: 'Người dùng',
+          label: _currentIndex == 5 ? 'Người dùng' : '',
         ),
       );
     }
 
     items.add(
-      const BottomNavigationBarItem(
+      BottomNavigationBarItem(
         icon: Icon(Icons.settings),
-        label: 'Cài đặt',
+        label: _currentIndex == 6 ? 'Cài đặt' : '',
       ),
     );
 

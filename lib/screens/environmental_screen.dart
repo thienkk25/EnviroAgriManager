@@ -344,96 +344,106 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                     ),
                   );
                 }
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: filteredEnvimentalData.length,
-                  itemBuilder: (context, index) {
-                    return EnvironmentalDataCard(
-                      environmentalData: filteredEnvimentalData[index],
-                      onTap: () => _showDataDialog(
-                        context: context,
-                        mode: EnvironmentalDialogMode.view,
+                return RefreshIndicator(
+                  onRefresh: () => environmentalDataProvider
+                      .refreshEnvironmentalData(context),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: filteredEnvimentalData.length,
+                    itemBuilder: (context, index) {
+                      return EnvironmentalDataCard(
                         environmentalData: filteredEnvimentalData[index],
-                      ),
-                      onEdit: () => _showDataDialog(
-                        context: context,
-                        mode: EnvironmentalDialogMode.edit,
-                        environmentalData: filteredEnvimentalData[index],
-                      ),
-                      onDelete: () {
-                        showDialog(
+                        onTap: () => _showDataDialog(
                           context: context,
-                          builder: (context) => AlertDialog(
-                            title: Text(
-                              'Xác nhận xóa',
-                              style: GoogleFonts.inter(
-                                fontWeight: FontWeight.w600,
+                          mode: EnvironmentalDialogMode.view,
+                          environmentalData: filteredEnvimentalData[index],
+                        ),
+                        onEdit: () => _showDataDialog(
+                          context: context,
+                          mode: EnvironmentalDialogMode.edit,
+                          environmentalData: filteredEnvimentalData[index],
+                        ),
+                        onDelete: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Text(
+                                'Xác nhận xóa',
+                                style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                            content: Text(
-                              'Bạn có chắc chắn muốn xóa dữ liệu môi trường này?',
-                              style: GoogleFonts.inter(),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                child: Text(
-                                  'Hủy',
-                                  style: GoogleFonts.inter(
-                                    color: Colors.grey[600],
+                              content: Text(
+                                'Bạn có chắc chắn muốn xóa dữ liệu môi trường này?',
+                                style: GoogleFonts.inter(),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: Text(
+                                    'Hủy',
+                                    style: GoogleFonts.inter(
+                                      color: Colors.grey[600],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              ElevatedButton(
-                                onPressed: () async {
-                                  final result = await context
-                                      .read<EnvironmentalDataProvider>()
-                                      .deleteEnvironmentalData(
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    final result = await context
+                                        .read<EnvironmentalDataProvider>()
+                                        .deleteEnvironmentalData(
+                                          context,
+                                          filteredEnvimentalData[index].id,
+                                        );
+
+                                    if (!context.mounted) return;
+                                    Navigator.of(context).pop();
+
+                                    if (result) {
+                                      ScaffoldMessenger.of(
                                         context,
-                                        filteredEnvimentalData[index].id,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Đã xóa dữ liệu môi trường thành công',
+                                            style: GoogleFonts.inter(),
+                                          ),
+                                          backgroundColor: const Color(
+                                            0xFFA3BE8C,
+                                          ),
+                                        ),
                                       );
-
-                                  if (!context.mounted) return;
-                                  Navigator.of(context).pop();
-
-                                  if (result) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Đã xóa dữ liệu môi trường thành công',
-                                          style: GoogleFonts.inter(),
+                                    } else {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Lỗi khi xóa dữ liệu môi trường',
+                                            style: GoogleFonts.inter(),
+                                          ),
+                                          backgroundColor: Colors.red,
                                         ),
-                                        backgroundColor: const Color(
-                                          0xFFA3BE8C,
-                                        ),
-                                      ),
-                                    );
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Lỗi khi xóa dữ liệu môi trường',
-                                          style: GoogleFonts.inter(),
-                                        ),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
+                                      );
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                  ),
+                                  child: Text(
+                                    'Xóa',
+                                    style: GoogleFonts.inter(
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
-                                child: Text(
-                                  'Xóa',
-                                  style: GoogleFonts.inter(color: Colors.white),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  },
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 );
               },
             ),

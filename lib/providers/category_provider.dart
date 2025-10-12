@@ -32,8 +32,6 @@ class CategoryProvider with ChangeNotifier {
       _categories = await _categoryRepository!.syncCategories(
         isOnline: isOnline,
       );
-
-      _error = '';
     } catch (e) {
       _error = 'Lỗi khi tải danh sách danh mục: ${e.toString()}';
     } finally {

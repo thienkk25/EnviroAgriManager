@@ -31,7 +31,6 @@ class EnvironmentalDataProvider with ChangeNotifier {
     try {
       _environmentalData = await _environmentalDataRepository!
           .syncEnvironmentalData(isOnline: isOnline);
-      _error = '';
     } catch (e) {
       _error = 'Lỗi khi tải danh sách danh mục: ${e.toString()}';
     } finally {
