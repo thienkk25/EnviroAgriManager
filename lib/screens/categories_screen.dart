@@ -196,6 +196,7 @@ class CategoryScreen extends StatelessWidget {
       floatingActionButton: RoleBasedActionButton(
         permission: 'edit',
         child: FloatingActionButton(
+          heroTag: 'fab_category',
           onPressed: () {
             _showCategoryDialog(context, mode: CategoryDialogMode.add);
           },

@@ -4,7 +4,7 @@ import '../services/auth_service.dart';
 import '../models/user_role_model.dart';
 
 class AuthProvider with ChangeNotifier {
-  AuthService _authService;
+  final AuthService _authService;
   User? _user;
   UserRoleModel _userRole = UserRoleModel.viewer;
   bool _isLoading = false;
@@ -17,15 +17,11 @@ class AuthProvider with ChangeNotifier {
   bool get isSignedIn => _user != null;
 
   AuthProvider(this._authService) {
-    _initializeAuth();
-  }
-  void update(AuthService authService) {
-    _authService = authService;
-    notifyListeners();
+    initializeAuth();
   }
 
   /// Khởi tạo auth state
-  Future<void> _initializeAuth() async {
+  Future<void> initializeAuth() async {
     _user = _authService.currentUser;
     await _loadUserRole();
     notifyListeners();

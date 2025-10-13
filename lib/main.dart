@@ -32,33 +32,29 @@ void main() async {
     url: SupabaseConfig.supabaseUrl,
     anonKey: SupabaseConfig.supabaseAnonKey,
   );
-  final db = AppDatabase();
+  final authService = AuthService();
+  final authProvider = AuthProvider(authService);
+  final connectivityService = ConnectivityService();
+  final connectivityProvider = ConnectivityProvider(connectivityService);
 
+  final db = AppDatabase();
   runApp(
     MultiProvider(
       providers: [
         Provider.value(value: db),
 
         // Services
-        Provider(create: (_) => AuthService()),
-        Provider(create: (_) => ConnectivityService()),
         Provider(create: (_) => CategoryService()),
         Provider(create: (_) => EnvironmentalDataService()),
         Provider(create: (_) => ProductService()),
         Provider(create: (_) => RegionService()),
 
         // Auth
-        ChangeNotifierProxyProvider<AuthService, AuthProvider>(
-          create: (context) => AuthProvider(context.read<AuthService>()),
-          update: (_, authService, provider) => provider!..update(authService),
-        ),
-
+        Provider(create: (_) => authService),
+        ChangeNotifierProvider(create: (_) => authProvider),
         // Connectivity
-        ChangeNotifierProxyProvider<ConnectivityService, ConnectivityProvider>(
-          create: (context) =>
-              ConnectivityProvider(context.read<ConnectivityService>()),
-          update: (_, service, provider) => provider!..update(service),
-        ),
+        Provider(create: (_) => connectivityService),
+        ChangeNotifierProvider(create: (_) => connectivityProvider),
 
         // Category
         ProxyProvider2<AppDatabase, CategoryService, CategoryRepository>(

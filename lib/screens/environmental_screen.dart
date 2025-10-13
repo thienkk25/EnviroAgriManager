@@ -453,6 +453,7 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
       floatingActionButton: RoleBasedActionButton(
         permission: 'edit',
         child: FloatingActionButton(
+          heroTag: 'fab_envir',
           onPressed: () {
             _showDataDialog(
               context: context,

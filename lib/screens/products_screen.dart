@@ -276,6 +276,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
       floatingActionButton: RoleBasedActionButton(
         permission: 'edit',
         child: FloatingActionButton(
+          heroTag: 'fab_product',
           onPressed: () {
             Navigator.push(
               context,

@@ -47,7 +47,7 @@ class _MainScreenState extends State<MainScreen> {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
         return Scaffold(
-          body: _screens[_currentIndex],
+          body: IndexedStack(index: _currentIndex, children: _screens),
           bottomNavigationBar: Container(
             decoration: BoxDecoration(
               color: Colors.white,
