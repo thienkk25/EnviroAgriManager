@@ -41,6 +41,13 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        // Auth
+        Provider(create: (_) => authService),
+        ChangeNotifierProvider(create: (_) => authProvider),
+        // Connectivity
+        Provider(create: (_) => connectivityService),
+        ChangeNotifierProvider(create: (_) => connectivityProvider),
+
         Provider.value(value: db),
 
         // Services
@@ -48,13 +55,6 @@ void main() async {
         Provider(create: (_) => EnvironmentalDataService()),
         Provider(create: (_) => ProductService()),
         Provider(create: (_) => RegionService()),
-
-        // Auth
-        Provider(create: (_) => authService),
-        ChangeNotifierProvider(create: (_) => authProvider),
-        // Connectivity
-        Provider(create: (_) => connectivityService),
-        ChangeNotifierProvider(create: (_) => connectivityProvider),
 
         // Category
         ProxyProvider2<AppDatabase, CategoryService, CategoryRepository>(

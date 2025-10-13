@@ -15,7 +15,7 @@ class ReportsScreen extends StatefulWidget {
 }
 
 class _ReportsScreenState extends State<ReportsScreen> {
-  String _selectedPeriod = 'Tháng này';
+  String _selectedPeriod = 'month';
   Map<String, double> _trendData = {};
   List<EnvironmentalDataModel> _environmentalData = [];
   String _selectedEnvMetric =
@@ -851,12 +851,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Dữ liệu môi trường',
-                style: GoogleFonts.inter(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF2E3440),
+              Expanded(
+                child: Text(
+                  'Dữ liệu môi trường',
+                  style: GoogleFonts.inter(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF2E3440),
+                  ),
                 ),
               ),
               _buildMetricDropdown(),

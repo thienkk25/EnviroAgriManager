@@ -151,7 +151,7 @@ class CategoryScreen extends StatelessWidget {
                     crossAxisCount: constraints.maxWidth < 600 ? 2 : 4,
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
-                    childAspectRatio: constraints.maxWidth < 600 ? .75 : 1.1,
+                    childAspectRatio: constraints.maxWidth < 600 ? .7 : 1.1,
                   ),
                   itemCount: subCategories.length,
                   itemBuilder: (context, index) {

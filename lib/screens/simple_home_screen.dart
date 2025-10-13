@@ -81,7 +81,7 @@ class SimpleHomeScreen extends StatelessWidget {
                   crossAxisCount: constraints.maxWidth < 600 ? 2 : 4,
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
-                  childAspectRatio: constraints.maxWidth < 600 ? .8 : 1.1,
+                  childAspectRatio: constraints.maxWidth < 600 ? .75 : 1.1,
                   children: [
                     _FeatureCard(
                       icon: Icons.inventory_2,
@@ -132,15 +132,17 @@ class SimpleHomeScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
+                    spacing: 8,
                     children: [
                       const Icon(Icons.eco, color: Color(0xFF5E81AC), size: 24),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Dữ liệu Môi trường Hiện tại',
-                        style: GoogleFonts.inter(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF2E3440),
+                      Expanded(
+                        child: Text(
+                          'Dữ liệu Môi trường Hiện tại',
+                          style: GoogleFonts.inter(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF2E3440),
+                          ),
                         ),
                       ),
                     ],
