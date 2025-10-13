@@ -40,7 +40,11 @@ void main() async {
         //Theme
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         // Connectivity
-        Provider(create: (_) => ConnectivityService()),
+        Provider(
+          create: (_) => ConnectivityService(),
+          dispose: (context, connectivityService) =>
+              connectivityService.dispose(),
+        ),
         ChangeNotifierProxyProvider<ConnectivityService, ConnectivityProvider>(
           create: (context) =>
               ConnectivityProvider(context.read<ConnectivityService>()),
