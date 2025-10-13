@@ -1,9 +1,9 @@
+import 'package:enviro_agri_manager/models/user_role_model.dart';
+import 'package:enviro_agri_manager/providers/auth_provider.dart';
+import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../providers/auth_provider.dart';
-import '../models/user_role_model.dart';
-import '../widgets/role_based_widget.dart';
 
 class UserManagementScreen extends StatefulWidget {
   const UserManagementScreen({super.key});

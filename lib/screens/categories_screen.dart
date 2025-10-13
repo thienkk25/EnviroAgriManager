@@ -1,4 +1,5 @@
 import 'package:enviro_agri_manager/models/category_model.dart';
+import 'package:enviro_agri_manager/providers/category_provider.dart';
 import 'package:enviro_agri_manager/utils/constants.dart';
 import 'package:enviro_agri_manager/widgets/category_card.dart';
 import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
@@ -6,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-import '../providers/category_provider.dart';
 
 enum CategoryDialogMode { add, edit, view }
 
@@ -143,55 +143,58 @@ class CategoryScreen extends StatelessWidget {
       ),
       body: subCategories.isEmpty
           ? const Center(child: Text('Không có danh mục con'))
-          : LayoutBuilder(
-              builder: (context, constraints) {
-                return GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: constraints.maxWidth < 600 ? 2 : 4,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: constraints.maxWidth < 600 ? .7 : 1.1,
-                  ),
-                  itemCount: subCategories.length,
-                  itemBuilder: (context, index) {
-                    final category = subCategories[index];
-                    return CategoryCard(
-                      category: category,
-                      onTap: () {
-                        // Đệ quy gọi lại chính CategoryScreen
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => CategoryScreen(
-                              parentId: category.id,
-                              title: category.name,
-                              startFirst: false,
+          : Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return GridView.builder(
+                    padding: const EdgeInsets.all(16),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: constraints.maxWidth < 600 ? 2 : 4,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      childAspectRatio: constraints.maxWidth < 600 ? .7 : 1.1,
+                    ),
+                    itemCount: subCategories.length,
+                    itemBuilder: (context, index) {
+                      final category = subCategories[index];
+                      return CategoryCard(
+                        category: category,
+                        onTap: () {
+                          // Đệ quy gọi lại chính CategoryScreen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => CategoryScreen(
+                                parentId: category.id,
+                                title: category.name,
+                                startFirst: false,
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                      onLongPress: () {
-                        _showCategoryDialog(
-                          context,
-                          mode: CategoryDialogMode.view,
-                          category: category,
-                        );
-                      },
-                      onEdit: () {
-                        _showCategoryDialog(
-                          context,
-                          mode: CategoryDialogMode.edit,
-                          category: category,
-                        );
-                      },
-                      onDelete: () {
-                        _showDeleteDialog(context, category);
-                      },
-                    );
-                  },
-                );
-              },
+                          );
+                        },
+                        onLongPress: () {
+                          _showCategoryDialog(
+                            context,
+                            mode: CategoryDialogMode.view,
+                            category: category,
+                          );
+                        },
+                        onEdit: () {
+                          _showCategoryDialog(
+                            context,
+                            mode: CategoryDialogMode.edit,
+                            category: category,
+                          );
+                        },
+                        onDelete: () {
+                          _showDeleteDialog(context, category);
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
       floatingActionButton: RoleBasedActionButton(
         permission: 'edit',

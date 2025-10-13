@@ -71,384 +71,390 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Filters Section
-          Container(
-            color: const Color(0xFF5E81AC),
-            padding: const EdgeInsets.all(16),
-            width: double.infinity,
-            child: Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              spacing: 8,
-              runAlignment: WrapAlignment.spaceBetween,
-              runSpacing: 8,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: 5,
-                  children: [
-                    const Icon(Icons.location_on, color: Colors.white),
-                    Text(
-                      'Vị trí: ',
-                      style: GoogleFonts.inter(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
+      body: Container(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: Column(
+          children: [
+            // Filters Section
+            Container(
+              color: const Color(0xFF5E81AC),
+              padding: const EdgeInsets.all(16),
+              width: double.infinity,
+              child: Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                spacing: 8,
+                runAlignment: WrapAlignment.spaceBetween,
+                runSpacing: 8,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: 5,
+                    children: [
+                      const Icon(Icons.location_on, color: Colors.white),
+                      Text(
+                        'Vị trí: ',
+                        style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                    Consumer<RegionProvider>(
-                      builder: (context, regionProvider, child) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // ==== Tỉnh ====
-                            DropdownButton<String>(
-                              value: _selectedProvince,
-                              hint: Text("Chọn tỉnh"),
-                              dropdownColor: Color(0xFF5E81AC),
-                              style: GoogleFonts.inter(color: Colors.white),
-                              items: [
-                                const DropdownMenuItem(
-                                  value: null,
-                                  child: Text(
-                                    'Tất cả',
-                                    style: TextStyle(color: Colors.white),
+                      Consumer<RegionProvider>(
+                        builder: (context, regionProvider, child) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // ==== Tỉnh ====
+                              DropdownButton<String>(
+                                value: _selectedProvince,
+                                hint: Text("Chọn tỉnh"),
+                                dropdownColor: Color(0xFF5E81AC),
+                                style: GoogleFonts.inter(color: Colors.white),
+                                items: [
+                                  const DropdownMenuItem(
+                                    value: null,
+                                    child: Text(
+                                      'Tất cả',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                  ...regionProvider.getMainRegions().map((
+                                    province,
+                                  ) {
+                                    return DropdownMenuItem(
+                                      value: province.id,
+                                      child: Text(province.name),
+                                    );
+                                  }),
+                                ],
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedProvince = value;
+                                    _selectedDistrict = null;
+                                    _selectedWard = null;
+                                  });
+                                },
+                              ),
+
+                              // ==== Xã ====
+                              ?_selectedProvince == null
+                                  ? null
+                                  : DropdownButton<String>(
+                                      value: _selectedDistrict,
+                                      hint: Text(
+                                        "Chọn xã",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      dropdownColor: Color(0xFF5E81AC),
+                                      style: GoogleFonts.inter(
+                                        color: Colors.white,
+                                      ),
+                                      items: _selectedProvince == null
+                                          ? null
+                                          : [
+                                              const DropdownMenuItem(
+                                                value: null,
+                                                child: Text(
+                                                  'Tất cả',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                              ...regionProvider
+                                                  .getSubRegions(
+                                                    _selectedProvince!,
+                                                  )
+                                                  .map((district) {
+                                                    return DropdownMenuItem(
+                                                      value: district.id,
+                                                      child: Text(
+                                                        district.name,
+                                                      ),
+                                                    );
+                                                  }),
+                                            ],
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _selectedDistrict = value;
+                                          _selectedWard = null;
+                                        });
+                                      },
+                                    ),
+
+                              ?_selectedDistrict == null
+                                  ? null
+                                  : DropdownButton<String>(
+                                      value: _selectedWard,
+                                      hint: Text(
+                                        "Chọn",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      dropdownColor: Color(0xFF5E81AC),
+                                      style: GoogleFonts.inter(
+                                        color: Colors.white,
+                                      ),
+                                      items: _selectedDistrict == null
+                                          ? null
+                                          : [
+                                              const DropdownMenuItem(
+                                                value: null,
+                                                child: Text(
+                                                  'Tất cả',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                              ...regionProvider
+                                                  .getSubRegions(
+                                                    _selectedDistrict!,
+                                                  )
+                                                  .map((ward) {
+                                                    return DropdownMenuItem(
+                                                      value: ward.id,
+                                                      child: Text(ward.name),
+                                                    );
+                                                  }),
+                                            ],
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _selectedWard = value;
+                                        });
+                                      },
+                                    ),
+                            ],
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: 5,
+                    children: [
+                      const Icon(Icons.schedule, color: Colors.white),
+                      DropdownButton<String>(
+                        value: _selectedTimeRange,
+                        dropdownColor: Color(0xFF5E81AC),
+                        style: GoogleFonts.inter(color: Colors.white),
+                        underline: Container(),
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'Tất cả',
+                            child: Text(
+                              'Tất cả',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Hôm nay',
+                            child: Text(
+                              'Hôm nay',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: '7 ngày',
+                            child: Text(
+                              '7 ngày trước',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: '30 ngày',
+                            child: Text(
+                              '30 ngày trước',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedTimeRange = value!;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Consumer<EnvironmentalDataProvider>(
+                builder: (context, environmentalDataProvider, child) {
+                  if (environmentalDataProvider.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (environmentalDataProvider.error.isNotEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            size: 64,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            environmentalDataProvider.error,
+                            style: GoogleFonts.inter(color: Colors.grey[600]),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () => environmentalDataProvider
+                                .fetchEnvironmentalData(context),
+                            child: const Text('Thử lại'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  List<EnvironmentalDataModel> filteredEnvimentalData =
+                      environmentalDataProvider.getFilteredData(
+                        _selectedProvince,
+                        _selectedDistrict,
+                        _selectedWard,
+                        _selectedTimeRange,
+                        context.read<RegionProvider>().regions,
+                      );
+                  if (filteredEnvimentalData.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.inventory_2_outlined,
+                            size: 64,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Không có môi trường nào',
+                            style: GoogleFonts.inter(
+                              fontSize: 18,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Thử thay đổi vị trí hoặc thời gian gần đây',
+                            style: GoogleFonts.inter(color: Colors.grey[500]),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  return RefreshIndicator(
+                    onRefresh: () => environmentalDataProvider
+                        .refreshEnvironmentalData(context),
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: filteredEnvimentalData.length,
+                      itemBuilder: (context, index) {
+                        return EnvironmentalDataCard(
+                          environmentalData: filteredEnvimentalData[index],
+                          onTap: () => _showDataDialog(
+                            context: context,
+                            mode: EnvironmentalDialogMode.view,
+                            environmentalData: filteredEnvimentalData[index],
+                          ),
+                          onEdit: () => _showDataDialog(
+                            context: context,
+                            mode: EnvironmentalDialogMode.edit,
+                            environmentalData: filteredEnvimentalData[index],
+                          ),
+                          onDelete: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text(
+                                  'Xác nhận xóa',
+                                  style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                                ...regionProvider.getMainRegions().map((
-                                  province,
-                                ) {
-                                  return DropdownMenuItem(
-                                    value: province.id,
-                                    child: Text(province.name),
-                                  );
-                                }),
-                              ],
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedProvince = value;
-                                  _selectedDistrict = null;
-                                  _selectedWard = null;
-                                });
-                              },
-                            ),
-
-                            // ==== Xã ====
-                            ?_selectedProvince == null
-                                ? null
-                                : DropdownButton<String>(
-                                    value: _selectedDistrict,
-                                    hint: Text(
-                                      "Chọn xã",
-                                      style: TextStyle(color: Colors.white),
+                                content: Text(
+                                  'Bạn có chắc chắn muốn xóa dữ liệu môi trường này?',
+                                  style: GoogleFonts.inter(),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    child: Text(
+                                      'Hủy',
+                                      style: GoogleFonts.inter(
+                                        color: Colors.grey[600],
+                                      ),
                                     ),
-                                    dropdownColor: Color(0xFF5E81AC),
-                                    style: GoogleFonts.inter(
-                                      color: Colors.white,
-                                    ),
-                                    items: _selectedProvince == null
-                                        ? null
-                                        : [
-                                            const DropdownMenuItem(
-                                              value: null,
-                                              child: Text(
-                                                'Tất cả',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                            ...regionProvider
-                                                .getSubRegions(
-                                                  _selectedProvince!,
-                                                )
-                                                .map((district) {
-                                                  return DropdownMenuItem(
-                                                    value: district.id,
-                                                    child: Text(district.name),
-                                                  );
-                                                }),
-                                          ],
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _selectedDistrict = value;
-                                        _selectedWard = null;
-                                      });
-                                    },
                                   ),
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      final result = await context
+                                          .read<EnvironmentalDataProvider>()
+                                          .deleteEnvironmentalData(
+                                            context,
+                                            filteredEnvimentalData[index].id,
+                                          );
 
-                            ?_selectedDistrict == null
-                                ? null
-                                : DropdownButton<String>(
-                                    value: _selectedWard,
-                                    hint: Text(
-                                      "Chọn",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    dropdownColor: Color(0xFF5E81AC),
-                                    style: GoogleFonts.inter(
-                                      color: Colors.white,
-                                    ),
-                                    items: _selectedDistrict == null
-                                        ? null
-                                        : [
-                                            const DropdownMenuItem(
-                                              value: null,
-                                              child: Text(
-                                                'Tất cả',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                ),
-                                              ),
+                                      if (!context.mounted) return;
+                                      Navigator.of(context).pop();
+
+                                      if (result) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Đã xóa dữ liệu môi trường thành công',
+                                              style: GoogleFonts.inter(),
                                             ),
-                                            ...regionProvider
-                                                .getSubRegions(
-                                                  _selectedDistrict!,
-                                                )
-                                                .map((ward) {
-                                                  return DropdownMenuItem(
-                                                    value: ward.id,
-                                                    child: Text(ward.name),
-                                                  );
-                                                }),
-                                          ],
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _selectedWard = value;
-                                      });
+                                            backgroundColor: const Color(
+                                              0xFFA3BE8C,
+                                            ),
+                                          ),
+                                        );
+                                      } else {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Lỗi khi xóa dữ liệu môi trường',
+                                              style: GoogleFonts.inter(),
+                                            ),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      }
                                     },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                    ),
+                                    child: Text(
+                                      'Xóa',
+                                      style: GoogleFonts.inter(
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                   ),
-                          ],
+                                ],
+                              ),
+                            );
+                          },
                         );
                       },
                     ),
-                  ],
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: 5,
-                  children: [
-                    const Icon(Icons.schedule, color: Colors.white),
-                    DropdownButton<String>(
-                      value: _selectedTimeRange,
-                      dropdownColor: Color(0xFF5E81AC),
-                      style: GoogleFonts.inter(color: Colors.white),
-                      underline: Container(),
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'Tất cả',
-                          child: Text(
-                            'Tất cả',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Hôm nay',
-                          child: Text(
-                            'Hôm nay',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        DropdownMenuItem(
-                          value: '7 ngày',
-                          child: Text(
-                            '7 ngày trước',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        DropdownMenuItem(
-                          value: '30 ngày',
-                          child: Text(
-                            '30 ngày trước',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedTimeRange = value!;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Consumer<EnvironmentalDataProvider>(
-              builder: (context, environmentalDataProvider, child) {
-                if (environmentalDataProvider.isLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (environmentalDataProvider.error.isNotEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          size: 64,
-                          color: Colors.grey[400],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          environmentalDataProvider.error,
-                          style: GoogleFonts.inter(color: Colors.grey[600]),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () => environmentalDataProvider
-                              .fetchEnvironmentalData(context),
-                          child: const Text('Thử lại'),
-                        ),
-                      ],
-                    ),
                   );
-                }
-                List<EnvironmentalDataModel> filteredEnvimentalData =
-                    environmentalDataProvider.getFilteredData(
-                      _selectedProvince,
-                      _selectedDistrict,
-                      _selectedWard,
-                      _selectedTimeRange,
-                      context.read<RegionProvider>().regions,
-                    );
-                if (filteredEnvimentalData.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.inventory_2_outlined,
-                          size: 64,
-                          color: Colors.grey[400],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Không có môi trường nào',
-                          style: GoogleFonts.inter(
-                            fontSize: 18,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Thử thay đổi vị trí hoặc thời gian gần đây',
-                          style: GoogleFonts.inter(color: Colors.grey[500]),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-                return RefreshIndicator(
-                  onRefresh: () => environmentalDataProvider
-                      .refreshEnvironmentalData(context),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: filteredEnvimentalData.length,
-                    itemBuilder: (context, index) {
-                      return EnvironmentalDataCard(
-                        environmentalData: filteredEnvimentalData[index],
-                        onTap: () => _showDataDialog(
-                          context: context,
-                          mode: EnvironmentalDialogMode.view,
-                          environmentalData: filteredEnvimentalData[index],
-                        ),
-                        onEdit: () => _showDataDialog(
-                          context: context,
-                          mode: EnvironmentalDialogMode.edit,
-                          environmentalData: filteredEnvimentalData[index],
-                        ),
-                        onDelete: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: Text(
-                                'Xác nhận xóa',
-                                style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              content: Text(
-                                'Bạn có chắc chắn muốn xóa dữ liệu môi trường này?',
-                                style: GoogleFonts.inter(),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.of(context).pop(),
-                                  child: Text(
-                                    'Hủy',
-                                    style: GoogleFonts.inter(
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    final result = await context
-                                        .read<EnvironmentalDataProvider>()
-                                        .deleteEnvironmentalData(
-                                          context,
-                                          filteredEnvimentalData[index].id,
-                                        );
-
-                                    if (!context.mounted) return;
-                                    Navigator.of(context).pop();
-
-                                    if (result) {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Đã xóa dữ liệu môi trường thành công',
-                                            style: GoogleFonts.inter(),
-                                          ),
-                                          backgroundColor: const Color(
-                                            0xFFA3BE8C,
-                                          ),
-                                        ),
-                                      );
-                                    } else {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Lỗi khi xóa dữ liệu môi trường',
-                                            style: GoogleFonts.inter(),
-                                          ),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
-                                  ),
-                                  child: Text(
-                                    'Xóa',
-                                    style: GoogleFonts.inter(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                );
-              },
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       floatingActionButton: RoleBasedActionButton(
         permission: 'edit',

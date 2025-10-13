@@ -1,9 +1,9 @@
+import 'package:enviro_agri_manager/models/product_model.dart';
 import 'package:enviro_agri_manager/providers/category_provider.dart';
 import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
 import 'package:enviro_agri_manager/repositories/product_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/product_model.dart';
 
 class ProductProvider with ChangeNotifier {
   ProductRepository _productRepository;

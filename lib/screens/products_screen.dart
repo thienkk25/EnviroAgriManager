@@ -1,13 +1,13 @@
 import 'package:enviro_agri_manager/models/product_model.dart';
 import 'package:enviro_agri_manager/providers/category_provider.dart';
+import 'package:enviro_agri_manager/providers/product_provider.dart';
 import 'package:enviro_agri_manager/widgets/category_selector.dart';
 import 'package:enviro_agri_manager/widgets/product_card.dart';
+import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-import '../providers/product_provider.dart';
-import '../widgets/role_based_widget.dart';
 
 enum ProductFormMode { add, edit, view }
 
@@ -63,215 +63,219 @@ class _ProductsScreenState extends State<ProductsScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Search and Filter Section
-          Container(
-            color: const Color(0xFF5E81AC),
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                // Search Bar
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+      body: Container(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: Column(
+          children: [
+            // Search and Filter Section
+            Container(
+              color: const Color(0xFF5E81AC),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  // Search Bar
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Tìm kiếm sản phẩm...',
+                        hintStyle: GoogleFonts.inter(color: Colors.grey[500]),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: Color(0xFF5E81AC),
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                      ),
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                    ),
                   ),
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Tìm kiếm sản phẩm...',
-                      hintStyle: GoogleFonts.inter(color: Colors.grey[500]),
-                      prefixIcon: const Icon(
-                        Icons.search,
-                        color: Color(0xFF5E81AC),
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                    ),
-                    onChanged: (value) {
-                      setState(() {});
-                    },
-                  ),
-                ),
-                const SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
-                // Category Filter
-                Consumer<CategoryProvider>(
-                  builder: (context, categoryProvider, child) {
-                    final categories = [
-                      {'id': 'Tất cả', 'name': 'Tất cả'},
-                      ...categoryProvider.getMainCategories().map(
-                        (e) => {'id': e.id, 'name': e.name},
-                      ),
-                    ];
+                  // Category Filter
+                  Consumer<CategoryProvider>(
+                    builder: (context, categoryProvider, child) {
+                      final categories = [
+                        {'id': 'Tất cả', 'name': 'Tất cả'},
+                        ...categoryProvider.getMainCategories().map(
+                          (e) => {'id': e.id, 'name': e.name},
+                        ),
+                      ];
 
-                    return SizedBox(
-                      height: 40,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: categories.length,
-                        itemBuilder: (context, index) {
-                          final category = categories[index];
-                          final isSelected =
-                              category['id'] == _selectedCategory;
+                      return SizedBox(
+                        height: 40,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: categories.length,
+                          itemBuilder: (context, index) {
+                            final category = categories[index];
+                            final isSelected =
+                                category['id'] == _selectedCategory;
 
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: FilterChip(
-                              label: Text(category['name']!),
-                              selected: isSelected,
-                              onSelected: (selected) {
-                                setState(() {
-                                  _selectedCategory = category['id']!;
-                                });
-                              },
-                              selectedColor: Colors.white,
-                              checkmarkColor: const Color(0xFF5E81AC),
-                              labelStyle: GoogleFonts.inter(
-                                color: isSelected
-                                    ? const Color(0xFF5E81AC)
-                                    : Colors.grey,
-                                fontWeight: FontWeight.w500,
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: FilterChip(
+                                label: Text(category['name']!),
+                                selected: isSelected,
+                                onSelected: (selected) {
+                                  setState(() {
+                                    _selectedCategory = category['id']!;
+                                  });
+                                },
+                                selectedColor: Colors.white,
+                                checkmarkColor: const Color(0xFF5E81AC),
+                                labelStyle: GoogleFonts.inter(
+                                  color: isSelected
+                                      ? const Color(0xFF5E81AC)
+                                      : Colors.grey,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-
-          // Products List
-          Expanded(
-            child: Consumer<ProductProvider>(
-              builder: (context, productProvider, child) {
-                if (productProvider.isLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (productProvider.error.isNotEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          size: 64,
-                          color: Colors.grey[400],
+                            );
+                          },
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          productProvider.error,
-                          style: GoogleFonts.inter(color: Colors.grey[600]),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () =>
-                              productProvider.fetchProducts(context),
-                          child: const Text('Thử lại'),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                // Filter products
-                List<ProductModel> filteredProducts = productProvider.products;
-
-                // Search filter
-                if (_searchController.text.isNotEmpty) {
-                  filteredProducts = productProvider.searchProducts(
-                    _searchController.text,
-                  );
-                }
-
-                // Category filter
-                if (_selectedCategory != 'Tất cả') {
-                  filteredProducts = filteredProducts
-                      .where(
-                        (product) => product.categoryId == _selectedCategory,
-                      )
-                      .toList();
-                }
-
-                if (filteredProducts.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.inventory_2_outlined,
-                          size: 64,
-                          color: Colors.grey[400],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Không tìm thấy sản phẩm nào',
-                          style: GoogleFonts.inter(
-                            fontSize: 18,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc',
-                          style: GoogleFonts.inter(color: Colors.grey[500]),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                return RefreshIndicator(
-                  onRefresh: () => productProvider.refreshProducts(context),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: filteredProducts.length,
-                    itemBuilder: (context, index) {
-                      final product = filteredProducts[index];
-                      return ProductCard(
-                        product: product,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => ProductFormScreen(
-                                mode: ProductFormMode.view,
-                                product: product,
-                              ),
-                            ),
-                          );
-                        },
-                        onEdit: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => ProductFormScreen(
-                                mode: ProductFormMode.edit,
-                                product: product,
-                              ),
-                            ),
-                          );
-                        },
-                        onDelete: () {
-                          _showDeleteDialog(context, product);
-                        },
                       );
                     },
                   ),
-                );
-              },
+                ],
+              ),
             ),
-          ),
-        ],
+
+            // Products List
+            Expanded(
+              child: Consumer<ProductProvider>(
+                builder: (context, productProvider, child) {
+                  if (productProvider.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (productProvider.error.isNotEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            size: 64,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            productProvider.error,
+                            style: GoogleFonts.inter(color: Colors.grey[600]),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () =>
+                                productProvider.fetchProducts(context),
+                            child: const Text('Thử lại'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  // Filter products
+                  List<ProductModel> filteredProducts =
+                      productProvider.products;
+
+                  // Search filter
+                  if (_searchController.text.isNotEmpty) {
+                    filteredProducts = productProvider.searchProducts(
+                      _searchController.text,
+                    );
+                  }
+
+                  // Category filter
+                  if (_selectedCategory != 'Tất cả') {
+                    filteredProducts = filteredProducts
+                        .where(
+                          (product) => product.categoryId == _selectedCategory,
+                        )
+                        .toList();
+                  }
+
+                  if (filteredProducts.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.inventory_2_outlined,
+                            size: 64,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Không tìm thấy sản phẩm nào',
+                            style: GoogleFonts.inter(
+                              fontSize: 18,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc',
+                            style: GoogleFonts.inter(color: Colors.grey[500]),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return RefreshIndicator(
+                    onRefresh: () => productProvider.refreshProducts(context),
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: filteredProducts.length,
+                      itemBuilder: (context, index) {
+                        final product = filteredProducts[index];
+                        return ProductCard(
+                          product: product,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ProductFormScreen(
+                                  mode: ProductFormMode.view,
+                                  product: product,
+                                ),
+                              ),
+                            );
+                          },
+                          onEdit: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ProductFormScreen(
+                                  mode: ProductFormMode.edit,
+                                  product: product,
+                                ),
+                              ),
+                            );
+                          },
+                          onDelete: () {
+                            _showDeleteDialog(context, product);
+                          },
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: RoleBasedActionButton(
         permission: 'edit',

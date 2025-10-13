@@ -1,8 +1,8 @@
+import 'package:enviro_agri_manager/models/user_role_model.dart';
+import 'package:enviro_agri_manager/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
-import '../models/user_role_model.dart';
 import 'simple_home_screen.dart';
 import 'products_screen.dart';
 import 'categories_screen.dart';
@@ -67,7 +67,7 @@ class _MainScreenState extends State<MainScreen> {
                 });
               },
               type: BottomNavigationBarType.fixed,
-              backgroundColor: Colors.white,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               selectedItemColor: const Color(0xFF5E81AC),
               unselectedItemColor: const Color(0xFF88C0D0),
               selectedLabelStyle: GoogleFonts.inter(

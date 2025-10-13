@@ -2,6 +2,7 @@ import 'package:enviro_agri_manager/local/drift/app_database.dart';
 import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
 import 'package:enviro_agri_manager/providers/environmental_data_provider.dart';
 import 'package:enviro_agri_manager/providers/region_provider.dart';
+import 'package:enviro_agri_manager/providers/theme_provider.dart';
 import 'package:enviro_agri_manager/repositories/category_repository.dart';
 import 'package:enviro_agri_manager/repositories/environmental_data_repository.dart';
 import 'package:enviro_agri_manager/repositories/product_repository.dart';
@@ -32,23 +33,36 @@ void main() async {
     url: SupabaseConfig.supabaseUrl,
     anonKey: SupabaseConfig.supabaseAnonKey,
   );
-  final authService = AuthService();
-  final authProvider = AuthProvider(authService);
-  final connectivityService = ConnectivityService();
-  final connectivityProvider = ConnectivityProvider(connectivityService);
 
-  final db = AppDatabase();
   runApp(
     MultiProvider(
       providers: [
-        // Auth
-        Provider(create: (_) => authService),
-        ChangeNotifierProvider(create: (_) => authProvider),
+        //Theme
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         // Connectivity
-        Provider(create: (_) => connectivityService),
-        ChangeNotifierProvider(create: (_) => connectivityProvider),
+        Provider(create: (_) => ConnectivityService()),
+        ChangeNotifierProxyProvider<ConnectivityService, ConnectivityProvider>(
+          create: (context) =>
+              ConnectivityProvider(context.read<ConnectivityService>()),
+          update: (_, service, provider) => provider!..updateService(service),
+        ),
 
-        Provider.value(value: db),
+        // Auth
+        Provider(create: (_) => AuthService()),
+        ChangeNotifierProxyProvider2<
+          ConnectivityProvider,
+          AuthService,
+          AuthProvider
+        >(
+          create: (context) => AuthProvider(
+            context.read<ConnectivityProvider>(),
+            context.read<AuthService>(),
+          ),
+          update: (_, connectivity, authService, provider) =>
+              provider!..updateDependencies(connectivity, authService),
+        ),
+        // Database
+        Provider(create: (_) => AppDatabase(), dispose: (_, db) => db.close()),
 
         // Services
         Provider(create: (_) => CategoryService()),
@@ -114,6 +128,7 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.watch<ThemeProvider>().themeMode;
     return MaterialApp(
       title: 'Hệ thống Quản lý Danh mục Nông nghiệp & Môi trường',
       theme: ThemeData(
@@ -142,6 +157,61 @@ class MainApp extends StatelessWidget {
           ),
         ),
       ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.blue,
+        primaryColor: const Color(0xFF5E81AC),
+        fontFamily: GoogleFonts.inter().fontFamily,
+        scaffoldBackgroundColor: const Color(0xFF1E1E1E),
+
+        appBarTheme: AppBarTheme(
+          backgroundColor: const Color(0xFF2E3440),
+          foregroundColor: Colors.white,
+          elevation: 0,
+          titleTextStyle: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF5E81AC),
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            textStyle: GoogleFonts.inter(fontWeight: FontWeight.w500),
+          ),
+        ),
+
+        textTheme: TextTheme(
+          bodyLarge: GoogleFonts.inter(color: Colors.white, fontSize: 16),
+          bodyMedium: GoogleFonts.inter(color: Colors.white70, fontSize: 14),
+          labelLarge: GoogleFonts.inter(color: Colors.white),
+        ),
+
+        cardColor: const Color(0xFF2A2A2A),
+        dividerColor: Colors.white12,
+        hintColor: Colors.white54,
+        iconTheme: const IconThemeData(color: Colors.white70),
+
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: const Color(0xFF2C2C2C),
+          hintStyle: GoogleFonts.inter(color: Colors.white54),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Colors.white24),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFF5E81AC)),
+          ),
+        ),
+      ),
+      themeMode: isDark,
       home: const AuthWrapper(),
       routes: {
         LoginScreen.routeName: (context) => const LoginScreen(),

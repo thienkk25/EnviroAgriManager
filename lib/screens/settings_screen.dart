@@ -1,8 +1,9 @@
+import 'package:enviro_agri_manager/models/user_role_model.dart';
+import 'package:enviro_agri_manager/providers/auth_provider.dart';
+import 'package:enviro_agri_manager/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
-import '../models/user_role_model.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -12,16 +13,18 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _notificationsEnabled = true;
-  bool _darkModeEnabled = false;
-  bool _temperatureAlert = true;
-  bool _humidityAlert = true;
-  bool _phAlert = true;
-  String _selectedLanguage = 'Tiếng Việt';
-  String _selectedUpdateFrequency = 'Cập nhật mỗi 30 phút';
+  // bool _notificationsEnabled = true;
+  late bool _darkModeEnabled;
+  // bool _temperatureAlert = true;
+  // bool _humidityAlert = true;
+  // bool _phAlert = true;
+  // String _selectedLanguage = 'Tiếng Việt';
+  // String _selectedUpdateFrequency = 'Cập nhật mỗi 30 phút';
 
   @override
   Widget build(BuildContext context) {
+    _darkModeEnabled =
+        context.read<ThemeProvider>().themeMode == ThemeMode.dark;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
@@ -35,25 +38,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
         backgroundColor: const Color(0xFF5E81AC),
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // Profile Section
-            _buildProfileSection(),
-            const SizedBox(height: 24),
+      body: Container(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              // Profile Section
+              _buildProfileSection(),
+              const SizedBox(height: 24),
 
-            // System Settings
-            _buildSystemSettings(),
-            const SizedBox(height: 24),
+              // System Settings
+              _buildSystemSettings(),
+              const SizedBox(height: 24),
 
-            // Environmental Settings
-            _buildEnvironmentalSettings(),
-            const SizedBox(height: 24),
+              // HACK
+              // // Environmental Settings
+              // _buildEnvironmentalSettings(),
+              // const SizedBox(height: 24),
 
-            // About Section
-            _buildAboutSection(),
-          ],
+              // About Section
+              _buildAboutSection(),
+            ],
+          ),
         ),
       ),
     );
@@ -126,25 +133,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  _showEditProfileDialog();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF5E81AC),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'Chỉnh sửa thông tin',
-                  style: GoogleFonts.inter(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
+
+              // HACK
+              // const SizedBox(height: 16),
+              // ElevatedButton(
+              //   onPressed: () {
+              //     _showEditProfileDialog();
+              //   },
+              //   style: ElevatedButton.styleFrom(
+              //     backgroundColor: const Color(0xFF5E81AC),
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(12),
+              //     ),
+              //   ),
+              //   child: Text(
+              //     'Chỉnh sửa thông tin',
+              //     style: GoogleFonts.inter(
+              //       color: Colors.white,
+              //       fontWeight: FontWeight.w500,
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         );
@@ -178,42 +187,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          _buildSettingItem(
-            icon: Icons.notifications,
-            title: 'Thông báo',
-            subtitle: 'Nhận thông báo về cập nhật hệ thống',
-            trailing: Switch(
-              value: _notificationsEnabled,
-              onChanged: (value) {
-                setState(() {
-                  _notificationsEnabled = value;
-                });
-              },
-              activeThumbColor: const Color(0xFF5E81AC),
-            ),
-          ),
-          const Divider(),
-          _buildSettingItem(
-            icon: Icons.language,
-            title: 'Ngôn ngữ',
-            subtitle: _selectedLanguage,
-            trailing: const Icon(Icons.chevron_right, color: Color(0xFF88C0D0)),
-            onTap: () {
-              _showLanguageDialog();
-            },
-          ),
-          const Divider(),
+          // HACK
+          // _buildSettingItem(
+          //   icon: Icons.notifications,
+          //   title: 'Thông báo',
+          //   subtitle: 'Nhận thông báo về cập nhật hệ thống',
+          //   trailing: Switch(
+          //     value: _notificationsEnabled,
+          //     onChanged: (value) {
+          //       setState(() {
+          //         _notificationsEnabled = value;
+          //       });
+          //     },
+          //     activeThumbColor: const Color(0xFF5E81AC),
+          //   ),
+          // ),
+          // const Divider(),
+          // _buildSettingItem(
+          //   icon: Icons.language,
+          //   title: 'Ngôn ngữ',
+          //   subtitle: _selectedLanguage,
+          //   trailing: const Icon(Icons.chevron_right, color: Color(0xFF88C0D0)),
+          //   onTap: () {
+          //     _showLanguageDialog();
+          //   },
+          // ),
+          // const Divider(),
           _buildSettingItem(
             icon: Icons.dark_mode,
             title: 'Chế độ tối',
             subtitle: 'Giao diện tối cho mắt',
             trailing: Switch(
               value: _darkModeEnabled,
-              onChanged: (value) {
-                setState(() {
-                  _darkModeEnabled = value;
-                });
-              },
+              onChanged: (_) => context.read<ThemeProvider>().toggleTheme(),
               activeThumbColor: const Color(0xFF5E81AC),
             ),
           ),
@@ -232,90 +238,91 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildEnvironmentalSettings() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: .05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Cài đặt môi trường',
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF2E3440),
-            ),
-          ),
-          const SizedBox(height: 16),
-          _buildSettingItem(
-            icon: Icons.thermostat,
-            title: 'Cảnh báo nhiệt độ',
-            subtitle: 'Cảnh báo khi nhiệt độ vượt ngưỡng',
-            trailing: Switch(
-              value: _temperatureAlert,
-              onChanged: (value) {
-                setState(() {
-                  _temperatureAlert = value;
-                });
-              },
-              activeThumbColor: const Color(0xFF5E81AC),
-            ),
-          ),
-          const Divider(),
-          _buildSettingItem(
-            icon: Icons.water_drop,
-            title: 'Cảnh báo độ ẩm',
-            subtitle: 'Cảnh báo khi độ ẩm thấp',
-            trailing: Switch(
-              value: _humidityAlert,
-              onChanged: (value) {
-                setState(() {
-                  _humidityAlert = value;
-                });
-              },
-              activeThumbColor: const Color(0xFF5E81AC),
-            ),
-          ),
-          const Divider(),
-          _buildSettingItem(
-            icon: Icons.science,
-            title: 'Giám sát độ pH',
-            subtitle: 'Theo dõi độ pH của đất',
-            trailing: Switch(
-              value: _phAlert,
-              onChanged: (value) {
-                setState(() {
-                  _phAlert = value;
-                });
-              },
-              activeThumbColor: const Color(0xFF5E81AC),
-            ),
-          ),
-          const Divider(),
-          _buildSettingItem(
-            icon: Icons.schedule,
-            title: 'Tần suất cập nhật',
-            subtitle: _selectedUpdateFrequency,
-            trailing: const Icon(Icons.chevron_right, color: Color(0xFF88C0D0)),
-            onTap: () {
-              _showUpdateFrequencyDialog();
-            },
-          ),
-        ],
-      ),
-    );
-  }
+  // HACK
+  // Widget _buildEnvironmentalSettings() {
+  //   return Container(
+  //     padding: const EdgeInsets.all(20),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(16),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.black.withValues(alpha: .05),
+  //           blurRadius: 10,
+  //           offset: const Offset(0, 2),
+  //         ),
+  //       ],
+  //     ),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Text(
+  //           'Cài đặt môi trường',
+  //           style: GoogleFonts.inter(
+  //             fontSize: 18,
+  //             fontWeight: FontWeight.w600,
+  //             color: const Color(0xFF2E3440),
+  //           ),
+  //         ),
+  //         const SizedBox(height: 16),
+  //         _buildSettingItem(
+  //           icon: Icons.thermostat,
+  //           title: 'Cảnh báo nhiệt độ',
+  //           subtitle: 'Cảnh báo khi nhiệt độ vượt ngưỡng',
+  //           trailing: Switch(
+  //             value: _temperatureAlert,
+  //             onChanged: (value) {
+  //               setState(() {
+  //                 _temperatureAlert = value;
+  //               });
+  //             },
+  //             activeThumbColor: const Color(0xFF5E81AC),
+  //           ),
+  //         ),
+  //         const Divider(),
+  //         _buildSettingItem(
+  //           icon: Icons.water_drop,
+  //           title: 'Cảnh báo độ ẩm',
+  //           subtitle: 'Cảnh báo khi độ ẩm thấp',
+  //           trailing: Switch(
+  //             value: _humidityAlert,
+  //             onChanged: (value) {
+  //               setState(() {
+  //                 _humidityAlert = value;
+  //               });
+  //             },
+  //             activeThumbColor: const Color(0xFF5E81AC),
+  //           ),
+  //         ),
+  //         const Divider(),
+  //         _buildSettingItem(
+  //           icon: Icons.science,
+  //           title: 'Giám sát độ pH',
+  //           subtitle: 'Theo dõi độ pH của đất',
+  //           trailing: Switch(
+  //             value: _phAlert,
+  //             onChanged: (value) {
+  //               setState(() {
+  //                 _phAlert = value;
+  //               });
+  //             },
+  //             activeThumbColor: const Color(0xFF5E81AC),
+  //           ),
+  //         ),
+  //         const Divider(),
+  //         _buildSettingItem(
+  //           icon: Icons.schedule,
+  //           title: 'Tần suất cập nhật',
+  //           subtitle: _selectedUpdateFrequency,
+  //           trailing: const Icon(Icons.chevron_right, color: Color(0xFF88C0D0)),
+  //           onTap: () {
+  //             _showUpdateFrequencyDialog();
+  //           },
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildAboutSection() {
     return Container(
@@ -421,73 +428,74 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showEditProfileDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Chỉnh sửa thông tin',
-            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-          ),
-          content: const Text(
-            'Tính năng này sẽ được phát triển trong phiên bản tiếp theo.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                'Đóng',
-                style: GoogleFonts.inter(color: const Color(0xFF5E81AC)),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // HACK
+  // void _showEditProfileDialog() {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text(
+  //           'Chỉnh sửa thông tin',
+  //           style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+  //         ),
+  //         content: const Text(
+  //           'Tính năng này sẽ được phát triển trong phiên bản tiếp theo.',
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () => Navigator.of(context).pop(),
+  //             child: Text(
+  //               'Đóng',
+  //               style: GoogleFonts.inter(color: const Color(0xFF5E81AC)),
+  //             ),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
-  void _showLanguageDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Chọn ngôn ngữ',
-            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-          ),
-          content: RadioGroup<String>(
-            groupValue: _selectedLanguage,
-            onChanged: (value) {
-              setState(() {
-                _selectedLanguage = value!;
-              });
-              Navigator.of(context).pop();
-            },
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: const Text('Tiếng Việt'),
-                  leading: const Radio(
-                    value: 'Tiếng Việt',
-                    activeColor: Color(0xFF5E81AC),
-                  ),
-                ),
-                ListTile(
-                  title: const Text('English'),
-                  leading: const Radio(
-                    value: 'English',
-                    activeColor: Color(0xFF5E81AC),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
+  // void _showLanguageDialog() {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text(
+  //           'Chọn ngôn ngữ',
+  //           style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+  //         ),
+  //         content: RadioGroup<String>(
+  //           groupValue: _selectedLanguage,
+  //           onChanged: (value) {
+  //             setState(() {
+  //               _selectedLanguage = value!;
+  //             });
+  //             Navigator.of(context).pop();
+  //           },
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               ListTile(
+  //                 title: const Text('Tiếng Việt'),
+  //                 leading: const Radio(
+  //                   value: 'Tiếng Việt',
+  //                   activeColor: Color(0xFF5E81AC),
+  //                 ),
+  //               ),
+  //               ListTile(
+  //                 title: const Text('English'),
+  //                 leading: const Radio(
+  //                   value: 'English',
+  //                   activeColor: Color(0xFF5E81AC),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
   void _showSyncDialog() {
     showDialog(
@@ -515,54 +523,54 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showUpdateFrequencyDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Tần suất cập nhật',
-            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-          ),
-          content: RadioGroup<String>(
-            groupValue: _selectedUpdateFrequency,
-            onChanged: (value) {
-              setState(() {
-                _selectedUpdateFrequency = value!;
-              });
-              Navigator.of(context).pop();
-            },
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: const Text('Cập nhật mỗi 15 phút'),
-                  leading: Radio<String>(
-                    value: 'Cập nhật mỗi 15 phút',
-                    activeColor: const Color(0xFF5E81AC),
-                  ),
-                ),
-                ListTile(
-                  title: const Text('Cập nhật mỗi 30 phút'),
-                  leading: Radio<String>(
-                    value: 'Cập nhật mỗi 30 phút',
-                    activeColor: const Color(0xFF5E81AC),
-                  ),
-                ),
-                ListTile(
-                  title: const Text('Cập nhật mỗi 1 giờ'),
-                  leading: Radio<String>(
-                    value: 'Cập nhật mỗi 1 giờ',
-                    activeColor: const Color(0xFF5E81AC),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
+  // void _showUpdateFrequencyDialog() {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text(
+  //           'Tần suất cập nhật',
+  //           style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+  //         ),
+  //         content: RadioGroup<String>(
+  //           groupValue: _selectedUpdateFrequency,
+  //           onChanged: (value) {
+  //             setState(() {
+  //               _selectedUpdateFrequency = value!;
+  //             });
+  //             Navigator.of(context).pop();
+  //           },
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               ListTile(
+  //                 title: const Text('Cập nhật mỗi 15 phút'),
+  //                 leading: Radio<String>(
+  //                   value: 'Cập nhật mỗi 15 phút',
+  //                   activeColor: const Color(0xFF5E81AC),
+  //                 ),
+  //               ),
+  //               ListTile(
+  //                 title: const Text('Cập nhật mỗi 30 phút'),
+  //                 leading: Radio<String>(
+  //                   value: 'Cập nhật mỗi 30 phút',
+  //                   activeColor: const Color(0xFF5E81AC),
+  //                 ),
+  //               ),
+  //               ListTile(
+  //                 title: const Text('Cập nhật mỗi 1 giờ'),
+  //                 leading: Radio<String>(
+  //                   value: 'Cập nhật mỗi 1 giờ',
+  //                   activeColor: const Color(0xFF5E81AC),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
   void _showVersionDialog() {
     showDialog(

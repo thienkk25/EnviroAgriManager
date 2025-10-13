@@ -19,216 +19,223 @@ class SimpleHomeScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF5E81AC),
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Header
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF5E81AC), Color(0xFF88C0D0)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+      body: Container(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF5E81AC), Color(0xFF88C0D0)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Nông nghiệp & Môi trường',
-                    style: GoogleFonts.inter(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Hệ thống quản lý danh mục điện tử dùng chung',
-                    style: GoogleFonts.inter(
-                      fontSize: 16,
-                      color: Colors.white.withValues(alpha: .9),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Features Grid
-            Text(
-              'Tính năng chính',
-              style: GoogleFonts.inter(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF2E3440),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            LayoutBuilder(
-              builder: (context, constraints) {
-                return GridView.count(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: constraints.maxWidth < 600 ? 2 : 4,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: constraints.maxWidth < 600 ? .75 : 1.1,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _FeatureCard(
-                      icon: Icons.inventory_2,
-                      title: 'Quản lý Sản phẩm',
-                      description: 'Thêm, sửa, xóa sản phẩm nông nghiệp',
-                      color: const Color(0xFF5E81AC),
+                    Text(
+                      'Nông nghiệp & Môi trường',
+                      style: GoogleFonts.inter(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                    _FeatureCard(
-                      icon: Icons.category,
-                      title: 'Quản lý Danh mục',
-                      description: 'Phân loại sản phẩm theo loại',
-                      color: const Color(0xFFA3BE8C),
-                    ),
-                    _FeatureCard(
-                      icon: Icons.eco,
-                      title: 'Giám sát Môi trường',
-                      description: 'Theo dõi dữ liệu môi trường',
-                      color: const Color(0xFF88C0D0),
-                    ),
-                    _FeatureCard(
-                      icon: Icons.analytics,
-                      title: 'Báo cáo Thống kê',
-                      description: 'Biểu đồ và thống kê chi tiết',
-                      color: const Color(0xFFD08770),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Hệ thống quản lý danh mục điện tử dùng chung',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        color: Colors.white.withValues(alpha: .9),
+                      ),
                     ),
                   ],
-                );
-              },
-            ),
-
-            const SizedBox(height: 24),
-
-            // Environmental Data
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: .05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    spacing: 8,
+
+              const SizedBox(height: 24),
+
+              // Features Grid
+              Text(
+                'Tính năng chính',
+                style: GoogleFonts.inter(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF2E3440),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: constraints.maxWidth < 600 ? 2 : 4,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: constraints.maxWidth < 600 ? .75 : 1.1,
                     children: [
-                      const Icon(Icons.eco, color: Color(0xFF5E81AC), size: 24),
-                      Expanded(
-                        child: Text(
-                          'Dữ liệu Môi trường Hiện tại',
-                          style: GoogleFonts.inter(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF2E3440),
+                      _FeatureCard(
+                        icon: Icons.inventory_2,
+                        title: 'Quản lý Sản phẩm',
+                        description: 'Thêm, sửa, xóa sản phẩm nông nghiệp',
+                        color: const Color(0xFF5E81AC),
+                      ),
+                      _FeatureCard(
+                        icon: Icons.category,
+                        title: 'Quản lý Danh mục',
+                        description: 'Phân loại sản phẩm theo loại',
+                        color: const Color(0xFFA3BE8C),
+                      ),
+                      _FeatureCard(
+                        icon: Icons.eco,
+                        title: 'Giám sát Môi trường',
+                        description: 'Theo dõi dữ liệu môi trường',
+                        color: const Color(0xFF88C0D0),
+                      ),
+                      _FeatureCard(
+                        icon: Icons.analytics,
+                        title: 'Báo cáo Thống kê',
+                        description: 'Biểu đồ và thống kê chi tiết',
+                        color: const Color(0xFFD08770),
+                      ),
+                    ],
+                  );
+                },
+              ),
+
+              const SizedBox(height: 24),
+
+              // Environmental Data
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: .05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      spacing: 8,
+                      children: [
+                        const Icon(
+                          Icons.eco,
+                          color: Color(0xFF5E81AC),
+                          size: 24,
+                        ),
+                        Expanded(
+                          child: Text(
+                            'Dữ liệu Môi trường Hiện tại',
+                            style: GoogleFonts.inter(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF2E3440),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _EnvironmentalMetric(
-                          icon: Icons.thermostat,
-                          label: 'Nhiệt độ',
-                          value: '28°C',
-                          status: 'Bình thường',
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _EnvironmentalMetric(
+                            icon: Icons.thermostat,
+                            label: 'Nhiệt độ',
+                            value: '28°C',
+                            status: 'Bình thường',
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _EnvironmentalMetric(
-                          icon: Icons.water_drop,
-                          label: 'Độ ẩm',
-                          value: '75%',
-                          status: 'Tốt',
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _EnvironmentalMetric(
+                            icon: Icons.water_drop,
+                            label: 'Độ ẩm',
+                            value: '75%',
+                            status: 'Tốt',
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _EnvironmentalMetric(
-                          icon: Icons.water,
-                          label: 'Độ ẩm đất',
-                          value: '65%',
-                          status: 'Tốt',
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _EnvironmentalMetric(
+                            icon: Icons.water,
+                            label: 'Độ ẩm đất',
+                            value: '65%',
+                            status: 'Tốt',
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _EnvironmentalMetric(
-                          icon: Icons.science,
-                          label: 'Độ pH',
-                          value: '6.5',
-                          status: 'Tối ưu',
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _EnvironmentalMetric(
+                            icon: Icons.science,
+                            label: 'Độ pH',
+                            value: '6.5',
+                            status: 'Tối ưu',
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            // Sample Products
-            Text(
-              'Sản phẩm mẫu',
-              style: GoogleFonts.inter(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF2E3440),
+              // Sample Products
+              Text(
+                'Sản phẩm mẫu',
+                style: GoogleFonts.inter(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF2E3440),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            _SampleProductCard(
-              name: 'Lúa Jasmine',
-              category: 'Cây lương thực',
-              price: '25,000 ₫',
-              quantity: '1000 kg',
-            ),
-            const SizedBox(height: 12),
-            _SampleProductCard(
-              name: 'Cà chua Cherry',
-              category: 'Rau củ',
-              price: '45,000 ₫',
-              quantity: '500 kg',
-            ),
-            const SizedBox(height: 12),
-            _SampleProductCard(
-              name: 'Dưa hấu',
-              category: 'Trái cây',
-              price: '35,000 ₫',
-              quantity: '200 quả',
-            ),
-          ],
+              _SampleProductCard(
+                name: 'Lúa Jasmine',
+                category: 'Cây lương thực',
+                price: '25,000 ₫',
+                quantity: '1000 kg',
+              ),
+              const SizedBox(height: 12),
+              _SampleProductCard(
+                name: 'Cà chua Cherry',
+                category: 'Rau củ',
+                price: '45,000 ₫',
+                quantity: '500 kg',
+              ),
+              const SizedBox(height: 12),
+              _SampleProductCard(
+                name: 'Dưa hấu',
+                category: 'Trái cây',
+                price: '35,000 ₫',
+                quantity: '200 quả',
+              ),
+            ],
+          ),
         ),
       ),
     );

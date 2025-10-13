@@ -1,37 +1,87 @@
+import 'package:enviro_agri_manager/local/prefs/app_preferences.dart';
+import 'package:enviro_agri_manager/models/user_role_model.dart';
+import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
+import 'package:enviro_agri_manager/services/auth_service.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../services/auth_service.dart';
-import '../models/user_role_model.dart';
 
 class AuthProvider with ChangeNotifier {
-  final AuthService _authService;
+  late ConnectivityProvider _connectivityProvider;
+  late AuthService _authService;
+  late SharedPreferences _prefs;
+  late AppPreferences _appPrefs;
   User? _user;
   UserRoleModel _userRole = UserRoleModel.viewer;
   bool _isLoading = false;
-  String? _errorMessage;
+  bool _isOfflineMode = false;
+  String _errorMessage = '';
 
   User? get user => _user;
   UserRoleModel get userRole => _userRole;
   bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
+  bool get isOfflineMode => _isOfflineMode;
+  String get errorMessage => _errorMessage;
   bool get isSignedIn => _user != null;
 
-  AuthProvider(this._authService) {
+  AuthProvider(this._connectivityProvider, this._authService) {
     initializeAuth();
+  }
+  void updateDependencies(
+    ConnectivityProvider connectivity,
+    AuthService authService,
+  ) {
+    _connectivityProvider = connectivity;
+    _authService = authService;
   }
 
   /// Khởi tạo auth state
   Future<void> initializeAuth() async {
-    _user = _authService.currentUser;
-    await _loadUserRole();
-    notifyListeners();
+    _prefs = await SharedPreferences.getInstance();
+    _appPrefs = AppPreferences(_prefs);
+    _isOfflineMode = _connectivityProvider.isOnline;
 
-    // Lắng nghe thay đổi trạng thái authentication
-    _authService.authStateChanges.listen((data) async {
-      _user = data.session?.user;
+    if (_isOfflineMode) {
+      // 🔹 Offline: load user từ local cache
+      final cached = _appPrefs.getCachedUser();
+      if (cached['id'] != null) {
+        _user = User(
+          id: cached['id']!,
+          email: cached['email'],
+          appMetadata: {},
+          userMetadata: {},
+          aud: '',
+          createdAt: '',
+        );
+        _userRole = UserRoleModel.fromString(cached['role']!);
+      }
+    } else {
+      // 🔹 Online: load từ Supabase
+      _user = _authService.currentUser;
       await _loadUserRole();
-      notifyListeners();
-    });
+      if (_user != null) {
+        await _appPrefs.setCachedUser(
+          id: _user!.id,
+          email: _user!.email ?? '',
+          role: (await _authService.getCurrentUserRole()).value,
+        );
+      }
+
+      // Lắng nghe thay đổi trạng thái authentication
+      _authService.authStateChanges.listen((data) async {
+        _user = data.session?.user;
+        await _loadUserRole();
+        if (_user != null) {
+          await _appPrefs.setCachedUser(
+            id: _user!.id,
+            email: _user!.email ?? '',
+            role: (await _authService.getCurrentUserRole()).value,
+          );
+        }
+        notifyListeners();
+      });
+    }
+    notifyListeners();
   }
 
   Future<void> _loadUserRole() async {
@@ -44,16 +94,6 @@ class AuthProvider with ChangeNotifier {
     } else {
       _userRole = UserRoleModel.viewer;
     }
-  }
-
-  void _setLoading(bool loading) {
-    _isLoading = loading;
-    notifyListeners();
-  }
-
-  void _setError(String? error) {
-    _errorMessage = error;
-    notifyListeners();
   }
 
   Future<bool> signUp({
@@ -89,6 +129,14 @@ class AuthProvider with ChangeNotifier {
       if (response.user != null) {
         _user = response.user;
         await _loadUserRole();
+
+        await _appPrefs.setAccessToken(response.session?.accessToken ?? '');
+        await _appPrefs.setCachedUser(
+          id: _user!.id,
+          email: _user!.email ?? '',
+          role: _userRole.value,
+        );
+
         notifyListeners();
         return true;
       }
@@ -111,22 +159,21 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> signOut() async {
     try {
-      _setLoading(true);
-      _setError(null);
+      _isLoading = true;
+      _errorMessage = '';
+      notifyListeners();
 
-      await _authService.signOut();
+      if (!_isOfflineMode) await _authService.signOut();
+      await _appPrefs.clearCachedUser();
       _user = null;
       _userRole = UserRoleModel.viewer;
       notifyListeners();
     } catch (e) {
-      _setError(e.toString());
+      _errorMessage = e.toString();
     } finally {
-      _setLoading(false);
+      _isLoading = false;
+      notifyListeners();
     }
-  }
-
-  void clearError() {
-    _setError(null);
   }
 
   /// Kiểm tra quyền
@@ -155,6 +202,11 @@ class AuthProvider with ChangeNotifier {
       // Nếu cập nhật chính mình thì đổi local luôn
       if (_user?.id == userId) {
         _userRole = newRole;
+        await _appPrefs.setCachedUser(
+          id: _user!.id,
+          email: _user!.email ?? '',
+          role: newRole.value,
+        );
         notifyListeners();
       }
 
@@ -173,7 +225,7 @@ class AuthProvider with ChangeNotifier {
       final users = await _authService.getAllUsersWithProfiles();
       return users;
     } catch (e) {
-      _setError(e.toString());
+      _errorMessage = e.toString();
       return null;
     }
   }

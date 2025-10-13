@@ -1,33 +1,47 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppPreferences {
-  final SharedPreferences prefs;
+  final SharedPreferences _prefs;
 
-  // inject instance khi khởi tạo
-  AppPreferences(this.prefs);
+  AppPreferences(this._prefs);
 
   static const _keyThemeMode = 'theme_mode';
   static const _keyAccessToken = 'access_token';
-  static const _keyLastSync = 'last_sync';
+  static const _keyUserId = 'user_id';
+  static const _keyUserEmail = 'user_email';
+  static const _keyUserRole = 'user_role';
 
-  // Theme Mode
+  // Theme
   Future<void> setThemeMode(String mode) async =>
-      prefs.setString(_keyThemeMode, mode);
+      _prefs.setString(_keyThemeMode, mode);
+  String? getThemeMode() => _prefs.getString(_keyThemeMode);
 
-  String? getThemeMode() => prefs.getString(_keyThemeMode);
-
-  // Access Token
+  // Auth
   Future<void> setAccessToken(String token) async =>
-      prefs.setString(_keyAccessToken, token);
+      _prefs.setString(_keyAccessToken, token);
+  String? getAccessToken() => _prefs.getString(_keyAccessToken);
+  Future<void> clearAccessToken() async => _prefs.remove(_keyAccessToken);
 
-  String? getAccessToken() => prefs.getString(_keyAccessToken);
+  Future<void> setCachedUser({
+    required String id,
+    required String email,
+    required String role,
+  }) async {
+    await _prefs.setString(_keyUserId, id);
+    await _prefs.setString(_keyUserEmail, email);
+    await _prefs.setString(_keyUserRole, role);
+  }
 
-  // Last Sync
-  Future<void> setLastSync(DateTime time) async =>
-      prefs.setString(_keyLastSync, time.toIso8601String());
+  Map<String, String?> getCachedUser() => {
+    'id': _prefs.getString(_keyUserId),
+    'email': _prefs.getString(_keyUserEmail),
+    'role': _prefs.getString(_keyUserRole),
+  };
 
-  DateTime? getLastSync() {
-    final value = prefs.getString(_keyLastSync);
-    return value != null ? DateTime.tryParse(value) : null;
+  Future<void> clearCachedUser() async {
+    await _prefs.remove(_keyUserId);
+    await _prefs.remove(_keyUserEmail);
+    await _prefs.remove(_keyUserRole);
+    await clearAccessToken();
   }
 }
