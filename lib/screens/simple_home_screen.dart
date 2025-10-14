@@ -1,5 +1,7 @@
+import 'package:enviro_agri_manager/providers/product_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class SimpleHomeScreen extends StatelessWidget {
   const SimpleHomeScreen({super.key});
@@ -205,7 +207,7 @@ class SimpleHomeScreen extends StatelessWidget {
 
               // Sample Products
               Text(
-                'Sản phẩm mẫu',
+                'Danh sách sản phẩm hôm nay',
                 style: GoogleFonts.inter(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
@@ -214,25 +216,45 @@ class SimpleHomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              _SampleProductCard(
-                name: 'Lúa Jasmine',
-                category: 'Cây lương thực',
-                price: '25,000 ₫',
-                quantity: '1000 kg',
-              ),
-              const SizedBox(height: 12),
-              _SampleProductCard(
-                name: 'Cà chua Cherry',
-                category: 'Rau củ',
-                price: '45,000 ₫',
-                quantity: '500 kg',
-              ),
-              const SizedBox(height: 12),
-              _SampleProductCard(
-                name: 'Dưa hấu',
-                category: 'Trái cây',
-                price: '35,000 ₫',
-                quantity: '200 quả',
+              Consumer<ProductProvider>(
+                builder: (context, productProvider, child) {
+                  final now = DateTime.now();
+                  final startOfDay = DateTime(now.year, now.month, now.day);
+                  final endOfDay = startOfDay.add(const Duration(days: 1));
+                  final products = productProvider.products
+                      .where(
+                        (value) =>
+                            value.updatedAt.isAfter(startOfDay) &&
+                            value.updatedAt.isBefore(endOfDay),
+                      )
+                      .toList();
+
+                  if (products.isEmpty) {
+                    return _SampleProductCard(
+                      name: "Không có sản phẩm",
+                      description: "Chưa có sản phẩm thay đổi hôm nay",
+                      price: '',
+                      quantity: '',
+                    );
+                  }
+
+                  return ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: products.length,
+                    itemBuilder: (context, index) => Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: _SampleProductCard(
+                        name: products[index].name,
+                        description: products[index].description,
+                        price:
+                            "Giá: ${products[index].price.toStringAsFixed(0)} đ",
+                        quantity:
+                            "Số lượng: ${products[index].quantity.toString()}",
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -370,13 +392,13 @@ class _EnvironmentalMetric extends StatelessWidget {
 
 class _SampleProductCard extends StatelessWidget {
   final String name;
-  final String category;
+  final String description;
   final String price;
   final String quantity;
 
   const _SampleProductCard({
     required this.name,
-    required this.category,
+    required this.description,
     required this.price,
     required this.quantity,
   });
@@ -435,36 +457,41 @@ class _SampleProductCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    category,
+                    description,
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: const Color(0xFFA3BE8C),
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                price,
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFFD08770),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  price,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFFD08770),
+                  ),
                 ),
-              ),
-              Text(
-                quantity,
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  color: const Color(0xFF88C0D0),
+                Text(
+                  quantity,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: const Color(0xFF88C0D0),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

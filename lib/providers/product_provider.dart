@@ -130,13 +130,6 @@ class ProductProvider with ChangeNotifier {
     }).toList();
   }
 
-  // Lọc sản phẩm theo danh mục
-  List<ProductModel> getProductsByCategory(String categoryId) {
-    return _products
-        .where((product) => product.categoryId == categoryId)
-        .toList();
-  }
-
   // Lấy sản phẩm theo ID
   ProductModel? getProductById(String id) {
     try {

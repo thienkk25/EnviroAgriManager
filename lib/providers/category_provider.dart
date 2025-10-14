@@ -155,6 +155,7 @@ class CategoryProvider with ChangeNotifier {
     }).toList();
   }
 
+  // Lấy danh mục con lên cha
   List<String> getCategoryIds(String categoryId) {
     final category = _categories.firstWhere((c) => c.id == categoryId);
     if (category.parentId == null) {
@@ -164,5 +165,18 @@ class CategoryProvider with ChangeNotifier {
       // Gọi đệ quy lên trên và thêm id hiện tại
       return [...getCategoryIds(category.parentId!), category.id];
     }
+  }
+
+  // Lấy danh mục cha xuống con
+  List<String> getCategoryIdsDown(String id) {
+    List<String> result = [];
+    result.add(id);
+    final subCategory = _categories.where((e) => e.parentId == id).toList();
+
+    for (var e in subCategory) {
+      result.addAll(getCategoryIdsDown(e.id));
+    }
+
+    return result;
   }
 }

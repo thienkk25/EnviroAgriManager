@@ -152,8 +152,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
             // Products List
             Expanded(
-              child: Consumer<ProductProvider>(
-                builder: (context, productProvider, child) {
+              child: Consumer2<ProductProvider, CategoryProvider>(
+                builder: (context, productProvider, categoryProvider, child) {
                   if (productProvider.isLoading) {
                     return const Center(child: CircularProgressIndicator());
                   }
@@ -198,9 +198,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
                   // Category filter
                   if (_selectedCategory != 'Tất cả') {
+                    final categoriesIds = categoryProvider.getCategoryIdsDown(
+                      _selectedCategory,
+                    );
                     filteredProducts = filteredProducts
                         .where(
-                          (product) => product.categoryId == _selectedCategory,
+                          (product) =>
+                              categoriesIds.contains(product.categoryId),
                         )
                         .toList();
                   }
@@ -373,7 +377,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   late TextEditingController _unitController;
 
   String _selectedCategory = '';
-  final String _imageUrl = 'https://example.com/image2.jpg';
+  final String _imageUrl = '';
   String _selectedStatus = 'active';
 
   bool get isView => widget.mode == ProductFormMode.view;
