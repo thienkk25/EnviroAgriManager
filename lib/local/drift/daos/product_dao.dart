@@ -32,11 +32,11 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
   Future<List<ProductModel>> getAllProducts() async {
     final rows = await (select(
       productTable,
-    )..where((tbl) => tbl.deletedAt.isNull())).get();
+    )..where((tbl) => tbl.isDeleted.equals(false))).get();
     return rows.map(_mapToModel).toList();
   }
 
-  Future<List<ProductModel>> getUnsyncedProductsAsModels() async {
+  Future<List<ProductModel>> getUnsyncedProducts() async {
     final rows = await (select(
       productTable,
     )..where((t) => t.isSynced.equals(false))).get();
@@ -103,11 +103,22 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
     });
   }
 
-  Future<void> softDeleteProduct(String id) async {
+  Future<void> markProductAsDeleted(String id) async {
     await (update(productTable)..where((t) => t.id.equals(id))).write(
       ProductTableCompanion(
-        deletedAt: Value(DateTime.now()),
-        isSynced: Value(false), // Đánh dấu chưa sync
+        isSynced: const Value(false),
+        isDeleted: const Value(true),
+        pendingDelete: const Value(true),
+      ),
+    );
+  }
+
+  Future<void> restoreProduct(String id) async {
+    await (update(productTable)..where((t) => t.id.equals(id))).write(
+      ProductTableCompanion(
+        isSynced: const Value(false),
+        isDeleted: const Value(false),
+        pendingDelete: const Value(false),
       ),
     );
   }
@@ -115,7 +126,7 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
   Future<List<ProductModel>> getDeletedUnsyncedProducts() async {
     final rows =
         await (select(productTable)..where(
-              (t) => t.deletedAt.isNotNull() & t.isSynced
+              (t) => t.isDeleted.equals(true) & t.isSynced
                 ..equals(false),
             ))
             .get();

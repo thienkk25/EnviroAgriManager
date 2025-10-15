@@ -12,7 +12,7 @@ class RegionRepository {
   Future<List<RegionModel>> syncRegions({required bool isOnline}) async {
     if (isOnline) {
       try {
-        final localNewData = await _db.regionDao.getUnsyncedRegionsAsModels();
+        final localNewData = await _db.regionDao.getUnsyncedRegions();
 
         if (localNewData.isNotEmpty) {
           await _regionService.uploadRegions(localNewData);
@@ -25,10 +25,7 @@ class RegionRepository {
         final deletedData = await _db.regionDao.getDeletedUnsyncedRegions();
         if (deletedData.isNotEmpty) {
           for (var product in deletedData) {
-            await _regionService.deleteRegion(product.id);
-          }
-          for (var product in deletedData) {
-            await _db.regionDao.deleteRegion(product.id);
+            await delete(product.id, isOnline: isOnline);
           }
         }
 
@@ -126,11 +123,17 @@ class RegionRepository {
         await _regionService.deleteRegion(id);
         await _db.regionDao.deleteRegion(id);
       } catch (e) {
-        await _db.regionDao.softDeleteRegion(id);
-        rethrow;
+        if (e.toString().contains(
+              'Không thể xóa vị trí đang có dữ liệu môi trường phụ thuộc',
+            ) ||
+            e.toString().contains('Không thể')) {
+          await _db.regionDao.restoreRegion(id);
+        } else {
+          await _db.regionDao.markRegionAsDeleted(id);
+        }
       }
     } else {
-      await _db.regionDao.softDeleteRegion(id);
+      await _db.regionDao.markRegionAsDeleted(id);
     }
   }
 }

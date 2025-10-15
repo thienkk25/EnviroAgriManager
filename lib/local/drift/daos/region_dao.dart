@@ -28,11 +28,11 @@ class RegionDao extends DatabaseAccessor<AppDatabase> with _$RegionDaoMixin {
   Future<List<RegionModel>> getAllRegions() async {
     final rows = await (select(
       regionTable,
-    )..where((tbl) => tbl.deletedAt.isNull())).get();
+    )..where((tbl) => tbl.isDeleted.equals(false))).get();
     return rows.map(_mapToModel).toList();
   }
 
-  Future<List<RegionModel>> getUnsyncedRegionsAsModels() async {
+  Future<List<RegionModel>> getUnsyncedRegions() async {
     final rows = await (select(
       regionTable,
     )..where((t) => t.isSynced.equals(false))).get();
@@ -91,11 +91,22 @@ class RegionDao extends DatabaseAccessor<AppDatabase> with _$RegionDaoMixin {
     });
   }
 
-  Future<void> softDeleteRegion(String id) async {
+  Future<void> markRegionAsDeleted(String id) async {
     await (update(regionTable)..where((t) => t.id.equals(id))).write(
       RegionTableCompanion(
-        deletedAt: Value(DateTime.now()),
-        isSynced: Value(false), // Đánh dấu chưa sync
+        isSynced: const Value(false),
+        isDeleted: const Value(true),
+        pendingDelete: const Value(true),
+      ),
+    );
+  }
+
+  Future<void> restoreRegion(String id) async {
+    await (update(regionTable)..where((t) => t.id.equals(id))).write(
+      RegionTableCompanion(
+        isSynced: const Value(false),
+        isDeleted: const Value(false),
+        pendingDelete: const Value(false),
       ),
     );
   }
@@ -103,7 +114,7 @@ class RegionDao extends DatabaseAccessor<AppDatabase> with _$RegionDaoMixin {
   Future<List<RegionModel>> getDeletedUnsyncedRegions() async {
     final rows =
         await (select(regionTable)..where(
-              (t) => t.deletedAt.isNotNull() & t.isSynced
+              (t) => t.isDeleted.equals(true) & t.isSynced
                 ..equals(false),
             ))
             .get();

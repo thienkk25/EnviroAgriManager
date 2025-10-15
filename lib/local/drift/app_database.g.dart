@@ -123,16 +123,35 @@ class $CategoryTableTable extends CategoryTable
     ),
     defaultValue: const Constant(false),
   );
-  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
-    'deletedAt',
+  static const VerificationMeta _isDeletedMeta = const VerificationMeta(
+    'isDeleted',
   );
   @override
-  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
-    'deleted_at',
+  late final GeneratedColumn<bool> isDeleted = GeneratedColumn<bool>(
+    'is_deleted',
     aliasedName,
-    true,
-    type: DriftSqlType.dateTime,
+    false,
+    type: DriftSqlType.bool,
     requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_deleted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _pendingDeleteMeta = const VerificationMeta(
+    'pendingDelete',
+  );
+  @override
+  late final GeneratedColumn<bool> pendingDelete = GeneratedColumn<bool>(
+    'pending_delete',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("pending_delete" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
   );
   @override
   List<GeneratedColumn> get $columns => [
@@ -146,7 +165,8 @@ class $CategoryTableTable extends CategoryTable
     updatedAt,
     isActive,
     isSynced,
-    deletedAt,
+    isDeleted,
+    pendingDelete,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -224,10 +244,19 @@ class $CategoryTableTable extends CategoryTable
         isSynced.isAcceptableOrUnknown(data['is_synced']!, _isSyncedMeta),
       );
     }
-    if (data.containsKey('deleted_at')) {
+    if (data.containsKey('is_deleted')) {
       context.handle(
-        _deletedAtMeta,
-        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+        _isDeletedMeta,
+        isDeleted.isAcceptableOrUnknown(data['is_deleted']!, _isDeletedMeta),
+      );
+    }
+    if (data.containsKey('pending_delete')) {
+      context.handle(
+        _pendingDeleteMeta,
+        pendingDelete.isAcceptableOrUnknown(
+          data['pending_delete']!,
+          _pendingDeleteMeta,
+        ),
       );
     }
     return context;
@@ -279,10 +308,14 @@ class $CategoryTableTable extends CategoryTable
         DriftSqlType.bool,
         data['${effectivePrefix}is_synced'],
       )!,
-      deletedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}deleted_at'],
-      ),
+      isDeleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_deleted'],
+      )!,
+      pendingDelete: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}pending_delete'],
+      )!,
     );
   }
 
@@ -304,7 +337,8 @@ class CategoryTableData extends DataClass
   final DateTime updatedAt;
   final bool isActive;
   final bool isSynced;
-  final DateTime? deletedAt;
+  final bool isDeleted;
+  final bool pendingDelete;
   const CategoryTableData({
     required this.id,
     required this.name,
@@ -316,7 +350,8 @@ class CategoryTableData extends DataClass
     required this.updatedAt,
     required this.isActive,
     required this.isSynced,
-    this.deletedAt,
+    required this.isDeleted,
+    required this.pendingDelete,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -335,9 +370,8 @@ class CategoryTableData extends DataClass
     map['updated_at'] = Variable<DateTime>(updatedAt);
     map['is_active'] = Variable<bool>(isActive);
     map['is_synced'] = Variable<bool>(isSynced);
-    if (!nullToAbsent || deletedAt != null) {
-      map['deleted_at'] = Variable<DateTime>(deletedAt);
-    }
+    map['is_deleted'] = Variable<bool>(isDeleted);
+    map['pending_delete'] = Variable<bool>(pendingDelete);
     return map;
   }
 
@@ -357,9 +391,8 @@ class CategoryTableData extends DataClass
       updatedAt: Value(updatedAt),
       isActive: Value(isActive),
       isSynced: Value(isSynced),
-      deletedAt: deletedAt == null && nullToAbsent
-          ? const Value.absent()
-          : Value(deletedAt),
+      isDeleted: Value(isDeleted),
+      pendingDelete: Value(pendingDelete),
     );
   }
 
@@ -379,7 +412,8 @@ class CategoryTableData extends DataClass
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       isActive: serializer.fromJson<bool>(json['isActive']),
       isSynced: serializer.fromJson<bool>(json['isSynced']),
-      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      isDeleted: serializer.fromJson<bool>(json['isDeleted']),
+      pendingDelete: serializer.fromJson<bool>(json['pendingDelete']),
     );
   }
   @override
@@ -396,7 +430,8 @@ class CategoryTableData extends DataClass
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'isActive': serializer.toJson<bool>(isActive),
       'isSynced': serializer.toJson<bool>(isSynced),
-      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'isDeleted': serializer.toJson<bool>(isDeleted),
+      'pendingDelete': serializer.toJson<bool>(pendingDelete),
     };
   }
 
@@ -411,7 +446,8 @@ class CategoryTableData extends DataClass
     DateTime? updatedAt,
     bool? isActive,
     bool? isSynced,
-    Value<DateTime?> deletedAt = const Value.absent(),
+    bool? isDeleted,
+    bool? pendingDelete,
   }) => CategoryTableData(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -423,7 +459,8 @@ class CategoryTableData extends DataClass
     updatedAt: updatedAt ?? this.updatedAt,
     isActive: isActive ?? this.isActive,
     isSynced: isSynced ?? this.isSynced,
-    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    isDeleted: isDeleted ?? this.isDeleted,
+    pendingDelete: pendingDelete ?? this.pendingDelete,
   );
   CategoryTableData copyWithCompanion(CategoryTableCompanion data) {
     return CategoryTableData(
@@ -439,7 +476,10 @@ class CategoryTableData extends DataClass
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       isActive: data.isActive.present ? data.isActive.value : this.isActive,
       isSynced: data.isSynced.present ? data.isSynced.value : this.isSynced,
-      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      isDeleted: data.isDeleted.present ? data.isDeleted.value : this.isDeleted,
+      pendingDelete: data.pendingDelete.present
+          ? data.pendingDelete.value
+          : this.pendingDelete,
     );
   }
 
@@ -456,7 +496,8 @@ class CategoryTableData extends DataClass
           ..write('updatedAt: $updatedAt, ')
           ..write('isActive: $isActive, ')
           ..write('isSynced: $isSynced, ')
-          ..write('deletedAt: $deletedAt')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('pendingDelete: $pendingDelete')
           ..write(')'))
         .toString();
   }
@@ -473,7 +514,8 @@ class CategoryTableData extends DataClass
     updatedAt,
     isActive,
     isSynced,
-    deletedAt,
+    isDeleted,
+    pendingDelete,
   );
   @override
   bool operator ==(Object other) =>
@@ -489,7 +531,8 @@ class CategoryTableData extends DataClass
           other.updatedAt == this.updatedAt &&
           other.isActive == this.isActive &&
           other.isSynced == this.isSynced &&
-          other.deletedAt == this.deletedAt);
+          other.isDeleted == this.isDeleted &&
+          other.pendingDelete == this.pendingDelete);
 }
 
 class CategoryTableCompanion extends UpdateCompanion<CategoryTableData> {
@@ -503,7 +546,8 @@ class CategoryTableCompanion extends UpdateCompanion<CategoryTableData> {
   final Value<DateTime> updatedAt;
   final Value<bool> isActive;
   final Value<bool> isSynced;
-  final Value<DateTime?> deletedAt;
+  final Value<bool> isDeleted;
+  final Value<bool> pendingDelete;
   final Value<int> rowid;
   const CategoryTableCompanion({
     this.id = const Value.absent(),
@@ -516,7 +560,8 @@ class CategoryTableCompanion extends UpdateCompanion<CategoryTableData> {
     this.updatedAt = const Value.absent(),
     this.isActive = const Value.absent(),
     this.isSynced = const Value.absent(),
-    this.deletedAt = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    this.pendingDelete = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   CategoryTableCompanion.insert({
@@ -530,7 +575,8 @@ class CategoryTableCompanion extends UpdateCompanion<CategoryTableData> {
     this.updatedAt = const Value.absent(),
     this.isActive = const Value.absent(),
     this.isSynced = const Value.absent(),
-    this.deletedAt = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    this.pendingDelete = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        name = Value(name);
@@ -545,7 +591,8 @@ class CategoryTableCompanion extends UpdateCompanion<CategoryTableData> {
     Expression<DateTime>? updatedAt,
     Expression<bool>? isActive,
     Expression<bool>? isSynced,
-    Expression<DateTime>? deletedAt,
+    Expression<bool>? isDeleted,
+    Expression<bool>? pendingDelete,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -559,7 +606,8 @@ class CategoryTableCompanion extends UpdateCompanion<CategoryTableData> {
       if (updatedAt != null) 'updated_at': updatedAt,
       if (isActive != null) 'is_active': isActive,
       if (isSynced != null) 'is_synced': isSynced,
-      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (isDeleted != null) 'is_deleted': isDeleted,
+      if (pendingDelete != null) 'pending_delete': pendingDelete,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -575,7 +623,8 @@ class CategoryTableCompanion extends UpdateCompanion<CategoryTableData> {
     Value<DateTime>? updatedAt,
     Value<bool>? isActive,
     Value<bool>? isSynced,
-    Value<DateTime?>? deletedAt,
+    Value<bool>? isDeleted,
+    Value<bool>? pendingDelete,
     Value<int>? rowid,
   }) {
     return CategoryTableCompanion(
@@ -589,7 +638,8 @@ class CategoryTableCompanion extends UpdateCompanion<CategoryTableData> {
       updatedAt: updatedAt ?? this.updatedAt,
       isActive: isActive ?? this.isActive,
       isSynced: isSynced ?? this.isSynced,
-      deletedAt: deletedAt ?? this.deletedAt,
+      isDeleted: isDeleted ?? this.isDeleted,
+      pendingDelete: pendingDelete ?? this.pendingDelete,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -627,8 +677,11 @@ class CategoryTableCompanion extends UpdateCompanion<CategoryTableData> {
     if (isSynced.present) {
       map['is_synced'] = Variable<bool>(isSynced.value);
     }
-    if (deletedAt.present) {
-      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    if (isDeleted.present) {
+      map['is_deleted'] = Variable<bool>(isDeleted.value);
+    }
+    if (pendingDelete.present) {
+      map['pending_delete'] = Variable<bool>(pendingDelete.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -649,7 +702,8 @@ class CategoryTableCompanion extends UpdateCompanion<CategoryTableData> {
           ..write('updatedAt: $updatedAt, ')
           ..write('isActive: $isActive, ')
           ..write('isSynced: $isSynced, ')
-          ..write('deletedAt: $deletedAt, ')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('pendingDelete: $pendingDelete, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -756,16 +810,35 @@ class $RegionTableTable extends RegionTable
     ),
     defaultValue: const Constant(false),
   );
-  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
-    'deletedAt',
+  static const VerificationMeta _isDeletedMeta = const VerificationMeta(
+    'isDeleted',
   );
   @override
-  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
-    'deleted_at',
+  late final GeneratedColumn<bool> isDeleted = GeneratedColumn<bool>(
+    'is_deleted',
     aliasedName,
-    true,
-    type: DriftSqlType.dateTime,
+    false,
+    type: DriftSqlType.bool,
     requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_deleted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _pendingDeleteMeta = const VerificationMeta(
+    'pendingDelete',
+  );
+  @override
+  late final GeneratedColumn<bool> pendingDelete = GeneratedColumn<bool>(
+    'pending_delete',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("pending_delete" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
   );
   @override
   List<GeneratedColumn> get $columns => [
@@ -777,7 +850,8 @@ class $RegionTableTable extends RegionTable
     createdAt,
     updatedAt,
     isSynced,
-    deletedAt,
+    isDeleted,
+    pendingDelete,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -843,10 +917,19 @@ class $RegionTableTable extends RegionTable
         isSynced.isAcceptableOrUnknown(data['is_synced']!, _isSyncedMeta),
       );
     }
-    if (data.containsKey('deleted_at')) {
+    if (data.containsKey('is_deleted')) {
       context.handle(
-        _deletedAtMeta,
-        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+        _isDeletedMeta,
+        isDeleted.isAcceptableOrUnknown(data['is_deleted']!, _isDeletedMeta),
+      );
+    }
+    if (data.containsKey('pending_delete')) {
+      context.handle(
+        _pendingDeleteMeta,
+        pendingDelete.isAcceptableOrUnknown(
+          data['pending_delete']!,
+          _pendingDeleteMeta,
+        ),
       );
     }
     return context;
@@ -890,10 +973,14 @@ class $RegionTableTable extends RegionTable
         DriftSqlType.bool,
         data['${effectivePrefix}is_synced'],
       )!,
-      deletedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}deleted_at'],
-      ),
+      isDeleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_deleted'],
+      )!,
+      pendingDelete: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}pending_delete'],
+      )!,
     );
   }
 
@@ -912,7 +999,8 @@ class RegionTableData extends DataClass implements Insertable<RegionTableData> {
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isSynced;
-  final DateTime? deletedAt;
+  final bool isDeleted;
+  final bool pendingDelete;
   const RegionTableData({
     required this.id,
     required this.name,
@@ -922,7 +1010,8 @@ class RegionTableData extends DataClass implements Insertable<RegionTableData> {
     required this.createdAt,
     required this.updatedAt,
     required this.isSynced,
-    this.deletedAt,
+    required this.isDeleted,
+    required this.pendingDelete,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -939,9 +1028,8 @@ class RegionTableData extends DataClass implements Insertable<RegionTableData> {
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     map['is_synced'] = Variable<bool>(isSynced);
-    if (!nullToAbsent || deletedAt != null) {
-      map['deleted_at'] = Variable<DateTime>(deletedAt);
-    }
+    map['is_deleted'] = Variable<bool>(isDeleted);
+    map['pending_delete'] = Variable<bool>(pendingDelete);
     return map;
   }
 
@@ -959,9 +1047,8 @@ class RegionTableData extends DataClass implements Insertable<RegionTableData> {
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       isSynced: Value(isSynced),
-      deletedAt: deletedAt == null && nullToAbsent
-          ? const Value.absent()
-          : Value(deletedAt),
+      isDeleted: Value(isDeleted),
+      pendingDelete: Value(pendingDelete),
     );
   }
 
@@ -979,7 +1066,8 @@ class RegionTableData extends DataClass implements Insertable<RegionTableData> {
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       isSynced: serializer.fromJson<bool>(json['isSynced']),
-      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      isDeleted: serializer.fromJson<bool>(json['isDeleted']),
+      pendingDelete: serializer.fromJson<bool>(json['pendingDelete']),
     );
   }
   @override
@@ -994,7 +1082,8 @@ class RegionTableData extends DataClass implements Insertable<RegionTableData> {
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'isSynced': serializer.toJson<bool>(isSynced),
-      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'isDeleted': serializer.toJson<bool>(isDeleted),
+      'pendingDelete': serializer.toJson<bool>(pendingDelete),
     };
   }
 
@@ -1007,7 +1096,8 @@ class RegionTableData extends DataClass implements Insertable<RegionTableData> {
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isSynced,
-    Value<DateTime?> deletedAt = const Value.absent(),
+    bool? isDeleted,
+    bool? pendingDelete,
   }) => RegionTableData(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -1017,7 +1107,8 @@ class RegionTableData extends DataClass implements Insertable<RegionTableData> {
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     isSynced: isSynced ?? this.isSynced,
-    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    isDeleted: isDeleted ?? this.isDeleted,
+    pendingDelete: pendingDelete ?? this.pendingDelete,
   );
   RegionTableData copyWithCompanion(RegionTableCompanion data) {
     return RegionTableData(
@@ -1031,7 +1122,10 @@ class RegionTableData extends DataClass implements Insertable<RegionTableData> {
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       isSynced: data.isSynced.present ? data.isSynced.value : this.isSynced,
-      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      isDeleted: data.isDeleted.present ? data.isDeleted.value : this.isDeleted,
+      pendingDelete: data.pendingDelete.present
+          ? data.pendingDelete.value
+          : this.pendingDelete,
     );
   }
 
@@ -1046,7 +1140,8 @@ class RegionTableData extends DataClass implements Insertable<RegionTableData> {
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('isSynced: $isSynced, ')
-          ..write('deletedAt: $deletedAt')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('pendingDelete: $pendingDelete')
           ..write(')'))
         .toString();
   }
@@ -1061,7 +1156,8 @@ class RegionTableData extends DataClass implements Insertable<RegionTableData> {
     createdAt,
     updatedAt,
     isSynced,
-    deletedAt,
+    isDeleted,
+    pendingDelete,
   );
   @override
   bool operator ==(Object other) =>
@@ -1075,7 +1171,8 @@ class RegionTableData extends DataClass implements Insertable<RegionTableData> {
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.isSynced == this.isSynced &&
-          other.deletedAt == this.deletedAt);
+          other.isDeleted == this.isDeleted &&
+          other.pendingDelete == this.pendingDelete);
 }
 
 class RegionTableCompanion extends UpdateCompanion<RegionTableData> {
@@ -1087,7 +1184,8 @@ class RegionTableCompanion extends UpdateCompanion<RegionTableData> {
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<bool> isSynced;
-  final Value<DateTime?> deletedAt;
+  final Value<bool> isDeleted;
+  final Value<bool> pendingDelete;
   final Value<int> rowid;
   const RegionTableCompanion({
     this.id = const Value.absent(),
@@ -1098,7 +1196,8 @@ class RegionTableCompanion extends UpdateCompanion<RegionTableData> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.isSynced = const Value.absent(),
-    this.deletedAt = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    this.pendingDelete = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   RegionTableCompanion.insert({
@@ -1110,7 +1209,8 @@ class RegionTableCompanion extends UpdateCompanion<RegionTableData> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.isSynced = const Value.absent(),
-    this.deletedAt = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    this.pendingDelete = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        name = Value(name);
@@ -1123,7 +1223,8 @@ class RegionTableCompanion extends UpdateCompanion<RegionTableData> {
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<bool>? isSynced,
-    Expression<DateTime>? deletedAt,
+    Expression<bool>? isDeleted,
+    Expression<bool>? pendingDelete,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1135,7 +1236,8 @@ class RegionTableCompanion extends UpdateCompanion<RegionTableData> {
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (isSynced != null) 'is_synced': isSynced,
-      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (isDeleted != null) 'is_deleted': isDeleted,
+      if (pendingDelete != null) 'pending_delete': pendingDelete,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1149,7 +1251,8 @@ class RegionTableCompanion extends UpdateCompanion<RegionTableData> {
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<bool>? isSynced,
-    Value<DateTime?>? deletedAt,
+    Value<bool>? isDeleted,
+    Value<bool>? pendingDelete,
     Value<int>? rowid,
   }) {
     return RegionTableCompanion(
@@ -1161,7 +1264,8 @@ class RegionTableCompanion extends UpdateCompanion<RegionTableData> {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isSynced: isSynced ?? this.isSynced,
-      deletedAt: deletedAt ?? this.deletedAt,
+      isDeleted: isDeleted ?? this.isDeleted,
+      pendingDelete: pendingDelete ?? this.pendingDelete,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1193,8 +1297,11 @@ class RegionTableCompanion extends UpdateCompanion<RegionTableData> {
     if (isSynced.present) {
       map['is_synced'] = Variable<bool>(isSynced.value);
     }
-    if (deletedAt.present) {
-      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    if (isDeleted.present) {
+      map['is_deleted'] = Variable<bool>(isDeleted.value);
+    }
+    if (pendingDelete.present) {
+      map['pending_delete'] = Variable<bool>(pendingDelete.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -1213,7 +1320,8 @@ class RegionTableCompanion extends UpdateCompanion<RegionTableData> {
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('isSynced: $isSynced, ')
-          ..write('deletedAt: $deletedAt, ')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('pendingDelete: $pendingDelete, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1428,16 +1536,35 @@ class $EnvironmentalDataTableTable extends EnvironmentalDataTable
     ),
     defaultValue: const Constant(false),
   );
-  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
-    'deletedAt',
+  static const VerificationMeta _isDeletedMeta = const VerificationMeta(
+    'isDeleted',
   );
   @override
-  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
-    'deleted_at',
+  late final GeneratedColumn<bool> isDeleted = GeneratedColumn<bool>(
+    'is_deleted',
     aliasedName,
-    true,
-    type: DriftSqlType.dateTime,
+    false,
+    type: DriftSqlType.bool,
     requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_deleted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _pendingDeleteMeta = const VerificationMeta(
+    'pendingDelete',
+  );
+  @override
+  late final GeneratedColumn<bool> pendingDelete = GeneratedColumn<bool>(
+    'pending_delete',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("pending_delete" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
   );
   @override
   List<GeneratedColumn> get $columns => [
@@ -1459,7 +1586,8 @@ class $EnvironmentalDataTableTable extends EnvironmentalDataTable
     createdAt,
     updatedAt,
     isSynced,
-    deletedAt,
+    isDeleted,
+    pendingDelete,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1591,10 +1719,19 @@ class $EnvironmentalDataTableTable extends EnvironmentalDataTable
         isSynced.isAcceptableOrUnknown(data['is_synced']!, _isSyncedMeta),
       );
     }
-    if (data.containsKey('deleted_at')) {
+    if (data.containsKey('is_deleted')) {
       context.handle(
-        _deletedAtMeta,
-        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+        _isDeletedMeta,
+        isDeleted.isAcceptableOrUnknown(data['is_deleted']!, _isDeletedMeta),
+      );
+    }
+    if (data.containsKey('pending_delete')) {
+      context.handle(
+        _pendingDeleteMeta,
+        pendingDelete.isAcceptableOrUnknown(
+          data['pending_delete']!,
+          _pendingDeleteMeta,
+        ),
       );
     }
     return context;
@@ -1681,10 +1818,14 @@ class $EnvironmentalDataTableTable extends EnvironmentalDataTable
         DriftSqlType.bool,
         data['${effectivePrefix}is_synced'],
       )!,
-      deletedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}deleted_at'],
-      ),
+      isDeleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_deleted'],
+      )!,
+      pendingDelete: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}pending_delete'],
+      )!,
     );
   }
 
@@ -1714,7 +1855,8 @@ class EnvironmentalDataTableData extends DataClass
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isSynced;
-  final DateTime? deletedAt;
+  final bool isDeleted;
+  final bool pendingDelete;
   const EnvironmentalDataTableData({
     required this.id,
     required this.regionId,
@@ -1734,7 +1876,8 @@ class EnvironmentalDataTableData extends DataClass
     required this.createdAt,
     required this.updatedAt,
     required this.isSynced,
-    this.deletedAt,
+    required this.isDeleted,
+    required this.pendingDelete,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1781,9 +1924,8 @@ class EnvironmentalDataTableData extends DataClass
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     map['is_synced'] = Variable<bool>(isSynced);
-    if (!nullToAbsent || deletedAt != null) {
-      map['deleted_at'] = Variable<DateTime>(deletedAt);
-    }
+    map['is_deleted'] = Variable<bool>(isDeleted);
+    map['pending_delete'] = Variable<bool>(pendingDelete);
     return map;
   }
 
@@ -1829,9 +1971,8 @@ class EnvironmentalDataTableData extends DataClass
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       isSynced: Value(isSynced),
-      deletedAt: deletedAt == null && nullToAbsent
-          ? const Value.absent()
-          : Value(deletedAt),
+      isDeleted: Value(isDeleted),
+      pendingDelete: Value(pendingDelete),
     );
   }
 
@@ -1859,7 +2000,8 @@ class EnvironmentalDataTableData extends DataClass
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       isSynced: serializer.fromJson<bool>(json['isSynced']),
-      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      isDeleted: serializer.fromJson<bool>(json['isDeleted']),
+      pendingDelete: serializer.fromJson<bool>(json['pendingDelete']),
     );
   }
   @override
@@ -1884,7 +2026,8 @@ class EnvironmentalDataTableData extends DataClass
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'isSynced': serializer.toJson<bool>(isSynced),
-      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'isDeleted': serializer.toJson<bool>(isDeleted),
+      'pendingDelete': serializer.toJson<bool>(pendingDelete),
     };
   }
 
@@ -1907,7 +2050,8 @@ class EnvironmentalDataTableData extends DataClass
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isSynced,
-    Value<DateTime?> deletedAt = const Value.absent(),
+    bool? isDeleted,
+    bool? pendingDelete,
   }) => EnvironmentalDataTableData(
     id: id ?? this.id,
     regionId: regionId ?? this.regionId,
@@ -1931,7 +2075,8 @@ class EnvironmentalDataTableData extends DataClass
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     isSynced: isSynced ?? this.isSynced,
-    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    isDeleted: isDeleted ?? this.isDeleted,
+    pendingDelete: pendingDelete ?? this.pendingDelete,
   );
   EnvironmentalDataTableData copyWithCompanion(
     EnvironmentalDataTableCompanion data,
@@ -1967,7 +2112,10 @@ class EnvironmentalDataTableData extends DataClass
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       isSynced: data.isSynced.present ? data.isSynced.value : this.isSynced,
-      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      isDeleted: data.isDeleted.present ? data.isDeleted.value : this.isDeleted,
+      pendingDelete: data.pendingDelete.present
+          ? data.pendingDelete.value
+          : this.pendingDelete,
     );
   }
 
@@ -1992,7 +2140,8 @@ class EnvironmentalDataTableData extends DataClass
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('isSynced: $isSynced, ')
-          ..write('deletedAt: $deletedAt')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('pendingDelete: $pendingDelete')
           ..write(')'))
         .toString();
   }
@@ -2017,7 +2166,8 @@ class EnvironmentalDataTableData extends DataClass
     createdAt,
     updatedAt,
     isSynced,
-    deletedAt,
+    isDeleted,
+    pendingDelete,
   );
   @override
   bool operator ==(Object other) =>
@@ -2041,7 +2191,8 @@ class EnvironmentalDataTableData extends DataClass
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.isSynced == this.isSynced &&
-          other.deletedAt == this.deletedAt);
+          other.isDeleted == this.isDeleted &&
+          other.pendingDelete == this.pendingDelete);
 }
 
 class EnvironmentalDataTableCompanion
@@ -2064,7 +2215,8 @@ class EnvironmentalDataTableCompanion
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<bool> isSynced;
-  final Value<DateTime?> deletedAt;
+  final Value<bool> isDeleted;
+  final Value<bool> pendingDelete;
   final Value<int> rowid;
   const EnvironmentalDataTableCompanion({
     this.id = const Value.absent(),
@@ -2085,7 +2237,8 @@ class EnvironmentalDataTableCompanion
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.isSynced = const Value.absent(),
-    this.deletedAt = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    this.pendingDelete = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   EnvironmentalDataTableCompanion.insert({
@@ -2107,7 +2260,8 @@ class EnvironmentalDataTableCompanion
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.isSynced = const Value.absent(),
-    this.deletedAt = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    this.pendingDelete = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        regionId = Value(regionId);
@@ -2130,7 +2284,8 @@ class EnvironmentalDataTableCompanion
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<bool>? isSynced,
-    Expression<DateTime>? deletedAt,
+    Expression<bool>? isDeleted,
+    Expression<bool>? pendingDelete,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -2152,7 +2307,8 @@ class EnvironmentalDataTableCompanion
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (isSynced != null) 'is_synced': isSynced,
-      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (isDeleted != null) 'is_deleted': isDeleted,
+      if (pendingDelete != null) 'pending_delete': pendingDelete,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -2176,7 +2332,8 @@ class EnvironmentalDataTableCompanion
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<bool>? isSynced,
-    Value<DateTime?>? deletedAt,
+    Value<bool>? isDeleted,
+    Value<bool>? pendingDelete,
     Value<int>? rowid,
   }) {
     return EnvironmentalDataTableCompanion(
@@ -2198,7 +2355,8 @@ class EnvironmentalDataTableCompanion
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isSynced: isSynced ?? this.isSynced,
-      deletedAt: deletedAt ?? this.deletedAt,
+      isDeleted: isDeleted ?? this.isDeleted,
+      pendingDelete: pendingDelete ?? this.pendingDelete,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2260,8 +2418,11 @@ class EnvironmentalDataTableCompanion
     if (isSynced.present) {
       map['is_synced'] = Variable<bool>(isSynced.value);
     }
-    if (deletedAt.present) {
-      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    if (isDeleted.present) {
+      map['is_deleted'] = Variable<bool>(isDeleted.value);
+    }
+    if (pendingDelete.present) {
+      map['pending_delete'] = Variable<bool>(pendingDelete.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -2290,7 +2451,8 @@ class EnvironmentalDataTableCompanion
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('isSynced: $isSynced, ')
-          ..write('deletedAt: $deletedAt, ')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('pendingDelete: $pendingDelete, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2438,16 +2600,35 @@ class $ProductTableTable extends ProductTable
     ),
     defaultValue: const Constant(false),
   );
-  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
-    'deletedAt',
+  static const VerificationMeta _isDeletedMeta = const VerificationMeta(
+    'isDeleted',
   );
   @override
-  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
-    'deleted_at',
+  late final GeneratedColumn<bool> isDeleted = GeneratedColumn<bool>(
+    'is_deleted',
     aliasedName,
-    true,
-    type: DriftSqlType.dateTime,
+    false,
+    type: DriftSqlType.bool,
     requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_deleted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _pendingDeleteMeta = const VerificationMeta(
+    'pendingDelete',
+  );
+  @override
+  late final GeneratedColumn<bool> pendingDelete = GeneratedColumn<bool>(
+    'pending_delete',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("pending_delete" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
   );
   @override
   List<GeneratedColumn> get $columns => [
@@ -2463,7 +2644,8 @@ class $ProductTableTable extends ProductTable
     createdAt,
     updatedAt,
     isSynced,
-    deletedAt,
+    isDeleted,
+    pendingDelete,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2555,10 +2737,19 @@ class $ProductTableTable extends ProductTable
         isSynced.isAcceptableOrUnknown(data['is_synced']!, _isSyncedMeta),
       );
     }
-    if (data.containsKey('deleted_at')) {
+    if (data.containsKey('is_deleted')) {
       context.handle(
-        _deletedAtMeta,
-        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+        _isDeletedMeta,
+        isDeleted.isAcceptableOrUnknown(data['is_deleted']!, _isDeletedMeta),
+      );
+    }
+    if (data.containsKey('pending_delete')) {
+      context.handle(
+        _pendingDeleteMeta,
+        pendingDelete.isAcceptableOrUnknown(
+          data['pending_delete']!,
+          _pendingDeleteMeta,
+        ),
       );
     }
     return context;
@@ -2618,10 +2809,14 @@ class $ProductTableTable extends ProductTable
         DriftSqlType.bool,
         data['${effectivePrefix}is_synced'],
       )!,
-      deletedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}deleted_at'],
-      ),
+      isDeleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_deleted'],
+      )!,
+      pendingDelete: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}pending_delete'],
+      )!,
     );
   }
 
@@ -2645,7 +2840,8 @@ class ProductTableData extends DataClass
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isSynced;
-  final DateTime? deletedAt;
+  final bool isDeleted;
+  final bool pendingDelete;
   const ProductTableData({
     required this.id,
     required this.name,
@@ -2659,7 +2855,8 @@ class ProductTableData extends DataClass
     required this.createdAt,
     required this.updatedAt,
     required this.isSynced,
-    this.deletedAt,
+    required this.isDeleted,
+    required this.pendingDelete,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2680,9 +2877,8 @@ class ProductTableData extends DataClass
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     map['is_synced'] = Variable<bool>(isSynced);
-    if (!nullToAbsent || deletedAt != null) {
-      map['deleted_at'] = Variable<DateTime>(deletedAt);
-    }
+    map['is_deleted'] = Variable<bool>(isDeleted);
+    map['pending_delete'] = Variable<bool>(pendingDelete);
     return map;
   }
 
@@ -2704,9 +2900,8 @@ class ProductTableData extends DataClass
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       isSynced: Value(isSynced),
-      deletedAt: deletedAt == null && nullToAbsent
-          ? const Value.absent()
-          : Value(deletedAt),
+      isDeleted: Value(isDeleted),
+      pendingDelete: Value(pendingDelete),
     );
   }
 
@@ -2728,7 +2923,8 @@ class ProductTableData extends DataClass
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       isSynced: serializer.fromJson<bool>(json['isSynced']),
-      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      isDeleted: serializer.fromJson<bool>(json['isDeleted']),
+      pendingDelete: serializer.fromJson<bool>(json['pendingDelete']),
     );
   }
   @override
@@ -2747,7 +2943,8 @@ class ProductTableData extends DataClass
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'isSynced': serializer.toJson<bool>(isSynced),
-      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'isDeleted': serializer.toJson<bool>(isDeleted),
+      'pendingDelete': serializer.toJson<bool>(pendingDelete),
     };
   }
 
@@ -2764,7 +2961,8 @@ class ProductTableData extends DataClass
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isSynced,
-    Value<DateTime?> deletedAt = const Value.absent(),
+    bool? isDeleted,
+    bool? pendingDelete,
   }) => ProductTableData(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -2778,7 +2976,8 @@ class ProductTableData extends DataClass
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     isSynced: isSynced ?? this.isSynced,
-    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    isDeleted: isDeleted ?? this.isDeleted,
+    pendingDelete: pendingDelete ?? this.pendingDelete,
   );
   ProductTableData copyWithCompanion(ProductTableCompanion data) {
     return ProductTableData(
@@ -2798,7 +2997,10 @@ class ProductTableData extends DataClass
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       isSynced: data.isSynced.present ? data.isSynced.value : this.isSynced,
-      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      isDeleted: data.isDeleted.present ? data.isDeleted.value : this.isDeleted,
+      pendingDelete: data.pendingDelete.present
+          ? data.pendingDelete.value
+          : this.pendingDelete,
     );
   }
 
@@ -2817,7 +3019,8 @@ class ProductTableData extends DataClass
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('isSynced: $isSynced, ')
-          ..write('deletedAt: $deletedAt')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('pendingDelete: $pendingDelete')
           ..write(')'))
         .toString();
   }
@@ -2836,7 +3039,8 @@ class ProductTableData extends DataClass
     createdAt,
     updatedAt,
     isSynced,
-    deletedAt,
+    isDeleted,
+    pendingDelete,
   );
   @override
   bool operator ==(Object other) =>
@@ -2854,7 +3058,8 @@ class ProductTableData extends DataClass
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.isSynced == this.isSynced &&
-          other.deletedAt == this.deletedAt);
+          other.isDeleted == this.isDeleted &&
+          other.pendingDelete == this.pendingDelete);
 }
 
 class ProductTableCompanion extends UpdateCompanion<ProductTableData> {
@@ -2870,7 +3075,8 @@ class ProductTableCompanion extends UpdateCompanion<ProductTableData> {
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<bool> isSynced;
-  final Value<DateTime?> deletedAt;
+  final Value<bool> isDeleted;
+  final Value<bool> pendingDelete;
   final Value<int> rowid;
   const ProductTableCompanion({
     this.id = const Value.absent(),
@@ -2885,7 +3091,8 @@ class ProductTableCompanion extends UpdateCompanion<ProductTableData> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.isSynced = const Value.absent(),
-    this.deletedAt = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    this.pendingDelete = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ProductTableCompanion.insert({
@@ -2901,7 +3108,8 @@ class ProductTableCompanion extends UpdateCompanion<ProductTableData> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.isSynced = const Value.absent(),
-    this.deletedAt = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    this.pendingDelete = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        name = Value(name),
@@ -2919,7 +3127,8 @@ class ProductTableCompanion extends UpdateCompanion<ProductTableData> {
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<bool>? isSynced,
-    Expression<DateTime>? deletedAt,
+    Expression<bool>? isDeleted,
+    Expression<bool>? pendingDelete,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -2935,7 +3144,8 @@ class ProductTableCompanion extends UpdateCompanion<ProductTableData> {
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (isSynced != null) 'is_synced': isSynced,
-      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (isDeleted != null) 'is_deleted': isDeleted,
+      if (pendingDelete != null) 'pending_delete': pendingDelete,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -2953,7 +3163,8 @@ class ProductTableCompanion extends UpdateCompanion<ProductTableData> {
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<bool>? isSynced,
-    Value<DateTime?>? deletedAt,
+    Value<bool>? isDeleted,
+    Value<bool>? pendingDelete,
     Value<int>? rowid,
   }) {
     return ProductTableCompanion(
@@ -2969,7 +3180,8 @@ class ProductTableCompanion extends UpdateCompanion<ProductTableData> {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isSynced: isSynced ?? this.isSynced,
-      deletedAt: deletedAt ?? this.deletedAt,
+      isDeleted: isDeleted ?? this.isDeleted,
+      pendingDelete: pendingDelete ?? this.pendingDelete,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -3013,8 +3225,11 @@ class ProductTableCompanion extends UpdateCompanion<ProductTableData> {
     if (isSynced.present) {
       map['is_synced'] = Variable<bool>(isSynced.value);
     }
-    if (deletedAt.present) {
-      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    if (isDeleted.present) {
+      map['is_deleted'] = Variable<bool>(isDeleted.value);
+    }
+    if (pendingDelete.present) {
+      map['pending_delete'] = Variable<bool>(pendingDelete.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -3037,7 +3252,8 @@ class ProductTableCompanion extends UpdateCompanion<ProductTableData> {
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('isSynced: $isSynced, ')
-          ..write('deletedAt: $deletedAt, ')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('pendingDelete: $pendingDelete, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3101,7 +3317,8 @@ typedef $$CategoryTableTableCreateCompanionBuilder =
       Value<DateTime> updatedAt,
       Value<bool> isActive,
       Value<bool> isSynced,
-      Value<DateTime?> deletedAt,
+      Value<bool> isDeleted,
+      Value<bool> pendingDelete,
       Value<int> rowid,
     });
 typedef $$CategoryTableTableUpdateCompanionBuilder =
@@ -3116,7 +3333,8 @@ typedef $$CategoryTableTableUpdateCompanionBuilder =
       Value<DateTime> updatedAt,
       Value<bool> isActive,
       Value<bool> isSynced,
-      Value<DateTime?> deletedAt,
+      Value<bool> isDeleted,
+      Value<bool> pendingDelete,
       Value<int> rowid,
     });
 
@@ -3210,8 +3428,13 @@ class $$CategoryTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
-    column: $table.deletedAt,
+  ColumnFilters<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get pendingDelete => $composableBuilder(
+    column: $table.pendingDelete,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3300,8 +3523,13 @@ class $$CategoryTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
-    column: $table.deletedAt,
+  ColumnOrderings<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get pendingDelete => $composableBuilder(
+    column: $table.pendingDelete,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -3347,8 +3575,13 @@ class $$CategoryTableTableAnnotationComposer
   GeneratedColumn<bool> get isSynced =>
       $composableBuilder(column: $table.isSynced, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get deletedAt =>
-      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+  GeneratedColumn<bool> get isDeleted =>
+      $composableBuilder(column: $table.isDeleted, builder: (column) => column);
+
+  GeneratedColumn<bool> get pendingDelete => $composableBuilder(
+    column: $table.pendingDelete,
+    builder: (column) => column,
+  );
 
   Expression<T> productTableRefs<T extends Object>(
     Expression<T> Function($$ProductTableTableAnnotationComposer a) f,
@@ -3414,7 +3647,8 @@ class $$CategoryTableTableTableManager
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
                 Value<bool> isSynced = const Value.absent(),
-                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<bool> isDeleted = const Value.absent(),
+                Value<bool> pendingDelete = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CategoryTableCompanion(
                 id: id,
@@ -3427,7 +3661,8 @@ class $$CategoryTableTableTableManager
                 updatedAt: updatedAt,
                 isActive: isActive,
                 isSynced: isSynced,
-                deletedAt: deletedAt,
+                isDeleted: isDeleted,
+                pendingDelete: pendingDelete,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -3442,7 +3677,8 @@ class $$CategoryTableTableTableManager
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
                 Value<bool> isSynced = const Value.absent(),
-                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<bool> isDeleted = const Value.absent(),
+                Value<bool> pendingDelete = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CategoryTableCompanion.insert(
                 id: id,
@@ -3455,7 +3691,8 @@ class $$CategoryTableTableTableManager
                 updatedAt: updatedAt,
                 isActive: isActive,
                 isSynced: isSynced,
-                deletedAt: deletedAt,
+                isDeleted: isDeleted,
+                pendingDelete: pendingDelete,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -3524,7 +3761,8 @@ typedef $$RegionTableTableCreateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<bool> isSynced,
-      Value<DateTime?> deletedAt,
+      Value<bool> isDeleted,
+      Value<bool> pendingDelete,
       Value<int> rowid,
     });
 typedef $$RegionTableTableUpdateCompanionBuilder =
@@ -3537,7 +3775,8 @@ typedef $$RegionTableTableUpdateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<bool> isSynced,
-      Value<DateTime?> deletedAt,
+      Value<bool> isDeleted,
+      Value<bool> pendingDelete,
       Value<int> rowid,
     });
 
@@ -3623,8 +3862,13 @@ class $$RegionTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
-    column: $table.deletedAt,
+  ColumnFilters<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get pendingDelete => $composableBuilder(
+    column: $table.pendingDelete,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3704,8 +3948,13 @@ class $$RegionTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
-    column: $table.deletedAt,
+  ColumnOrderings<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get pendingDelete => $composableBuilder(
+    column: $table.pendingDelete,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -3745,8 +3994,13 @@ class $$RegionTableTableAnnotationComposer
   GeneratedColumn<bool> get isSynced =>
       $composableBuilder(column: $table.isSynced, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get deletedAt =>
-      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+  GeneratedColumn<bool> get isDeleted =>
+      $composableBuilder(column: $table.isDeleted, builder: (column) => column);
+
+  GeneratedColumn<bool> get pendingDelete => $composableBuilder(
+    column: $table.pendingDelete,
+    builder: (column) => column,
+  );
 
   Expression<T> environmentalDataTableRefs<T extends Object>(
     Expression<T> Function($$EnvironmentalDataTableTableAnnotationComposer a) f,
@@ -3811,7 +4065,8 @@ class $$RegionTableTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> isSynced = const Value.absent(),
-                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<bool> isDeleted = const Value.absent(),
+                Value<bool> pendingDelete = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => RegionTableCompanion(
                 id: id,
@@ -3822,7 +4077,8 @@ class $$RegionTableTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 isSynced: isSynced,
-                deletedAt: deletedAt,
+                isDeleted: isDeleted,
+                pendingDelete: pendingDelete,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -3835,7 +4091,8 @@ class $$RegionTableTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> isSynced = const Value.absent(),
-                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<bool> isDeleted = const Value.absent(),
+                Value<bool> pendingDelete = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => RegionTableCompanion.insert(
                 id: id,
@@ -3846,7 +4103,8 @@ class $$RegionTableTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 isSynced: isSynced,
-                deletedAt: deletedAt,
+                isDeleted: isDeleted,
+                pendingDelete: pendingDelete,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -3927,7 +4185,8 @@ typedef $$EnvironmentalDataTableTableCreateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<bool> isSynced,
-      Value<DateTime?> deletedAt,
+      Value<bool> isDeleted,
+      Value<bool> pendingDelete,
       Value<int> rowid,
     });
 typedef $$EnvironmentalDataTableTableUpdateCompanionBuilder =
@@ -3950,7 +4209,8 @@ typedef $$EnvironmentalDataTableTableUpdateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<bool> isSynced,
-      Value<DateTime?> deletedAt,
+      Value<bool> isDeleted,
+      Value<bool> pendingDelete,
       Value<int> rowid,
     });
 
@@ -4084,8 +4344,13 @@ class $$EnvironmentalDataTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
-    column: $table.deletedAt,
+  ColumnFilters<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get pendingDelete => $composableBuilder(
+    column: $table.pendingDelete,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4207,8 +4472,13 @@ class $$EnvironmentalDataTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
-    column: $table.deletedAt,
+  ColumnOrderings<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get pendingDelete => $composableBuilder(
+    column: $table.pendingDelete,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4308,8 +4578,13 @@ class $$EnvironmentalDataTableTableAnnotationComposer
   GeneratedColumn<bool> get isSynced =>
       $composableBuilder(column: $table.isSynced, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get deletedAt =>
-      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+  GeneratedColumn<bool> get isDeleted =>
+      $composableBuilder(column: $table.isDeleted, builder: (column) => column);
+
+  GeneratedColumn<bool> get pendingDelete => $composableBuilder(
+    column: $table.pendingDelete,
+    builder: (column) => column,
+  );
 
   $$RegionTableTableAnnotationComposer get regionId {
     final $$RegionTableTableAnnotationComposer composer = $composerBuilder(
@@ -4392,7 +4667,8 @@ class $$EnvironmentalDataTableTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> isSynced = const Value.absent(),
-                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<bool> isDeleted = const Value.absent(),
+                Value<bool> pendingDelete = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => EnvironmentalDataTableCompanion(
                 id: id,
@@ -4413,7 +4689,8 @@ class $$EnvironmentalDataTableTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 isSynced: isSynced,
-                deletedAt: deletedAt,
+                isDeleted: isDeleted,
+                pendingDelete: pendingDelete,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -4436,7 +4713,8 @@ class $$EnvironmentalDataTableTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> isSynced = const Value.absent(),
-                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<bool> isDeleted = const Value.absent(),
+                Value<bool> pendingDelete = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => EnvironmentalDataTableCompanion.insert(
                 id: id,
@@ -4457,7 +4735,8 @@ class $$EnvironmentalDataTableTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 isSynced: isSynced,
-                deletedAt: deletedAt,
+                isDeleted: isDeleted,
+                pendingDelete: pendingDelete,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -4543,7 +4822,8 @@ typedef $$ProductTableTableCreateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<bool> isSynced,
-      Value<DateTime?> deletedAt,
+      Value<bool> isDeleted,
+      Value<bool> pendingDelete,
       Value<int> rowid,
     });
 typedef $$ProductTableTableUpdateCompanionBuilder =
@@ -4560,7 +4840,8 @@ typedef $$ProductTableTableUpdateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<bool> isSynced,
-      Value<DateTime?> deletedAt,
+      Value<bool> isDeleted,
+      Value<bool> pendingDelete,
       Value<int> rowid,
     });
 
@@ -4653,8 +4934,13 @@ class $$ProductTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
-    column: $table.deletedAt,
+  ColumnFilters<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get pendingDelete => $composableBuilder(
+    column: $table.pendingDelete,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4746,8 +5032,13 @@ class $$ProductTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
-    column: $table.deletedAt,
+  ColumnOrderings<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get pendingDelete => $composableBuilder(
+    column: $table.pendingDelete,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4819,8 +5110,13 @@ class $$ProductTableTableAnnotationComposer
   GeneratedColumn<bool> get isSynced =>
       $composableBuilder(column: $table.isSynced, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get deletedAt =>
-      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+  GeneratedColumn<bool> get isDeleted =>
+      $composableBuilder(column: $table.isDeleted, builder: (column) => column);
+
+  GeneratedColumn<bool> get pendingDelete => $composableBuilder(
+    column: $table.pendingDelete,
+    builder: (column) => column,
+  );
 
   $$CategoryTableTableAnnotationComposer get categoryId {
     final $$CategoryTableTableAnnotationComposer composer = $composerBuilder(
@@ -4886,7 +5182,8 @@ class $$ProductTableTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> isSynced = const Value.absent(),
-                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<bool> isDeleted = const Value.absent(),
+                Value<bool> pendingDelete = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ProductTableCompanion(
                 id: id,
@@ -4901,7 +5198,8 @@ class $$ProductTableTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 isSynced: isSynced,
-                deletedAt: deletedAt,
+                isDeleted: isDeleted,
+                pendingDelete: pendingDelete,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -4918,7 +5216,8 @@ class $$ProductTableTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> isSynced = const Value.absent(),
-                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<bool> isDeleted = const Value.absent(),
+                Value<bool> pendingDelete = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ProductTableCompanion.insert(
                 id: id,
@@ -4933,7 +5232,8 @@ class $$ProductTableTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 isSynced: isSynced,
-                deletedAt: deletedAt,
+                isDeleted: isDeleted,
+                pendingDelete: pendingDelete,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

@@ -103,7 +103,11 @@ class RegionProvider with ChangeNotifier {
       _error = '';
       return true;
     } catch (e) {
-      _error = 'Lỗi khi xóa danh mục: ${e.toString()}';
+      if (e.toString().contains('Không thể xóa')) {
+        _error = 'Vị trí này có dữ liệu liên quan, không thể xóa!';
+      } else {
+        _error = 'Lỗi khi xóa: ${e.toString()}';
+      }
 
       return false;
     } finally {

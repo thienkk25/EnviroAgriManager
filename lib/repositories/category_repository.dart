@@ -13,8 +13,7 @@ class CategoryRepository {
     if (isOnline) {
       try {
         // Lấy dữ liệu local chưa sync (dưới dạng Model)
-        final localNewData = await _db.categoryDao
-            .getUnsyncedCategoriesAsModels();
+        final localNewData = await _db.categoryDao.getUnsyncedCategories();
 
         // Push dữ liệu local lên server
         if (localNewData.isNotEmpty) {
@@ -30,14 +29,8 @@ class CategoryRepository {
         final deletedData = await _db.categoryDao
             .getDeletedUnsyncedCategories();
         if (deletedData.isNotEmpty) {
-          // Xóa trên server
           for (var category in deletedData) {
-            await _categoryService.deleteCategory(category.id);
-          }
-
-          // Xóa thật khỏi local DB sau khi đã sync
-          for (var category in deletedData) {
-            await _db.categoryDao.deleteCategory(category.id);
+            await delete(category.id, isOnline: isOnline);
           }
         }
 
@@ -144,17 +137,20 @@ class CategoryRepository {
   Future<void> delete(String id, {required bool isOnline}) async {
     if (isOnline) {
       try {
-        // Online: xóa trên server và xóa thật local
         await _categoryService.deleteCategory(id);
         await _db.categoryDao.deleteCategory(id);
       } catch (e) {
-        // Lỗi → soft delete để sync sau
-        await _db.categoryDao.softDeleteCategory(id);
-        rethrow;
+        if (e.toString().contains('Không thể xóa danh mục đang có sản phẩm') ||
+            e.toString().contains('không thể')) {
+          // Server không cho xóa → rollback (phục hồi)
+          await _db.categoryDao.restoreCategory(id);
+        } else {
+          // Lỗi mạng hoặc lỗi khác → đánh dấu soft delete để sync lại sau
+          await _db.categoryDao.markCategoryAsDeleted(id);
+        }
       }
     } else {
-      // Offline: soft delete
-      await _db.categoryDao.softDeleteCategory(id);
+      await _db.categoryDao.markCategoryAsDeleted(id);
     }
   }
 }

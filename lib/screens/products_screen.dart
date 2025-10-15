@@ -46,20 +46,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
         backgroundColor: const Color(0xFF5E81AC),
         elevation: 0,
         actions: [
-          RoleBasedActionButton(
-            permission: 'edit',
-            child: IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        ProductFormScreen(mode: ProductFormMode.add),
-                  ),
-                );
-              },
-            ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () =>
+                context.read<ProductProvider>().refreshProducts(context),
           ),
         ],
       ),

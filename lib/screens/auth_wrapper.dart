@@ -29,9 +29,8 @@ class _AuthWrapperState extends State<AuthWrapper> {
             const MainScreen(),
             if (!isOnline)
               Positioned(
-                top: 20,
-                left: 16,
-                right: 16,
+                top: 10,
+                left: 0,
                 child: IgnorePointer(
                   child: Opacity(
                     opacity: .8,
@@ -42,16 +41,9 @@ class _AuthWrapperState extends State<AuthWrapper> {
                       ),
 
                       decoration: BoxDecoration(
-                        color: Colors.amber[700],
+                        color: Colors.transparent,
 
                         borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.2),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
                       ),
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,

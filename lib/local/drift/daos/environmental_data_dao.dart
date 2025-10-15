@@ -37,12 +37,11 @@ class EnvironmentalDataDao extends DatabaseAccessor<AppDatabase>
   Future<List<EnvironmentalDataModel>> getAll() async {
     final rows = await (select(
       environmentalDataTable,
-    )..where((tbl) => tbl.deletedAt.isNull())).get();
+    )..where((tbl) => tbl.isDeleted.equals(false))).get();
     return rows.map(_mapToModel).toList();
   }
 
-  Future<List<EnvironmentalDataModel>>
-  getUnsyncedEnvironmentalDataAsModels() async {
+  Future<List<EnvironmentalDataModel>> getUnsyncedEnvironmentalData() async {
     final rows = await (select(
       environmentalDataTable,
     )..where((t) => t.isSynced.equals(false))).get();
@@ -120,11 +119,22 @@ class EnvironmentalDataDao extends DatabaseAccessor<AppDatabase>
     });
   }
 
-  Future<void> softDeleteEnvironmentalData(String id) async {
+  Future<void> markEnvironmentDataAsDeleted(String id) async {
     await (update(environmentalDataTable)..where((t) => t.id.equals(id))).write(
       EnvironmentalDataTableCompanion(
-        deletedAt: Value(DateTime.now()),
-        isSynced: Value(false), // Đánh dấu chưa sync
+        isSynced: const Value(false),
+        isDeleted: const Value(true),
+        pendingDelete: const Value(true),
+      ),
+    );
+  }
+
+  Future<void> restoreEnvironmentData(String id) async {
+    await (update(environmentalDataTable)..where((t) => t.id.equals(id))).write(
+      EnvironmentalDataTableCompanion(
+        isSynced: const Value(false),
+        isDeleted: const Value(false),
+        pendingDelete: const Value(false),
       ),
     );
   }
@@ -133,7 +143,7 @@ class EnvironmentalDataDao extends DatabaseAccessor<AppDatabase>
   getDeletedUnsyncedEnvironmentalData() async {
     final rows =
         await (select(environmentalDataTable)..where(
-              (t) => t.deletedAt.isNotNull() & t.isSynced
+              (t) => t.isDeleted.equals(true) & t.isSynced
                 ..equals(false),
             ))
             .get();

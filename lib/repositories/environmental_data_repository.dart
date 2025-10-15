@@ -15,7 +15,7 @@ class EnvironmentalDataRepository {
     if (isOnline) {
       try {
         final localNewData = await _db.environmentalDataDao
-            .getUnsyncedEnvironmentalDataAsModels();
+            .getUnsyncedEnvironmentalData();
 
         if (localNewData.isNotEmpty) {
           await _environmentalDataService.uploadEnvironmentalData(localNewData);
@@ -29,12 +29,7 @@ class EnvironmentalDataRepository {
             .getDeletedUnsyncedEnvironmentalData();
         if (deletedData.isNotEmpty) {
           for (var environmentalData in deletedData) {
-            await _environmentalDataService.deleteEnvironmentalData(
-              environmentalData.id,
-            );
-          }
-          for (var environmentalData in deletedData) {
-            await _db.environmentalDataDao.deleteData(environmentalData.id);
+            await delete(environmentalData.id, isOnline: isOnline);
           }
         }
 
@@ -177,11 +172,11 @@ class EnvironmentalDataRepository {
         await _environmentalDataService.deleteEnvironmentalData(id);
         await _db.environmentalDataDao.deleteData(id);
       } catch (e) {
-        await _db.environmentalDataDao.softDeleteEnvironmentalData(id);
+        await _db.environmentalDataDao.markEnvironmentDataAsDeleted(id);
         rethrow;
       }
     } else {
-      await _db.environmentalDataDao.softDeleteEnvironmentalData(id);
+      await _db.environmentalDataDao.markEnvironmentDataAsDeleted(id);
     }
   }
 }

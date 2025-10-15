@@ -207,7 +207,7 @@ class SimpleHomeScreen extends StatelessWidget {
 
               // Sample Products
               Text(
-                'Danh sách sản phẩm hôm nay',
+                'Sản phẩm hôm nay',
                 style: GoogleFonts.inter(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,

@@ -12,7 +12,7 @@ class ProductRepository {
   Future<List<ProductModel>> syncProducts({required bool isOnline}) async {
     if (isOnline) {
       try {
-        final localNewData = await _db.productDao.getUnsyncedProductsAsModels();
+        final localNewData = await _db.productDao.getUnsyncedProducts();
 
         if (localNewData.isNotEmpty) {
           await _productService.uploadProducts(localNewData);
@@ -25,10 +25,7 @@ class ProductRepository {
         final deletedData = await _db.productDao.getDeletedUnsyncedProducts();
         if (deletedData.isNotEmpty) {
           for (var product in deletedData) {
-            await _productService.deleteProduct(product.id);
-          }
-          for (var product in deletedData) {
-            await _db.productDao.deleteProduct(product.id);
+            await delete(product.id, isOnline: isOnline);
           }
         }
 
@@ -134,11 +131,11 @@ class ProductRepository {
         await _productService.deleteProduct(id);
         await _db.productDao.deleteProduct(id);
       } catch (e) {
-        await _db.productDao.softDeleteProduct(id);
+        await _db.productDao.markProductAsDeleted(id);
         rethrow;
       }
     } else {
-      await _db.productDao.softDeleteProduct(id);
+      await _db.productDao.markProductAsDeleted(id);
     }
   }
 }

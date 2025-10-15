@@ -89,69 +89,78 @@ class _ReportsScreenState extends State<ReportsScreen> {
           ),
         ],
       ),
-      body: Container(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 26,
-            children: [
-              // Period Selector
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.calendar_today, color: Color(0xFF5E81AC)),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Kỳ báo cáo: ',
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF2E3440),
+      body: RefreshIndicator(
+        onRefresh: () async => refreshData,
+        child: Container(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 26,
+              children: [
+                // Period Selector
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
                       ),
-                    ),
-                    Text(
-                      _toSelectedPeriodToString(_selectedPeriod),
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF5E81AC),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.calendar_today,
+                        color: Color(0xFF5E81AC),
                       ),
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      icon: const Icon(Icons.refresh, color: Color(0xFF5E81AC)),
-                      onPressed: refreshData,
-                    ),
-                  ],
+                      const SizedBox(width: 12),
+                      Text(
+                        'Kỳ báo cáo: ',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF2E3440),
+                        ),
+                      ),
+                      Text(
+                        _toSelectedPeriodToString(_selectedPeriod),
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF5E81AC),
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.refresh,
+                          color: Color(0xFF5E81AC),
+                        ),
+                        onPressed: refreshData,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
 
-              // Overview Cards
-              _buildOverviewCards(),
+                // Overview Cards
+                _buildOverviewCards(),
 
-              // Products Chart
-              _buildProductsChart(_trendData),
+                // Products Chart
+                _buildProductsChart(_trendData),
 
-              // Category Distribution
-              _buildCategoryDistribution(),
+                // Category Distribution
+                _buildCategoryDistribution(),
 
-              // Environmental Data Chart
-              _buildEnvironmentalChart(),
-            ],
+                // Environmental Data Chart
+                _buildEnvironmentalChart(),
+              ],
+            ),
           ),
         ),
       ),

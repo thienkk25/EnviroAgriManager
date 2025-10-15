@@ -153,30 +153,30 @@ before update on public.products
 for each row execute function update_products_updated_at();
 
 -- ======================================
--- CHẶN INSERT/UPDATE PRODUCT NẾU CATEGORY INACTIVE
+-- Function kiểm tra category có product phụ thuộc không
 -- ======================================
--- Function kiểm tra category phải active khi update/insert product
-create or replace function check_category_active_for_product()
+create or replace function check_category_has_products()
 returns trigger as $$
 declare
-  v_category_active boolean;
+  v_product_count integer;
 begin
-  -- Kiểm tra category phải active
-  select is_active into v_category_active
-  from public.categories
-  where id = new.category_id;
+  select count(*) into v_product_count
+  from public.products
+  where category_id = old.id;
   
-  if v_category_active is null then
+  if v_product_count > 0 then
     raise exception 'Không thể xóa danh mục đang có sản phẩm';
   end if;
   
-  if v_category_active = false then
-    raise exception 'Không thể thêm/cập nhật sản phẩm vào category đã bị inactive';
-  end if;
-  
-  return new;
+  return old;
 end;
 $$ language plpgsql;
+
+CREATE TRIGGER trg_check_category_has_products
+BEFORE DELETE ON public.categories
+FOR EACH ROW
+EXECUTE FUNCTION check_category_has_products();
+
 
 -- Trigger áp dụng cho cả INSERT và UPDATE
 drop trigger if exists trg_check_category_active on public.products;
@@ -211,6 +211,31 @@ drop trigger if exists update_regions_updated_at on public.regions;
 create trigger update_regions_updated_at
 before update on public.regions
 for each row execute function update_regions_updated_at();
+
+-- ======================================
+-- Function kiểm tra Region có Environment data phụ thuộc không
+-- ======================================
+create or replace function check_region_has_environment_data()
+returns trigger as $$
+declare
+  v_environment_data_count integer;
+begin
+  select count(*) into v_environment_data_count
+  from public.environmental_data
+  where region_id = old.id;
+  
+  if v_environment_data_count > 0 then
+    raise exception 'Không thể xóa vị trí đang có dữ liệu môi trường phụ thuộc';
+  end if;
+  
+  return old;
+end;
+$$ language plpgsql;
+
+CREATE TRIGGER trg_check_region_has_environment_data
+BEFORE DELETE ON public.regions
+FOR EACH ROW
+EXECUTE FUNCTION check_region_has_environment_data();
 
 -- ======================================
 -- BẢNG ENVIRONMENTAL DATA

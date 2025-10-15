@@ -16,33 +16,29 @@ class RegionManagerScreen extends StatefulWidget {
 }
 
 class _RegionManagerScreenState extends State<RegionManagerScreen> {
-  late List<RegionModel> regions;
   @override
   void initState() {
-    regions = context.read<RegionProvider>().regions;
-    super.initState();
-  }
-
-  Future<void> reset() async {
-    await context.read<RegionProvider>().fetchRegions(context);
-    setState(() {
-      regions = context.read<RegionProvider>().regions;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<RegionProvider>().fetchRegions(context);
     });
+    super.initState();
   }
 
   // Map id region -> isExpanded
   final Map<String, bool> _expanded = {};
 
-  List<RegionModel> getChildren(String? parentId) =>
-      regions.where((r) => r.parentId == parentId).toList();
-
   // Build tree recursively
   List<Widget> buildRegionTree(String? parentId, int level) {
-    final children = getChildren(parentId);
+    final children = parentId == null
+        ? context.read<RegionProvider>().getMainRegions()
+        : context.read<RegionProvider>().getSubRegions(parentId);
     List<Widget> widgets = [];
 
     for (var child in children) {
-      final hasChildren = getChildren(child.id).isNotEmpty;
+      final hasChildren = context
+          .read<RegionProvider>()
+          .getSubRegions(child.id)
+          .isNotEmpty;
       final isExpanded = _expanded[child.id] ?? false;
 
       widgets.add(
@@ -153,69 +149,85 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Các địa điểm hoạt động')),
-      body: Consumer<RegionProvider>(
-        builder: (context, regionProvider, child) {
-          if (regionProvider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      appBar: AppBar(
+        title: const Text('Các địa điểm hoạt động'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () =>
+                context.read<RegionProvider>().refreshRegions(context),
+          ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: () => context.read<RegionProvider>().refreshRegions(context),
+        child: Consumer<RegionProvider>(
+          builder: (context, regionProvider, child) {
+            if (regionProvider.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          if (regionProvider.error.isNotEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
-                  const SizedBox(height: 16),
-                  Text(
-                    regionProvider.error,
-                    style: GoogleFonts.inter(color: Colors.grey[600]),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => regionProvider.fetchRegions(context),
-                    child: const Text('Thử lại'),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          final regions = regionProvider.getMainRegions();
-
-          if (regions.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.category_outlined,
-                    size: 64,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Không có vị trí nào',
-                    style: GoogleFonts.inter(
-                      fontSize: 18,
-                      color: Colors.grey[600],
+            if (regionProvider.error.isNotEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Colors.grey[400],
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Thêm vị trí để bắt đầu',
-                    style: GoogleFonts.inter(color: Colors.grey[500]),
-                  ),
-                ],
-              ),
+                    const SizedBox(height: 16),
+                    Text(
+                      regionProvider.error,
+                      style: GoogleFonts.inter(color: Colors.grey[600]),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => regionProvider.fetchRegions(context),
+                      child: const Text('Thử lại'),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            final regions = regionProvider.getMainRegions();
+
+            if (regions.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.category_outlined,
+                      size: 64,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Không có vị trí nào',
+                      style: GoogleFonts.inter(
+                        fontSize: 18,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Thêm vị trí để bắt đầu',
+                      style: GoogleFonts.inter(color: Colors.grey[500]),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: buildRegionTree(null, 0),
             );
-          }
-          return RefreshIndicator(
-            onRefresh: () => regionProvider.refreshRegions(context),
-            child: ListView(children: buildRegionTree(null, 0)),
-          );
-        },
+          },
+        ),
       ),
       floatingActionButton: RoleBasedActionButton(
         permission: 'edit',
@@ -463,7 +475,6 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
                         result = await context
                             .read<RegionProvider>()
                             .updateRegion(context, newRegion, true);
-                        await reset();
                       } else {
                         result = await context
                             .read<RegionProvider>()

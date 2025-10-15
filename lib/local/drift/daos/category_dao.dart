@@ -31,12 +31,12 @@ class CategoryDao extends DatabaseAccessor<AppDatabase>
   Future<List<CategoryModel>> getAllCategories() async {
     final rows = await (select(
       categoryTable,
-    )..where((t) => t.deletedAt.isNull())).get();
+    )..where((t) => t.isDeleted.equals(false))).get();
     return rows.map(_mapToModel).toList();
   }
 
-  // Lấy danh mục chưa đồng bộ sang model
-  Future<List<CategoryModel>> getUnsyncedCategoriesAsModels() async {
+  // Lấy danh mục chưa đồng bộ
+  Future<List<CategoryModel>> getUnsyncedCategories() async {
     final rows = await (select(
       categoryTable,
     )..where((t) => t.isSynced.equals(false))).get();
@@ -101,11 +101,24 @@ class CategoryDao extends DatabaseAccessor<AppDatabase>
     });
   }
 
-  Future<void> softDeleteCategory(String id) async {
+  // Đấu danh mục là đã xóa (soft delete)
+  Future<void> markCategoryAsDeleted(String id) async {
     await (update(categoryTable)..where((t) => t.id.equals(id))).write(
       CategoryTableCompanion(
-        deletedAt: Value(DateTime.now()),
-        isSynced: Value(false), // Đánh dấu chưa sync
+        isSynced: const Value(false),
+        isDeleted: const Value(true),
+        pendingDelete: const Value(true),
+      ),
+    );
+  }
+
+  // Phục hồi danh mục (nếu server từ chối xóa)
+  Future<void> restoreCategory(String id) async {
+    await (update(categoryTable)..where((t) => t.id.equals(id))).write(
+      CategoryTableCompanion(
+        isSynced: const Value(false),
+        isDeleted: const Value(false),
+        pendingDelete: const Value(false),
       ),
     );
   }
@@ -114,7 +127,7 @@ class CategoryDao extends DatabaseAccessor<AppDatabase>
   Future<List<CategoryModel>> getDeletedUnsyncedCategories() async {
     final rows =
         await (select(categoryTable)..where(
-              (t) => t.deletedAt.isNotNull() & t.isSynced
+              (t) => t.isDeleted.equals(true) & t.isSynced
                 ..equals(false),
             ))
             .get();

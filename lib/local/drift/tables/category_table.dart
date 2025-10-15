@@ -32,7 +32,9 @@ class CategoryTable extends Table {
   BoolColumn get isSynced => boolean().withDefault(const Constant(false))();
 
   // Kiểm tra xóa
-  DateTimeColumn get deletedAt => dateTime().nullable()();
+  BoolColumn get isDeleted => boolean().withDefault(const Constant(false))();
+  BoolColumn get pendingDelete =>
+      boolean().withDefault(const Constant(false))();
 
   // Khóa chính
   @override

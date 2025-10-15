@@ -67,24 +67,20 @@ class CategoryScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF5E81AC),
         elevation: 0,
         actions: [
-          RoleBasedActionButton(
-            permission: 'edit',
-            child: IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () {
-                _showCategoryDialog(context, mode: CategoryDialogMode.add);
-              },
-            ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () =>
+                context.read<CategoryProvider>().refreshCategories(context),
           ),
         ],
       ),
-      body: subCategories.isEmpty
-          ? const Center(child: Text('Không có danh mục'))
-          : Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: RefreshIndicator(
-                onRefresh: () =>
-                    context.read<CategoryProvider>().refreshCategories(context),
+      body: RefreshIndicator(
+        onRefresh: () =>
+            context.read<CategoryProvider>().refreshCategories(context),
+        child: subCategories.isEmpty
+            ? const Center(child: Text('Không có danh mục'))
+            : Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
                 child: Consumer<CategoryProvider>(
                   builder: (context, categoryProvider, child) {
                     if (categoryProvider.isLoading) {
@@ -205,7 +201,7 @@ class CategoryScreen extends StatelessWidget {
                   },
                 ),
               ),
-            ),
+      ),
       floatingActionButton: RoleBasedActionButton(
         permission: 'edit',
         child: FloatingActionButton(
