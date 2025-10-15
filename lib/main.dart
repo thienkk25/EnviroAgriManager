@@ -2,7 +2,7 @@ import 'package:enviro_agri_manager/local/drift/app_database.dart';
 import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
 import 'package:enviro_agri_manager/providers/environmental_data_provider.dart';
 import 'package:enviro_agri_manager/providers/region_provider.dart';
-import 'package:enviro_agri_manager/providers/theme_provider.dart';
+import 'package:enviro_agri_manager/providers/settings_provider.dart';
 import 'package:enviro_agri_manager/repositories/category_repository.dart';
 import 'package:enviro_agri_manager/repositories/environmental_data_repository.dart';
 import 'package:enviro_agri_manager/repositories/product_repository.dart';
@@ -38,7 +38,7 @@ void main() async {
     MultiProvider(
       providers: [
         //Theme
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
         // Connectivity
         Provider(
           create: (_) => ConnectivityService(),
@@ -132,7 +132,7 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.watch<ThemeProvider>().themeMode;
+    final isDark = context.watch<SettingsProvider>().themeMode;
     return MaterialApp(
       title: 'Hệ thống Quản lý Danh mục Nông nghiệp & Môi trường',
       theme: ThemeData(

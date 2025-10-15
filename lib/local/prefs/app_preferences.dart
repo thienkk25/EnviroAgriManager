@@ -10,6 +10,7 @@ class AppPreferences {
   static const _keyUserId = 'user_id';
   static const _keyUserEmail = 'user_email';
   static const _keyUserRole = 'user_role';
+  static const _keyScheduleAutoSyncData = 'schedule_auto_sync_data';
 
   // Theme
   Future<void> setThemeMode(String mode) async =>
@@ -44,4 +45,8 @@ class AppPreferences {
     await _prefs.remove(_keyUserRole);
     await clearAccessToken();
   }
+
+  Future<void> setScheduleAutoSyncData(int second) async =>
+      _prefs.setInt(_keyScheduleAutoSyncData, second);
+  int? getScheduleAutoSyncData() => _prefs.getInt(_keyScheduleAutoSyncData);
 }

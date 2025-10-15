@@ -1,6 +1,10 @@
 import 'package:enviro_agri_manager/models/user_role_model.dart';
 import 'package:enviro_agri_manager/providers/auth_provider.dart';
-import 'package:enviro_agri_manager/providers/theme_provider.dart';
+import 'package:enviro_agri_manager/providers/category_provider.dart';
+import 'package:enviro_agri_manager/providers/environmental_data_provider.dart';
+import 'package:enviro_agri_manager/providers/product_provider.dart';
+import 'package:enviro_agri_manager/providers/region_provider.dart';
+import 'package:enviro_agri_manager/providers/settings_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -15,16 +19,40 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   // bool _notificationsEnabled = true;
   late bool _darkModeEnabled;
+  late int _selectedSync;
   // bool _temperatureAlert = true;
   // bool _humidityAlert = true;
   // bool _phAlert = true;
   // String _selectedLanguage = 'Tiếng Việt';
   // String _selectedUpdateFrequency = 'Cập nhật mỗi 30 phút';
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<SettingsProvider>().scheduleAutoSyncData(() async {
+        await Future.wait([
+          context.read<ProductProvider>().refreshProducts(context),
+          context.read<CategoryProvider>().refreshCategories(context),
+          context.read<EnvironmentalDataProvider>().refreshEnvironmentalData(
+            context,
+          ),
+          context.read<RegionProvider>().refreshRegions(context),
+        ]);
+      }, context.read<SettingsProvider>().secondSync);
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    context.read<SettingsProvider>().cancelAutoSync();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     _darkModeEnabled =
-        context.read<ThemeProvider>().themeMode == ThemeMode.dark;
+        context.read<SettingsProvider>().themeMode == ThemeMode.dark;
+    _selectedSync = context.read<SettingsProvider>().secondSync;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
@@ -219,7 +247,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             subtitle: 'Giao diện tối cho mắt',
             trailing: Switch(
               value: _darkModeEnabled,
-              onChanged: (_) => context.read<ThemeProvider>().toggleTheme(),
+              onChanged: (_) => context.read<SettingsProvider>().toggleTheme(),
               activeThumbColor: const Color(0xFF5E81AC),
             ),
           ),
@@ -227,7 +255,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildSettingItem(
             icon: Icons.sync,
             title: 'Đồng bộ dữ liệu',
-            subtitle: 'Tự động đồng bộ mỗi 15 phút',
+            subtitle:
+                'Tự động đồng bộ mỗi ${(_selectedSync / 60).toInt()} phút',
             trailing: const Icon(Icons.chevron_right, color: Color(0xFF88C0D0)),
             onTap: () {
               _showSyncDialog();
@@ -506,18 +535,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
             'Đồng bộ dữ liệu',
             style: GoogleFonts.inter(fontWeight: FontWeight.w600),
           ),
-          content: const Text(
-            'Tính năng này sẽ được phát triển trong phiên bản tiếp theo.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                'Đóng',
-                style: GoogleFonts.inter(color: const Color(0xFF5E81AC)),
-              ),
+          content: RadioGroup<int>(
+            groupValue: _selectedSync,
+            onChanged: (value) {
+              setState(() {
+                _selectedSync = value!;
+              });
+              context.read<SettingsProvider>().scheduleAutoSyncData(() async {
+                await Future.wait([
+                  context.read<ProductProvider>().refreshProducts(context),
+                  context.read<CategoryProvider>().refreshCategories(context),
+                  context
+                      .read<EnvironmentalDataProvider>()
+                      .refreshEnvironmentalData(context),
+                  context.read<RegionProvider>().refreshRegions(context),
+                ]);
+              }, _selectedSync);
+              Navigator.of(context).pop();
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  title: const Text('Tự động đồng bộ mỗi 5 phút'),
+                  leading: const Radio(
+                    value: 5 * 60,
+                    activeColor: Color(0xFF5E81AC),
+                  ),
+                ),
+                ListTile(
+                  title: const Text('Tự động đồng bộ mỗi 15 phút'),
+                  leading: const Radio(
+                    value: 15 * 60,
+                    activeColor: Color(0xFF5E81AC),
+                  ),
+                ),
+                ListTile(
+                  title: const Text('Tự động đồng bộ mỗi 30 phút'),
+                  leading: const Radio(
+                    value: 30 * 60,
+                    activeColor: Color(0xFF5E81AC),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
