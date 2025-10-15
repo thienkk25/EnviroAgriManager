@@ -29,9 +29,8 @@
 - Báo cáo tổng quan
 
 ### Cài đặt
-- Quản lý thông tin người dùng
-- Cài đặt thông báo
-- Cấu hình giám sát môi trường
+- Thay đổi giao diện
+- Tự động đồng bộ dữ liệu
 - Thông tin ứng dụng
 
 ## Phân quyền người dùng
