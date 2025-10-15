@@ -2,80 +2,99 @@
 
 ## Tổng quan
 
-Đây là ứng dụng Flutter được thiết kế để quản lý danh mục điện tử dùng chung cho ngành Nông nghiệp và Môi trường. Hệ thống cung cấp các chức năng quản lý sản phẩm, theo dõi dữ liệu môi trường, và báo cáo thống kê.
+Đây là ứng dụng Flutter được thiết kế để quản lý danh mục điện tử dùng chung cho ngành Nông nghiệp và Môi trường. Hệ thống hỗ trợ quản lý sản phẩm, danh mục, dữ liệu môi trường, vị trí, và báo cáo thống kê, giúp người dùng dễ dàng theo dõi và đồng bộ dữ liệu giữa offline và online.
 
 ## Tính năng chính
 
-### 🏠 Trang chủ (Dashboard)
+### Trang chủ
 - Tổng quan thống kê sản phẩm
-- Giám sát dữ liệu môi trường trực tiếp
 - Hiển thị danh mục sản phẩm
 - Sản phẩm gần đây
 
-### 📦 Quản lý Sản phẩm
+### Quản lý Sản phẩm
 - Thêm, sửa, xóa sản phẩm
 - Tìm kiếm và lọc sản phẩm theo danh mục
 - Quản lý thông tin chi tiết sản phẩm
 - Theo dõi tồn kho và giá cả
 
-### 🏷️ Quản lý Danh mục
+### Quản lý Danh mục
 - Phân loại sản phẩm theo loại
 - Hỗ trợ danh mục con
 - Quản lý icon và màu sắc cho từng danh mục
 
-### 📊 Báo cáo & Thống kê
+### Báo cáo & Thống kê
 - Biểu đồ xu hướng sản phẩm
 - Phân bố theo danh mục
 - Thống kê dữ liệu môi trường
 - Báo cáo tổng quan
 
-### ⚙️ Cài đặt
+### Cài đặt
 - Quản lý thông tin người dùng
 - Cài đặt thông báo
 - Cấu hình giám sát môi trường
 - Thông tin ứng dụng
 
+## Phân quyền người dùng
+| Vai trò    | Quyền hạn          | Mô tả                                                                                                    |
+| ---------- | ------------------ | ---------------------------------------------------------------------------------------------------------|
+| **Admin**  | Toàn quyền         | - Quản lý tất cả dữ liệu (sản phẩm, danh mục, môi trường, vị trí)<br>- Cấp quyền cho người dùng khác<br> |
+| **Editor** | Chỉnh sửa nội dung | - Thêm, sửa, xóa dữ liệu trong phạm vi được phân công<br>- Không có quyền quản lý người dùng             |
+| **Viewer** | Xem dữ liệu        | - Chỉ được phép xem thông tin và báo cáo<br>- Không thể chỉnh sửa hoặc xóa dữ liệu                       |
+
+| Quyền              |  Admin |        Editor         | Viewer  |
+| ------------------ | ------- | -------------------- | ------- |
+| Thêm dữ liệu       |   ✅   |          ✅          |    ❌   |
+| Sửa dữ liệu        |   ✅   |          ✅          |    ❌   |
+| Xóa dữ liệu        |   ✅   |          ❌          |    ❌   |
+| Xem dữ liệu        |   ✅   |          ✅          |    ✅   |
+| Quản lý phân quyền |   ✅   |          ❌          |    ❌   |
+
 ## Cấu trúc dự án
 
 ```
 lib/
-├── models/              # Các model dữ liệu
-│   ├── product.dart
-│   ├── category.dart
-│   └── environmental_data.dart
-├── providers/           # State management
-│   ├── product_provider.dart
-│   └── category_provider.dart
-├── screens/             # Các màn hình
-│   ├── main_screen.dart
-│   ├── home_screen.dart
-│   ├── products_screen.dart
-│   ├── add_product_screen.dart
-│   ├── categories_screen.dart
-│   ├── reports_screen.dart
-│   └── settings_screen.dart
-├── widgets/             # Các widget tái sử dụng
-│   ├── dashboard_card.dart
-│   ├── category_grid.dart
-│   ├── recent_products.dart
-│   ├── environmental_monitor.dart
-│   └── product_card.dart
-└── main.dart           # Entry point
+│
+├── config/                # Cấu hình
+│
+├── local/                 # Dữ liệu và thao tác lưu trữ cục bộ
+│  
+├── models/                # Định nghĩa các model dữ liệu
+│
+├── providers/             # State management (Provider / ChangeNotifier)
+│
+├── repositories/          # Xử lý trung gian giữa local DB và remote API
+│
+├── services/              # Tầng giao tiếp với server (Supabase / API)
+│
+├── screens/               # Giao diện người dùng (UI)
+│
+├── widgets/               # Các widget tái sử dụng (custom components)
+│
+└── main.dart              #  Entry point của ứng dụng
+
 ```
 
-## Công nghệ sử dụng
+## Các thư viện sử dụng
 
-- **Flutter**: Framework phát triển ứng dụng di động
-- **Provider**: State management
-- **Google Fonts**: Typography
-- **FL Chart**: Biểu đồ và thống kê
-- **Shared Preferences**: Lưu trữ dữ liệu local
-- **HTTP**: API communication
-- **Image Picker**: Quản lý hình ảnh
+| Package                | Version | Mục đích                                      |
+| ---------------------- | ------- | --------------------------------------------- |
+| **flutter**            | sdk     | Framework chính                               |
+| **provider**           | ^6.1.2  | State management                              |
+| **shared_preferences** | ^2.3.2  | Lưu trữ dữ liệu đơn giản (theme, cài đặt,...) |
+| **http**               | ^1.2.2  | Giao tiếp API                                 |
+| **image_picker**       | ^1.1.2  | Chọn hình ảnh từ camera/gallery               |
+| **intl**               | ^0.20.2 | Xử lý định dạng ngày giờ, số,...              |
+| **fl_chart**           | ^1.1.1  | Hiển thị biểu đồ thống kê                     |
+| **google_fonts**       | ^6.2.1  | Font chữ Google                               |
+| **supabase_flutter**   | ^2.10.3 | Backend realtime & authentication             |
+| **uuid**               | ^4.5.1  | Sinh ID duy nhất                              |
+| **drift**              | ^2.28.2 | ORM quản lý database SQLite                   |
+| **drift_flutter**      | ^0.2.7  | Kết nối Drift với Flutter                     |
+| **connectivity_plus**  | ^7.0.0  | Kiểm tra trạng thái mạng                      |
+
 
 ## Tính năng môi trường
 
-Hệ thống tích hợp theo dõi các yếu tố môi trường:
 - **Nhiệt độ**: Giám sát nhiệt độ môi trường
 - **Độ ẩm**: Theo dõi độ ẩm không khí và đất
 - **Độ pH**: Kiểm tra độ pH của đất
@@ -95,16 +114,25 @@ Hệ thống tích hợp theo dõi các yếu tố môi trường:
 
 ### Thêm sản phẩm mới:
 1. Vào màn hình "Sản phẩm"
-2. Nhấn nút "+" hoặc "Thêm sản phẩm"
-3. Điền thông tin chi tiết
-4. Lưu sản phẩm
+2. Xem danh sách sản phẩm hiện có
+3. Thêm/sửa/xóa sản phẩm theo nhu cầu
 
 ### Quản lý danh mục:
 1. Vào màn hình "Danh mục"
 2. Xem danh sách danh mục hiện có
 3. Thêm/sửa/xóa danh mục theo nhu cầu
 
+### Quản lý dữ liệu môi trường:
+1. Vào màn hình "Dữ liệu môi trường"
+2. Xem danh sách Dữ liệu môi trường hiện có
+3. Thêm/sửa/xóa Dữ liệu môi trường theo nhu cầu
+
+### Quản lý vị trí:
+1. Vào màn hình "Vị trí"
+2. Xem danh sách Vị trí hiện có
+3. Thêm/sửa/xóa Vị trí theo nhu cầu
+
 ### Xem báo cáo:
 1. Vào màn hình "Báo cáo"
 2. Chọn kỳ báo cáo (tuần/tháng/quý/năm)
-3. Xem các biểu đồ và thống kê
+3. Xem các biểu đồ cột, tròn và thống kê
