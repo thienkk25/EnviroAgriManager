@@ -1,6 +1,6 @@
 import 'package:enviro_agri_manager/models/category_model.dart';
 import 'package:enviro_agri_manager/providers/category_provider.dart';
-import 'package:enviro_agri_manager/utils/constants.dart';
+import 'package:enviro_agri_manager/config/app_constants.dart';
 import 'package:enviro_agri_manager/widgets/category_card.dart';
 import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
