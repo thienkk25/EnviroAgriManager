@@ -17,15 +17,41 @@ class _ReportsScreenState extends State<ReportsScreen> {
   String _selectedPeriod = 'month';
   Map<String, double> _trendData = {};
   List<EnvironmentalDataModel> _environmentalData = [];
+  Map<String, double> _categoryData = {};
   String _selectedEnvMetric =
       'temperature'; // temperature, humidity, ph, light_intensity
 
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await context.read<ProductProvider>().fetchProducts(context);
+      if (!mounted) return;
+      await context.read<EnvironmentalDataProvider>().fetchEnvironmentalData(
+        context,
+      );
+
+      setState(() {
+        _trendData = context.read<ProductProvider>().getTrendByCategory(
+          context,
+          _selectedPeriod,
+        );
+        _categoryData = context
+            .read<ProductProvider>()
+            .getCategoryDistributionData(context, _selectedPeriod);
+        _environmentalData = context
+            .read<EnvironmentalDataProvider>()
+            .getEnvironmentalDataByTime(_selectedPeriod);
+      });
+    });
     super.initState();
   }
 
-  void refreshData() {
+  Future<void> refreshData() async {
+    await context.read<ProductProvider>().fetchProducts(context);
+    if (!mounted) return;
+    await context.read<EnvironmentalDataProvider>().fetchEnvironmentalData(
+      context,
+    );
     setState(() {
       context.read<ProductProvider>().fetchProducts(context);
       context.read<EnvironmentalDataProvider>().fetchEnvironmentalData(context);
@@ -33,6 +59,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
         context,
         _selectedPeriod,
       );
+      _categoryData = context
+          .read<ProductProvider>()
+          .getCategoryDistributionData(context, _selectedPeriod);
       _environmentalData = context
           .read<EnvironmentalDataProvider>()
           .getEnvironmentalDataByTime(_selectedPeriod);
@@ -41,13 +70,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _trendData = context.read<ProductProvider>().getTrendByCategory(
-      context,
-      _selectedPeriod,
-    );
-    _environmentalData = context
-        .read<EnvironmentalDataProvider>()
-        .environmentalData;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
@@ -63,10 +85,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
         elevation: 0,
         actions: [
           PopupMenuButton<String>(
-            onSelected: (value) {
-              setState(() {
-                _selectedPeriod = value;
-              });
+            onSelected: (value) async {
+              _selectedPeriod = value;
+              refreshData();
             },
             itemBuilder: (BuildContext context) => [
               const PopupMenuItem<String>(
@@ -157,7 +178,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 _buildProductsChart(_trendData),
 
                 // Category Distribution
-                _buildCategoryDistribution(),
+                _buildCategoryDistribution(_categoryData),
 
                 // Environmental Data Chart
                 _buildEnvironmentalChart(),
@@ -475,12 +496,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
   }
 
-  Widget _buildCategoryDistribution() {
-    // Get category data from your products
-    final categoryData = context
-        .read<ProductProvider>()
-        .getCategoryDistributionData(context, _selectedPeriod);
-
+  Widget _buildCategoryDistribution(Map<String, double> categoryData) {
     if (categoryData.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(20),
