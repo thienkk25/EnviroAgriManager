@@ -15,7 +15,6 @@ dependencies:
   image_picker: ^1.1.2
   intl: ^0.20.2
   fl_chart: ^1.1.1
-  google_fonts: ^6.2.1
   supabase_flutter: ^2.10.3
   uuid: ^4.5.1
   drift: ^2.28.2
@@ -31,3 +30,10 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  fonts:
+  - family: Inter
+    fonts:
+      - asset: assets/fonts/Inter-VariableFont_opsz,wght.ttf
+      - asset: assets/fonts/Inter-Italic-VariableFont_opsz,wght.ttf
+        style: italic
+        

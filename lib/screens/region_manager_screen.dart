@@ -2,7 +2,6 @@ import 'package:enviro_agri_manager/models/region_model.dart';
 import 'package:enviro_agri_manager/providers/region_provider.dart';
 import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -112,7 +111,9 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
                                     SnackBar(
                                       content: Text(
                                         result ? 'Xóa thành công' : 'Có lỗi!',
-                                        style: GoogleFonts.inter(),
+                                        style: const TextStyle(
+                                          fontFamily: 'Inter',
+                                        ),
                                       ),
                                       backgroundColor: result
                                           ? const Color(0xFFA3BE8C)
@@ -180,7 +181,10 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
                     const SizedBox(height: 16),
                     Text(
                       regionProvider.error,
-                      style: GoogleFonts.inter(color: Colors.grey[600]),
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        color: Colors.grey[600],
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),
@@ -208,7 +212,8 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
                     const SizedBox(height: 16),
                     Text(
                       'Không có vị trí nào',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
+                        fontFamily: 'Inter',
                         fontSize: 18,
                         color: Colors.grey[600],
                       ),
@@ -216,7 +221,10 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
                     const SizedBox(height: 8),
                     Text(
                       'Thêm vị trí để bắt đầu',
-                      style: GoogleFonts.inter(color: Colors.grey[500]),
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        color: Colors.grey[500],
+                      ),
                     ),
                   ],
                 ),
@@ -454,7 +462,7 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
                         SnackBar(
                           content: Text(
                             result ? 'Đã thêm vị trí thành công' : 'Có lỗi!',
-                            style: GoogleFonts.inter(),
+                            style: const TextStyle(fontFamily: 'Inter'),
                           ),
                           backgroundColor: result
                               ? const Color(0xFFA3BE8C)
@@ -489,7 +497,7 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
                             result
                                 ? 'Đã cập nhật vị trí thành công'
                                 : 'Có lỗi!',
-                            style: GoogleFonts.inter(),
+                            style: const TextStyle(fontFamily: 'Inter'),
                           ),
                           backgroundColor: result
                               ? const Color(0xFFA3BE8C)

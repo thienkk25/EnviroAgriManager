@@ -3,7 +3,6 @@ import 'package:enviro_agri_manager/providers/auth_provider.dart';
 import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class UserManagementScreen extends StatefulWidget {
   const UserManagementScreen({super.key});
@@ -40,7 +39,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       appBar: AppBar(
         title: Text(
           'Quản lý người dùng',
-          style: GoogleFonts.inter(
+          style: const TextStyle(
+            fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
@@ -64,7 +64,10 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               return Center(
                 child: Text(
                   'Lỗi: ${snapshot.error}',
-                  style: GoogleFonts.inter(color: Colors.red),
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    color: Colors.red,
+                  ),
                 ),
               );
             }
@@ -84,7 +87,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                     const SizedBox(height: 16),
                     Text(
                       'Không có người dùng nào',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
+                        fontFamily: 'Inter',
                         fontSize: 18,
                         color: Colors.grey[600],
                       ),
@@ -121,7 +125,10 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                       ),
                       title: Text(
                         user == userData['id'] ? "Tôi" : fullName,
-                        style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,7 +151,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                                 ),
                                 child: Text(
                                   role.displayName,
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
                                     fontSize: 12,
                                     color: _getRoleColor(role),
                                     fontWeight: FontWeight.w500,
@@ -154,7 +162,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                               Expanded(
                                 child: Text(
                                   'Tạo: ${_formatDate(userData['profile_created_at'] as String?)}',
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
                                     fontSize: 10,
                                     color: Colors.grey[600],
                                   ),
@@ -163,7 +172,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                               Expanded(
                                 child: Text(
                                   'Cập nhật: ${_formatDate(userData['profile_updated_at'] as String?)}',
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
                                     fontSize: 10,
                                     color: Colors.grey[600],
                                   ),
@@ -204,7 +214,10 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         return AlertDialog(
           title: Text(
             'Cập nhật quyền cho ${userData['email']}',
-            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w600,
+            ),
           ),
           content: RadioGroup<UserRoleModel>(
             groupValue: currentRole,
@@ -245,7 +258,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               onPressed: () => Navigator.of(dialogContext).pop(),
               child: Text(
                 'Hủy',
-                style: GoogleFonts.inter(color: Colors.grey[600]),
+                style: TextStyle(fontFamily: 'Inter', color: Colors.grey[600]),
               ),
             ),
           ],

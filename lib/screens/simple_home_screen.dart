@@ -1,6 +1,5 @@
 import 'package:enviro_agri_manager/providers/product_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class SimpleHomeScreen extends StatelessWidget {
@@ -13,7 +12,8 @@ class SimpleHomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Hệ thống Quản lý Danh mục',
-          style: GoogleFonts.inter(
+          style: const TextStyle(
+            fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
@@ -46,7 +46,8 @@ class SimpleHomeScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Nông nghiệp & Môi trường',
-                      style: GoogleFonts.inter(
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -55,7 +56,8 @@ class SimpleHomeScreen extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       'Hệ thống quản lý danh mục điện tử dùng chung',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
+                        fontFamily: 'Inter',
                         fontSize: 16,
                         color: Colors.white.withValues(alpha: .9),
                       ),
@@ -69,10 +71,11 @@ class SimpleHomeScreen extends StatelessWidget {
               // Features Grid
               Text(
                 'Tính năng chính',
-                style: GoogleFonts.inter(
+                style: const TextStyle(
+                  fontFamily: 'Inter',
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF2E3440),
+                  color: Color(0xFF2E3440),
                 ),
               ),
               const SizedBox(height: 16),
@@ -146,10 +149,11 @@ class SimpleHomeScreen extends StatelessWidget {
                         Expanded(
                           child: Text(
                             'Dữ liệu Môi trường Hiện tại',
-                            style: GoogleFonts.inter(
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
-                              color: const Color(0xFF2E3440),
+                              color: Color(0xFF2E3440),
                             ),
                           ),
                         ),
@@ -208,10 +212,11 @@ class SimpleHomeScreen extends StatelessWidget {
               // Sample Products
               Text(
                 'Sản phẩm hôm nay',
-                style: GoogleFonts.inter(
+                style: const TextStyle(
+                  fontFamily: 'Inter',
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF2E3440),
+                  color: Color(0xFF2E3440),
                 ),
               ),
               const SizedBox(height: 16),
@@ -308,18 +313,20 @@ class _FeatureCard extends StatelessWidget {
           const Spacer(),
           Text(
             title,
-            style: GoogleFonts.inter(
+            style: const TextStyle(
+              fontFamily: 'Inter',
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF2E3440),
+              color: Color(0xFF2E3440),
             ),
           ),
           const SizedBox(height: 4),
           Text(
             description,
-            style: GoogleFonts.inter(
+            style: const TextStyle(
+              fontFamily: 'Inter',
               fontSize: 12,
-              color: const Color(0xFF88C0D0),
+              color: Color(0xFF88C0D0),
             ),
           ),
         ],
@@ -355,18 +362,20 @@ class _EnvironmentalMetric extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             value,
-            style: GoogleFonts.inter(
+            style: const TextStyle(
+              fontFamily: 'Inter',
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF2E3440),
+              color: Color(0xFF2E3440),
             ),
           ),
           const SizedBox(height: 4),
           Text(
             label,
-            style: GoogleFonts.inter(
+            style: const TextStyle(
+              fontFamily: 'Inter',
               fontSize: 12,
-              color: const Color(0xFF88C0D0),
+              color: Color(0xFF88C0D0),
             ),
           ),
           const SizedBox(height: 4),
@@ -378,9 +387,10 @@ class _EnvironmentalMetric extends StatelessWidget {
             ),
             child: Text(
               status,
-              style: GoogleFonts.inter(
+              style: const TextStyle(
+                fontFamily: 'Inter',
                 fontSize: 10,
-                color: const Color(0xFFA3BE8C),
+                color: Color(0xFFA3BE8C),
               ),
             ),
           ),
@@ -440,10 +450,11 @@ class _SampleProductCard extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: GoogleFonts.inter(
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF2E3440),
+                    color: Color(0xFF2E3440),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -458,10 +469,11 @@ class _SampleProductCard extends StatelessWidget {
                   ),
                   child: Text(
                     description,
-                    style: GoogleFonts.inter(
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: const Color(0xFFA3BE8C),
+                      color: Color(0xFFA3BE8C),
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -477,17 +489,19 @@ class _SampleProductCard extends StatelessWidget {
               children: [
                 Text(
                   price,
-                  style: GoogleFonts.inter(
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFFD08770),
+                    color: Color(0xFFD08770),
                   ),
                 ),
                 Text(
                   quantity,
-                  style: GoogleFonts.inter(
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
                     fontSize: 12,
-                    color: const Color(0xFF88C0D0),
+                    color: Color(0xFF88C0D0),
                   ),
                 ),
               ],

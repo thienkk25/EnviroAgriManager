@@ -3,7 +3,6 @@ import 'package:enviro_agri_manager/providers/category_provider.dart';
 import 'package:enviro_agri_manager/providers/environmental_data_provider.dart';
 import 'package:enviro_agri_manager/providers/product_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -54,7 +53,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
       appBar: AppBar(
         title: Text(
           'Báo cáo & Thống kê',
-          style: GoogleFonts.inter(
+          style: const TextStyle(
+            fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
@@ -122,18 +122,20 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       const SizedBox(width: 12),
                       Text(
                         'Kỳ báo cáo: ',
-                        style: GoogleFonts.inter(
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: const Color(0xFF2E3440),
+                          color: Color(0xFF2E3440),
                         ),
                       ),
                       Text(
                         _toSelectedPeriodToString(_selectedPeriod),
-                        style: GoogleFonts.inter(
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF5E81AC),
+                          color: Color(0xFF5E81AC),
                         ),
                       ),
                       const Spacer(),
@@ -177,10 +179,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
           children: [
             Text(
               'Tổng quan',
-              style: GoogleFonts.inter(
+              style: const TextStyle(
+                fontFamily: 'Inter',
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF2E3440),
+                color: Color(0xFF2E3440),
               ),
             ),
             const SizedBox(height: 16),
@@ -251,10 +254,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
           children: [
             Text(
               'Xu hướng sản phẩm theo danh mục',
-              style: GoogleFonts.inter(
+              style: const TextStyle(
+                fontFamily: 'Inter',
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF2E3440),
+                color: Color(0xFF2E3440),
               ),
             ),
             const SizedBox(height: 20),
@@ -305,10 +309,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
         children: [
           Text(
             'Xu hướng sản phẩm theo danh mục',
-            style: GoogleFonts.inter(
+            style: const TextStyle(
+              fontFamily: 'Inter',
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF2E3440),
+              color: Color(0xFF2E3440),
             ),
           ),
           const SizedBox(height: 20),
@@ -357,9 +362,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
                             angle: -0.5, // Rotate 45 degrees
                             child: Text(
                               label,
-                              style: GoogleFonts.inter(
+                              style: const TextStyle(
+                                fontFamily: 'Inter',
                                 fontSize: 10,
-                                color: const Color(0xFF4C566A),
+                                color: Color(0xFF4C566A),
                               ),
                               textAlign: TextAlign.right,
                             ),
@@ -378,9 +384,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
                           padding: const EdgeInsets.only(right: 8),
                           child: Text(
                             _formatYAxisValue(value),
-                            style: GoogleFonts.inter(
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 10,
-                              color: const Color(0xFF4C566A),
+                              color: Color(0xFF4C566A),
                             ),
                             textAlign: TextAlign.right,
                           ),
@@ -446,7 +453,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         final index = spot.x.toInt();
                         return LineTooltipItem(
                           '${keys[index]}\n${spot.y.toInt()}',
-                          GoogleFonts.inter(
+                          const TextStyle(
+                            fontFamily: 'Inter',
                             color: Colors.white,
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -492,10 +500,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
           children: [
             Text(
               'Phân bố theo danh mục',
-              style: GoogleFonts.inter(
+              style: const TextStyle(
+                fontFamily: 'Inter',
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF2E3440),
+                color: Color(0xFF2E3440),
               ),
             ),
             const SizedBox(height: 20),
@@ -534,10 +543,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
         children: [
           Text(
             'Phân bố theo danh mục',
-            style: GoogleFonts.inter(
+            style: const TextStyle(
+              fontFamily: 'Inter',
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF2E3440),
+              color: Color(0xFF2E3440),
             ),
           ),
           const SizedBox(height: 20),
@@ -602,7 +612,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
         value: categoryEntry.value,
         title: percentage >= 5 ? '${percentage.toStringAsFixed(1)}%' : '',
         radius: 60,
-        titleStyle: GoogleFonts.inter(
+        titleStyle: const TextStyle(
+          fontFamily: 'Inter',
           fontSize: 12,
           fontWeight: FontWeight.w600,
           color: Colors.white,
@@ -655,19 +666,21 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   children: [
                     Text(
                       categoryEntry.key,
-                      style: GoogleFonts.inter(
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
-                        color: const Color(0xFF2E3440),
+                        color: Color(0xFF2E3440),
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       '${percentage.toStringAsFixed(1)}% (${categoryEntry.value.toInt()})',
-                      style: GoogleFonts.inter(
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
                         fontSize: 10,
-                        color: const Color(0xFF4C566A),
+                        color: Color(0xFF4C566A),
                       ),
                     ),
                   ],
@@ -823,10 +836,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
           children: [
             Text(
               'Dữ liệu môi trường',
-              style: GoogleFonts.inter(
+              style: const TextStyle(
+                fontFamily: 'Inter',
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF2E3440),
+                color: Color(0xFF2E3440),
               ),
             ),
             const SizedBox(height: 20),
@@ -866,10 +880,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
               Expanded(
                 child: Text(
                   'Dữ liệu môi trường',
-                  style: GoogleFonts.inter(
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF2E3440),
+                    color: Color(0xFF2E3440),
                   ),
                 ),
               ),
@@ -914,9 +929,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
             value: entry.key,
             child: Text(
               entry.value,
-              style: GoogleFonts.inter(
+              style: const TextStyle(
+                fontFamily: 'Inter',
                 fontSize: 13,
-                color: const Color(0xFF2E3440),
+                color: Color(0xFF2E3440),
               ),
             ),
           );
@@ -965,7 +981,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
               final value = entries[group.x.toInt()].value;
               return BarTooltipItem(
                 '$location\n${value.toStringAsFixed(1)}',
-                GoogleFonts.inter(
+                const TextStyle(
+                  fontFamily: 'Inter',
                   color: Colors.white,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -998,9 +1015,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     angle: -0.5,
                     child: Text(
                       entries[index].key,
-                      style: GoogleFonts.inter(
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
                         fontSize: 10,
-                        color: const Color(0xFF4C566A),
+                        color: Color(0xFF4C566A),
                       ),
                       textAlign: TextAlign.right,
                     ),
@@ -1017,9 +1035,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
               getTitlesWidget: (double value, TitleMeta meta) {
                 return Text(
                   value.toInt().toString(),
-                  style: GoogleFonts.inter(
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
                     fontSize: 10,
-                    color: const Color(0xFF4C566A),
+                    color: Color(0xFF4C566A),
                   ),
                 );
               },
@@ -1122,7 +1141,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
       children: [
         Text(
           value,
-          style: GoogleFonts.inter(
+          style: TextStyle(
+            fontFamily: 'Inter',
             fontSize: 20,
             fontWeight: FontWeight.w700,
             color: color,
@@ -1131,9 +1151,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
         const SizedBox(height: 4),
         Text(
           label,
-          style: GoogleFonts.inter(
+          style: const TextStyle(
+            fontFamily: 'Inter',
             fontSize: 12,
-            color: const Color(0xFF4C566A),
+            color: Color(0xFF4C566A),
           ),
         ),
       ],
@@ -1188,17 +1209,19 @@ class _OverviewCard extends StatelessWidget {
           const Spacer(),
           Text(
             value,
-            style: GoogleFonts.inter(
+            style: const TextStyle(
+              fontFamily: 'Inter',
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF2E3440),
+              color: Color(0xFF2E3440),
             ),
           ),
           Text(
             title,
-            style: GoogleFonts.inter(
+            style: const TextStyle(
+              fontFamily: 'Inter',
               fontSize: 12,
-              color: const Color(0xFF88C0D0),
+              color: Color(0xFF88C0D0),
             ),
           ),
         ],

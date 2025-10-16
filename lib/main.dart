@@ -13,9 +13,9 @@ import 'package:enviro_agri_manager/services/connectivity_service.dart';
 import 'package:enviro_agri_manager/services/environmental_data_service.dart';
 import 'package:enviro_agri_manager/services/product_service.dart';
 import 'package:enviro_agri_manager/services/regions_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config/supabase_config.dart';
 import 'providers/product_provider.dart';
@@ -66,7 +66,11 @@ void main() async {
               provider!..updateDependencies(connectivity, authService),
         ),
         // Database
-        Provider(create: (_) => AppDatabase(), dispose: (_, db) => db.close()),
+        // Database
+        Provider<AppDatabase?>(
+          create: (_) => kIsWeb ? null : AppDatabase(),
+          dispose: (_, db) => db?.close(),
+        ),
 
         // Services
         Provider(create: (_) => CategoryService()),
@@ -75,7 +79,7 @@ void main() async {
         Provider(create: (_) => RegionService()),
 
         // Category
-        ProxyProvider2<AppDatabase, CategoryService, CategoryRepository>(
+        ProxyProvider2<AppDatabase?, CategoryService, CategoryRepository>(
           update: (_, db, service, _) => CategoryRepository(db, service),
         ),
         ChangeNotifierProxyProvider<CategoryRepository, CategoryProvider>(
@@ -86,7 +90,7 @@ void main() async {
 
         // Environmental Data
         ProxyProvider2<
-          AppDatabase,
+          AppDatabase?,
           EnvironmentalDataService,
           EnvironmentalDataRepository
         >(
@@ -104,7 +108,7 @@ void main() async {
         ),
 
         // Product
-        ProxyProvider2<AppDatabase, ProductService, ProductRepository>(
+        ProxyProvider2<AppDatabase?, ProductService, ProductRepository>(
           update: (_, db, service, _) => ProductRepository(db, service),
         ),
         ChangeNotifierProxyProvider<ProductRepository, ProductProvider>(
@@ -114,7 +118,7 @@ void main() async {
         ),
 
         // Region
-        ProxyProvider2<AppDatabase, RegionService, RegionRepository>(
+        ProxyProvider2<AppDatabase?, RegionService, RegionRepository>(
           update: (_, db, service, _) => RegionRepository(db, service),
         ),
         ChangeNotifierProxyProvider<RegionRepository, RegionProvider>(
@@ -138,13 +142,14 @@ class MainApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         primaryColor: const Color(0xFF5E81AC),
-        fontFamily: GoogleFonts.inter().fontFamily,
+        fontFamily: 'Inter',
         scaffoldBackgroundColor: const Color(0xFFF5F5F5),
         appBarTheme: AppBarTheme(
           backgroundColor: const Color(0xFF5E81AC),
           foregroundColor: Colors.white,
           elevation: 0,
-          titleTextStyle: GoogleFonts.inter(
+          titleTextStyle: const TextStyle(
+            fontFamily: 'Inter',
             fontSize: 18,
             fontWeight: FontWeight.w600,
             color: Colors.white,
@@ -157,7 +162,10 @@ class MainApp extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
-            textStyle: GoogleFonts.inter(fontWeight: FontWeight.w500),
+            textStyle: const TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ),
@@ -165,14 +173,15 @@ class MainApp extends StatelessWidget {
         brightness: Brightness.dark,
         primarySwatch: Colors.blue,
         primaryColor: const Color(0xFF5E81AC),
-        fontFamily: GoogleFonts.inter().fontFamily,
+        fontFamily: 'Inter',
         scaffoldBackgroundColor: const Color(0xFF1E1E1E),
 
         appBarTheme: AppBarTheme(
           backgroundColor: const Color(0xFF2E3440),
           foregroundColor: Colors.white,
           elevation: 0,
-          titleTextStyle: GoogleFonts.inter(
+          titleTextStyle: const TextStyle(
+            fontFamily: 'Inter',
             fontSize: 18,
             fontWeight: FontWeight.w600,
             color: Colors.white,
@@ -186,14 +195,25 @@ class MainApp extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
-            textStyle: GoogleFonts.inter(fontWeight: FontWeight.w500),
+            textStyle: const TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
 
         textTheme: TextTheme(
-          bodyLarge: GoogleFonts.inter(color: Colors.white, fontSize: 16),
-          bodyMedium: GoogleFonts.inter(color: Colors.white70, fontSize: 14),
-          labelLarge: GoogleFonts.inter(color: Colors.white),
+          bodyLarge: const TextStyle(
+            fontFamily: 'Inter',
+            color: Colors.white,
+            fontSize: 16,
+          ),
+          bodyMedium: const TextStyle(
+            fontFamily: 'Inter',
+            color: Colors.white70,
+            fontSize: 14,
+          ),
+          labelLarge: const TextStyle(fontFamily: 'Inter', color: Colors.white),
         ),
 
         cardColor: const Color(0xFF2A2A2A),
@@ -204,7 +224,10 @@ class MainApp extends StatelessWidget {
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: const Color(0xFF2C2C2C),
-          hintStyle: GoogleFonts.inter(color: Colors.white54),
+          hintStyle: const TextStyle(
+            fontFamily: 'Inter',
+            color: Colors.white54,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(color: Colors.white24),

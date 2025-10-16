@@ -4,7 +4,6 @@ import 'package:enviro_agri_manager/config/app_constants.dart';
 import 'package:enviro_agri_manager/widgets/category_card.dart';
 import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -59,7 +58,8 @@ class CategoryScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           title ?? 'Quản lý Danh mục',
-          style: GoogleFonts.inter(
+          style: const TextStyle(
+            fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
@@ -100,7 +100,10 @@ class CategoryScreen extends StatelessWidget {
                             const SizedBox(height: 16),
                             Text(
                               categoryProvider.error,
-                              style: GoogleFonts.inter(color: Colors.grey[600]),
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                color: Colors.grey[600],
+                              ),
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 16),
@@ -129,7 +132,8 @@ class CategoryScreen extends StatelessWidget {
                             const SizedBox(height: 16),
                             Text(
                               'Chưa có danh mục nào',
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
+                                fontFamily: 'Inter',
                                 fontSize: 18,
                                 color: Colors.grey[600],
                               ),
@@ -137,7 +141,10 @@ class CategoryScreen extends StatelessWidget {
                             const SizedBox(height: 8),
                             Text(
                               'Thêm danh mục đầu tiên để bắt đầu',
-                              style: GoogleFonts.inter(color: Colors.grey[500]),
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                color: Colors.grey[500],
+                              ),
                             ),
                           ],
                         ),
@@ -243,7 +250,10 @@ class CategoryScreen extends StatelessWidget {
                     : mode == CategoryDialogMode.edit
                     ? 'Chỉnh sửa danh mục'
                     : 'Chi tiết danh mục',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               content: Form(
                 key: formKey,
@@ -258,8 +268,9 @@ class CategoryScreen extends StatelessWidget {
                         enabled: !isView,
                         decoration: InputDecoration(
                           labelText: 'Tên danh mục',
-                          labelStyle: GoogleFonts.inter(
-                            color: const Color(0xFF88C0D0),
+                          labelStyle: const TextStyle(
+                            fontFamily: 'Inter',
+                            color: Color(0xFF88C0D0),
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -275,8 +286,9 @@ class CategoryScreen extends StatelessWidget {
                         maxLines: 2,
                         decoration: InputDecoration(
                           labelText: 'Mô tả',
-                          labelStyle: GoogleFonts.inter(
-                            color: const Color(0xFF88C0D0),
+                          labelStyle: const TextStyle(
+                            fontFamily: 'Inter',
+                            color: Color(0xFF88C0D0),
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -285,7 +297,10 @@ class CategoryScreen extends StatelessWidget {
                       ),
                       Text(
                         'Chọn icon:',
-                        style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       Wrap(
                         spacing: 8,
@@ -326,7 +341,10 @@ class CategoryScreen extends StatelessWidget {
                       ),
                       Text(
                         'Chọn màu:',
-                        style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       Wrap(
                         spacing: 8,
@@ -365,8 +383,9 @@ class CategoryScreen extends StatelessWidget {
                         initialValue: selectedIsActive,
                         decoration: InputDecoration(
                           labelText: 'Trạng thái danh mục',
-                          labelStyle: GoogleFonts.inter(
-                            color: const Color(0xFF88C0D0),
+                          labelStyle: const TextStyle(
+                            fontFamily: 'Inter',
+                            color: Color(0xFF88C0D0),
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -377,12 +396,15 @@ class CategoryScreen extends StatelessWidget {
                             value: true,
                             child: Text(
                               "Hoạt động",
-                              style: GoogleFonts.inter(),
+                              style: const TextStyle(fontFamily: 'Inter'),
                             ),
                           ),
                           DropdownMenuItem(
                             value: false,
-                            child: Text("Tạm dừng", style: GoogleFonts.inter()),
+                            child: Text(
+                              "Tạm dừng",
+                              style: const TextStyle(fontFamily: 'Inter'),
+                            ),
                           ),
                         ],
                         onChanged: isView
@@ -400,7 +422,10 @@ class CategoryScreen extends StatelessWidget {
                   onPressed: () => Navigator.of(context).pop(),
                   child: Text(
                     'Đóng',
-                    style: GoogleFonts.inter(color: Colors.grey[600]),
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      color: Colors.grey[600],
+                    ),
                   ),
                 ),
                 if (!isView)
@@ -430,7 +455,7 @@ class CategoryScreen extends StatelessWidget {
                                 result
                                     ? 'Đã thêm danh mục thành công'
                                     : 'Có lỗi vui lòng thử lại!',
-                                style: GoogleFonts.inter(),
+                                style: const TextStyle(fontFamily: 'Inter'),
                               ),
                               backgroundColor: result
                                   ? const Color(0xFFA3BE8C)
@@ -458,7 +483,7 @@ class CategoryScreen extends StatelessWidget {
                                 result
                                     ? 'Đã cập danh mục thành công'
                                     : 'Có lỗi vui lòng thử lại!',
-                                style: GoogleFonts.inter(),
+                                style: const TextStyle(fontFamily: 'Inter'),
                               ),
                               backgroundColor: result
                                   ? const Color(0xFFA3BE8C)
@@ -473,7 +498,10 @@ class CategoryScreen extends StatelessWidget {
                     ),
                     child: Text(
                       mode == CategoryDialogMode.add ? 'Thêm' : 'Cập nhật',
-                      style: GoogleFonts.inter(color: Colors.white),
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        color: Colors.white,
+                      ),
                     ),
                   ),
               ],
@@ -491,18 +519,21 @@ class CategoryScreen extends StatelessWidget {
         return AlertDialog(
           title: Text(
             'Xác nhận xóa',
-            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w600,
+            ),
           ),
           content: Text(
             'Bạn có chắc chắn muốn xóa danh mục "${category.name}"? Tất cả danh mục con sẽ bị xóa (Nếu có).',
-            style: GoogleFonts.inter(),
+            style: const TextStyle(fontFamily: 'Inter'),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 'Hủy',
-                style: GoogleFonts.inter(color: Colors.grey[600]),
+                style: TextStyle(fontFamily: 'Inter', color: Colors.grey[600]),
               ),
             ),
             TextButton(
@@ -518,7 +549,7 @@ class CategoryScreen extends StatelessWidget {
                       result
                           ? 'Đã xóa danh mục "${category.name}" thành công'
                           : 'Có lỗi vui lòng thử lại!',
-                      style: GoogleFonts.inter(),
+                      style: const TextStyle(fontFamily: 'Inter'),
                     ),
                     backgroundColor: result
                         ? const Color(0xFFA3BE8C)
@@ -526,7 +557,10 @@ class CategoryScreen extends StatelessWidget {
                   ),
                 );
               },
-              child: Text('Xóa', style: GoogleFonts.inter(color: Colors.red)),
+              child: Text(
+                'Xóa',
+                style: const TextStyle(fontFamily: 'Inter', color: Colors.red),
+              ),
             ),
           ],
         );

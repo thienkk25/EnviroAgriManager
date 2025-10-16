@@ -84,7 +84,6 @@ lib/
 | **image_picker**       | ^1.1.2  | Chọn hình ảnh từ camera/gallery               |
 | **intl**               | ^0.20.2 | Xử lý định dạng ngày giờ, số,...              |
 | **fl_chart**           | ^1.1.1  | Hiển thị biểu đồ thống kê                     |
-| **google_fonts**       | ^6.2.1  | Font chữ Google                               |
 | **supabase_flutter**   | ^2.10.3 | Backend realtime & authentication             |
 | **uuid**               | ^4.5.1  | Sinh ID duy nhất                              |
 | **drift**              | ^2.28.2 | ORM quản lý database SQLite                   |

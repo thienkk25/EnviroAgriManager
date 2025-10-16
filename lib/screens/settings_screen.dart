@@ -5,8 +5,8 @@ import 'package:enviro_agri_manager/providers/environmental_data_provider.dart';
 import 'package:enviro_agri_manager/providers/product_provider.dart';
 import 'package:enviro_agri_manager/providers/region_provider.dart';
 import 'package:enviro_agri_manager/providers/settings_provider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -28,24 +28,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<SettingsProvider>().scheduleAutoSyncData(() async {
-        await Future.wait([
-          context.read<ProductProvider>().refreshProducts(context),
-          context.read<CategoryProvider>().refreshCategories(context),
-          context.read<EnvironmentalDataProvider>().refreshEnvironmentalData(
-            context,
-          ),
-          context.read<RegionProvider>().refreshRegions(context),
-        ]);
-      }, context.read<SettingsProvider>().secondSync);
+      if (!kIsWeb) {
+        context.read<SettingsProvider>().scheduleAutoSyncData(() async {
+          await Future.wait([
+            context.read<ProductProvider>().refreshProducts(context),
+            context.read<CategoryProvider>().refreshCategories(context),
+            context.read<EnvironmentalDataProvider>().refreshEnvironmentalData(
+              context,
+            ),
+            context.read<RegionProvider>().refreshRegions(context),
+          ]);
+        }, context.read<SettingsProvider>().secondSync);
+      }
     });
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    context.read<SettingsProvider>().cancelAutoSync();
-    super.dispose();
   }
 
   @override
@@ -58,7 +54,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         title: Text(
           'Cài đặt',
-          style: GoogleFonts.inter(
+          style: const TextStyle(
+            fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
@@ -129,17 +126,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 16),
               Text(
                 displayName,
-                style: GoogleFonts.inter(
+                style: const TextStyle(
+                  fontFamily: 'Inter',
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF2E3440),
+                  color: Color(0xFF2E3440),
                 ),
               ),
               Text(
                 email,
-                style: GoogleFonts.inter(
+                style: const TextStyle(
+                  fontFamily: 'Inter',
                   fontSize: 14,
-                  color: const Color(0xFF88C0D0),
+                  color: Color(0xFF88C0D0),
                 ),
               ),
               const SizedBox(height: 8),
@@ -154,7 +153,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 child: Text(
                   userRole.displayName,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
+                    fontFamily: 'Inter',
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: _getRoleColor(userRole),
@@ -176,7 +176,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               //   ),
               //   child: Text(
               //     'Chỉnh sửa thông tin',
-              //     style: GoogleFonts.inter(
+              //     style: const TextStyle(fontFamily: 'Inter',
               //       color: Colors.white,
               //       fontWeight: FontWeight.w500,
               //     ),
@@ -208,10 +208,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           Text(
             'Cài đặt hệ thống',
-            style: GoogleFonts.inter(
+            style: const TextStyle(
+              fontFamily: 'Inter',
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF2E3440),
+              color: Color(0xFF2E3440),
             ),
           ),
           const SizedBox(height: 16),
@@ -287,7 +288,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   //       children: [
   //         Text(
   //           'Cài đặt môi trường',
-  //           style: GoogleFonts.inter(
+  //           style: const TextStyle(fontFamily: 'Inter',
   //             fontSize: 18,
   //             fontWeight: FontWeight.w600,
   //             color: const Color(0xFF2E3440),
@@ -372,10 +373,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           Text(
             'Thông tin ứng dụng',
-            style: GoogleFonts.inter(
+            style: const TextStyle(
+              fontFamily: 'Inter',
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF2E3440),
+              color: Color(0xFF2E3440),
             ),
           ),
           const SizedBox(height: 16),
@@ -442,15 +444,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       title: Text(
         title,
-        style: GoogleFonts.inter(
+        style: const TextStyle(
+          fontFamily: 'Inter',
           fontSize: 16,
           fontWeight: FontWeight.w500,
-          color: const Color(0xFF2E3440),
+          color: Color(0xFF2E3440),
         ),
       ),
       subtitle: Text(
         subtitle,
-        style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF88C0D0)),
+        style: const TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 14,
+          color: Color(0xFF88C0D0),
+        ),
       ),
       trailing: trailing,
       onTap: onTap,
@@ -465,7 +472,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   //       return AlertDialog(
   //         title: Text(
   //           'Chỉnh sửa thông tin',
-  //           style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+  //           style: const TextStyle(fontFamily: 'Inter',fontWeight: FontWeight.w600),
   //         ),
   //         content: const Text(
   //           'Tính năng này sẽ được phát triển trong phiên bản tiếp theo.',
@@ -475,7 +482,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   //             onPressed: () => Navigator.of(context).pop(),
   //             child: Text(
   //               'Đóng',
-  //               style: GoogleFonts.inter(color: const Color(0xFF5E81AC)),
+  //               style: const TextStyle(fontFamily: 'Inter',color: const Color(0xFF5E81AC)),
   //             ),
   //           ),
   //         ],
@@ -491,7 +498,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   //       return AlertDialog(
   //         title: Text(
   //           'Chọn ngôn ngữ',
-  //           style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+  //           style: const TextStyle(fontFamily: 'Inter',fontWeight: FontWeight.w600),
   //         ),
   //         content: RadioGroup<String>(
   //           groupValue: _selectedLanguage,
@@ -533,7 +540,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return AlertDialog(
           title: Text(
             'Đồng bộ dữ liệu',
-            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w600,
+            ),
           ),
           content: RadioGroup<int>(
             groupValue: _selectedSync,
@@ -541,16 +551,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               setState(() {
                 _selectedSync = value!;
               });
-              context.read<SettingsProvider>().scheduleAutoSyncData(() async {
-                await Future.wait([
-                  context.read<ProductProvider>().refreshProducts(context),
-                  context.read<CategoryProvider>().refreshCategories(context),
-                  context
-                      .read<EnvironmentalDataProvider>()
-                      .refreshEnvironmentalData(context),
-                  context.read<RegionProvider>().refreshRegions(context),
-                ]);
-              }, _selectedSync);
+              if (!kIsWeb) {
+                context.read<SettingsProvider>().scheduleAutoSyncData(() async {
+                  await Future.wait([
+                    context.read<ProductProvider>().refreshProducts(context),
+                    context.read<CategoryProvider>().refreshCategories(context),
+                    context
+                        .read<EnvironmentalDataProvider>()
+                        .refreshEnvironmentalData(context),
+                    context.read<RegionProvider>().refreshRegions(context),
+                  ]);
+                }, _selectedSync);
+              }
               Navigator.of(context).pop();
             },
             child: Column(
@@ -592,7 +604,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   //       return AlertDialog(
   //         title: Text(
   //           'Tần suất cập nhật',
-  //           style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+  //           style: const TextStyle(fontFamily: 'Inter',fontWeight: FontWeight.w600),
   //         ),
   //         content: RadioGroup<String>(
   //           groupValue: _selectedUpdateFrequency,
@@ -641,15 +653,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return AlertDialog(
           title: Text(
             'Thông tin phiên bản',
-            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w600,
+            ),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Phiên bản: v1.0.0', style: GoogleFonts.inter()),
-              Text('Ngày phát hành: 2025', style: GoogleFonts.inter()),
-              Text('Nhà phát triển: Thien Nguyen', style: GoogleFonts.inter()),
+              Text(
+                'Phiên bản: v1.0.0',
+                style: const TextStyle(fontFamily: 'Inter'),
+              ),
+              Text(
+                'Ngày phát hành: 2025',
+                style: const TextStyle(fontFamily: 'Inter'),
+              ),
+              Text(
+                'Nhà phát triển: Thien Nguyen',
+                style: const TextStyle(fontFamily: 'Inter'),
+              ),
             ],
           ),
           actions: [
@@ -657,7 +681,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 'Đóng',
-                style: GoogleFonts.inter(color: const Color(0xFF5E81AC)),
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  color: Color(0xFF5E81AC),
+                ),
               ),
             ),
           ],
@@ -673,7 +700,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return AlertDialog(
           title: Text(
             'Trợ giúp',
-            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w600,
+            ),
           ),
           content: const Text(
             'Tài liệu hướng dẫn sẽ được cập nhật trong phiên bản tiếp theo.',
@@ -683,7 +713,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 'Đóng',
-                style: GoogleFonts.inter(color: const Color(0xFF5E81AC)),
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  color: Color(0xFF5E81AC),
+                ),
               ),
             ),
           ],
@@ -699,7 +732,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return AlertDialog(
           title: Text(
             'Chính sách bảo mật',
-            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w600,
+            ),
           ),
           content: const Text(
             'Chính sách bảo mật sẽ được cập nhật trong phiên bản tiếp theo.',
@@ -709,7 +745,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 'Đóng',
-                style: GoogleFonts.inter(color: const Color(0xFF5E81AC)),
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  color: Color(0xFF5E81AC),
+                ),
               ),
             ),
           ],
@@ -725,7 +764,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return AlertDialog(
           title: Text(
             'Đăng xuất',
-            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w600,
+            ),
           ),
           content: const Text('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?'),
           actions: [
@@ -733,7 +775,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 'Hủy',
-                style: GoogleFonts.inter(color: Colors.grey[600]),
+                style: TextStyle(fontFamily: 'Inter', color: Colors.grey[600]),
               ),
             ),
             TextButton(
@@ -751,7 +793,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     SnackBar(
                       content: Text(
                         'Đã đăng xuất thành công',
-                        style: GoogleFonts.inter(),
+                        style: const TextStyle(fontFamily: 'Inter'),
                       ),
                       backgroundColor: const Color(0xFFA3BE8C),
                     ),
@@ -760,7 +802,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               },
               child: Text(
                 'Đăng xuất',
-                style: GoogleFonts.inter(color: Colors.red),
+                style: const TextStyle(fontFamily: 'Inter', color: Colors.red),
               ),
             ),
           ],

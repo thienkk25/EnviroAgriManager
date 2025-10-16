@@ -5,7 +5,6 @@ import 'package:enviro_agri_manager/widgets/category_selector.dart';
 import 'package:enviro_agri_manager/widgets/product_card.dart';
 import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -38,7 +37,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
       appBar: AppBar(
         title: Text(
           'Quản lý Sản phẩm',
-          style: GoogleFonts.inter(
+          style: const TextStyle(
+            fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
@@ -73,7 +73,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       controller: _searchController,
                       decoration: InputDecoration(
                         hintText: 'Tìm kiếm sản phẩm...',
-                        hintStyle: GoogleFonts.inter(color: Colors.grey[500]),
+                        hintStyle: TextStyle(
+                          fontFamily: 'Inter',
+                          color: Colors.grey[500],
+                        ),
                         prefixIcon: const Icon(
                           Icons.search,
                           color: Color(0xFF5E81AC),
@@ -123,7 +126,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                 },
                                 selectedColor: Colors.white,
                                 checkmarkColor: const Color(0xFF5E81AC),
-                                labelStyle: GoogleFonts.inter(
+                                labelStyle: TextStyle(
+                                  fontFamily: 'Inter',
                                   color: isSelected
                                       ? const Color(0xFF5E81AC)
                                       : Colors.grey,
@@ -161,7 +165,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           const SizedBox(height: 16),
                           Text(
                             productProvider.error,
-                            style: GoogleFonts.inter(color: Colors.grey[600]),
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              color: Colors.grey[600],
+                            ),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 16),
@@ -212,7 +219,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           const SizedBox(height: 16),
                           Text(
                             'Không tìm thấy sản phẩm nào',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 18,
                               color: Colors.grey[600],
                             ),
@@ -220,7 +228,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           const SizedBox(height: 8),
                           Text(
                             'Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc',
-                            style: GoogleFonts.inter(color: Colors.grey[500]),
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              color: Colors.grey[500],
+                            ),
                           ),
                         ],
                       ),
@@ -297,18 +308,21 @@ class _ProductsScreenState extends State<ProductsScreen> {
         return AlertDialog(
           title: Text(
             'Xác nhận xóa',
-            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w600,
+            ),
           ),
           content: Text(
             'Bạn có chắc chắn muốn xóa sản phẩm "${product.name}"?',
-            style: GoogleFonts.inter(),
+            style: const TextStyle(fontFamily: 'Inter'),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 'Hủy',
-                style: GoogleFonts.inter(color: Colors.grey[600]),
+                style: TextStyle(fontFamily: 'Inter', color: Colors.grey[600]),
               ),
             ),
             TextButton(
@@ -324,7 +338,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       result
                           ? 'Xóa sản phẩm thành công'
                           : 'Có lỗi xảy ra vui lòng thử lại!',
-                      style: GoogleFonts.inter(),
+                      style: const TextStyle(fontFamily: 'Inter'),
                     ),
                     backgroundColor: result
                         ? const Color(0xFFA3BE8C)
@@ -332,7 +346,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   ),
                 );
               },
-              child: Text('Xóa', style: GoogleFonts.inter(color: Colors.red)),
+              child: Text(
+                'Xóa',
+                style: const TextStyle(fontFamily: 'Inter', color: Colors.red),
+              ),
             ),
           ],
         );
@@ -397,7 +414,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   InputDecoration _inputDecoration(String label) {
     return InputDecoration(
       labelText: label,
-      labelStyle: GoogleFonts.inter(color: const Color(0xFF88C0D0)),
+      labelStyle: const TextStyle(
+        fontFamily: 'Inter',
+        color: Color(0xFF88C0D0),
+      ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: Color(0xFF88C0D0)),
@@ -420,7 +440,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               : isEdit
               ? 'Chỉnh sửa Sản phẩm'
               : 'Chi tiết Sản phẩm',
-          style: GoogleFonts.inter(
+          style: const TextStyle(
+            fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
@@ -440,7 +461,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
               child: Text(
                 'Lưu',
-                style: GoogleFonts.inter(
+                style: const TextStyle(
+                  fontFamily: 'Inter',
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
                 ),
@@ -609,7 +631,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     ),
                     child: Text(
                       isAdd ? 'Lưu sản phẩm' : 'Cập nhật sản phẩm',
-                      style: GoogleFonts.inter(
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -641,10 +664,11 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   Widget _sectionTitle(String text) {
     return Text(
       text,
-      style: GoogleFonts.inter(
+      style: const TextStyle(
+        fontFamily: 'Inter',
         fontSize: 18,
         fontWeight: FontWeight.w600,
-        color: const Color(0xFF2E3440),
+        color: Color(0xFF2E3440),
       ),
     );
   }
@@ -677,7 +701,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
             result
                 ? 'Đã thêm sản phẩm thành công'
                 : 'Có lỗi xảy ra khi thêm sản phẩm',
-            style: GoogleFonts.inter(),
+            style: const TextStyle(fontFamily: 'Inter'),
           ),
           backgroundColor: result ? const Color(0xFFA3BE8C) : Colors.red,
         ),
@@ -714,7 +738,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
             result
                 ? 'Đã cập nhật sản phẩm thành công'
                 : 'Có lỗi xảy ra vui lòng thử lại!',
-            style: GoogleFonts.inter(),
+            style: const TextStyle(fontFamily: 'Inter'),
           ),
           backgroundColor: result ? const Color(0xFFA3BE8C) : Colors.red,
         ),

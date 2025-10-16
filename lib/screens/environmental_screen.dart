@@ -5,7 +5,6 @@ import 'package:enviro_agri_manager/screens/region_manager_screen.dart';
 import 'package:enviro_agri_manager/widgets/environmental_data_card.dart';
 import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -42,7 +41,8 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
       appBar: AppBar(
         title: Text(
           'Giám sát Môi trường',
-          style: GoogleFonts.inter(
+          style: const TextStyle(
+            fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
@@ -57,7 +57,7 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                 const Icon(Icons.location_on),
                 Text(
                   "Các địa điểm hoạt động",
-                  style: GoogleFonts.inter(fontSize: 14),
+                  style: const TextStyle(fontFamily: 'Inter', fontSize: 14),
                 ),
               ],
             ),
@@ -93,7 +93,8 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                       const Icon(Icons.location_on, color: Colors.white),
                       Text(
                         'Vị trí: ',
-                        style: GoogleFonts.inter(
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
                           color: Colors.white,
                           fontWeight: FontWeight.w500,
                         ),
@@ -109,7 +110,10 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                 value: _selectedProvince,
                                 hint: Text("Chọn tỉnh"),
                                 dropdownColor: Color(0xFF5E81AC),
-                                style: GoogleFonts.inter(color: Colors.white),
+                                style: const TextStyle(
+                                  fontFamily: 'Inter',
+                                  color: Colors.white,
+                                ),
                                 items: [
                                   const DropdownMenuItem(
                                     value: null,
@@ -146,7 +150,8 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                         style: TextStyle(color: Colors.white),
                                       ),
                                       dropdownColor: Color(0xFF5E81AC),
-                                      style: GoogleFonts.inter(
+                                      style: const TextStyle(
+                                        fontFamily: 'Inter',
                                         color: Colors.white,
                                       ),
                                       items: _selectedProvince == null
@@ -191,7 +196,8 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                         style: TextStyle(color: Colors.white),
                                       ),
                                       dropdownColor: Color(0xFF5E81AC),
-                                      style: GoogleFonts.inter(
+                                      style: const TextStyle(
+                                        fontFamily: 'Inter',
                                         color: Colors.white,
                                       ),
                                       items: _selectedDistrict == null
@@ -237,7 +243,10 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                       DropdownButton<String>(
                         value: _selectedTimeRange,
                         dropdownColor: Color(0xFF5E81AC),
-                        style: GoogleFonts.inter(color: Colors.white),
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          color: Colors.white,
+                        ),
                         underline: Container(),
                         items: const [
                           DropdownMenuItem(
@@ -300,7 +309,10 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                           const SizedBox(height: 16),
                           Text(
                             environmentalDataProvider.error,
-                            style: GoogleFonts.inter(color: Colors.grey[600]),
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              color: Colors.grey[600],
+                            ),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 16),
@@ -334,7 +346,8 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                           const SizedBox(height: 16),
                           Text(
                             'Không có môi trường nào',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 18,
                               color: Colors.grey[600],
                             ),
@@ -342,7 +355,10 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                           const SizedBox(height: 8),
                           Text(
                             'Thử thay đổi vị trí hoặc thời gian gần đây',
-                            style: GoogleFonts.inter(color: Colors.grey[500]),
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              color: Colors.grey[500],
+                            ),
                           ),
                         ],
                       ),
@@ -373,13 +389,14 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                               builder: (context) => AlertDialog(
                                 title: Text(
                                   'Xác nhận xóa',
-                                  style: GoogleFonts.inter(
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                                 content: Text(
                                   'Bạn có chắc chắn muốn xóa dữ liệu môi trường này?',
-                                  style: GoogleFonts.inter(),
+                                  style: const TextStyle(fontFamily: 'Inter'),
                                 ),
                                 actions: [
                                   TextButton(
@@ -387,7 +404,8 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                         Navigator.of(context).pop(),
                                     child: Text(
                                       'Hủy',
-                                      style: GoogleFonts.inter(
+                                      style: TextStyle(
+                                        fontFamily: 'Inter',
                                         color: Colors.grey[600],
                                       ),
                                     ),
@@ -411,7 +429,9 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                           SnackBar(
                                             content: Text(
                                               'Đã xóa dữ liệu môi trường thành công',
-                                              style: GoogleFonts.inter(),
+                                              style: const TextStyle(
+                                                fontFamily: 'Inter',
+                                              ),
                                             ),
                                             backgroundColor: const Color(
                                               0xFFA3BE8C,
@@ -425,7 +445,9 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                           SnackBar(
                                             content: Text(
                                               'Lỗi khi xóa dữ liệu môi trường',
-                                              style: GoogleFonts.inter(),
+                                              style: const TextStyle(
+                                                fontFamily: 'Inter',
+                                              ),
                                             ),
                                             backgroundColor: Colors.red,
                                           ),
@@ -437,7 +459,8 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                     ),
                                     child: Text(
                                       'Xóa',
-                                      style: GoogleFonts.inter(
+                                      style: const TextStyle(
+                                        fontFamily: 'Inter',
                                         color: Colors.white,
                                       ),
                                     ),
@@ -539,7 +562,10 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                     : mode == EnvironmentalDialogMode.edit
                     ? 'Chỉnh sửa dữ liệu môi trường'
                     : 'Xem dữ liệu môi trường',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               content: Form(
                 key: formKey,
@@ -907,7 +933,10 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                   onPressed: () => Navigator.of(context).pop(),
                   child: Text(
                     'Hủy',
-                    style: GoogleFonts.inter(color: Colors.grey[600]),
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      color: Colors.grey[600],
+                    ),
                   ),
                 ),
                 !isView
@@ -968,7 +997,9 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                   SnackBar(
                                     content: Text(
                                       'Đã thêm dữ liệu môi trường thành công',
-                                      style: GoogleFonts.inter(),
+                                      style: const TextStyle(
+                                        fontFamily: 'Inter',
+                                      ),
                                     ),
                                     backgroundColor: const Color(0xFFA3BE8C),
                                   ),
@@ -978,7 +1009,9 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                   SnackBar(
                                     content: Text(
                                       'Lỗi khi thêm dữ liệu môi trường',
-                                      style: GoogleFonts.inter(),
+                                      style: const TextStyle(
+                                        fontFamily: 'Inter',
+                                      ),
                                     ),
                                     backgroundColor: Colors.red,
                                   ),
@@ -1036,7 +1069,9 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                   SnackBar(
                                     content: Text(
                                       'Đã cập nhật dữ liệu môi trường thành công',
-                                      style: GoogleFonts.inter(),
+                                      style: const TextStyle(
+                                        fontFamily: 'Inter',
+                                      ),
                                     ),
                                     backgroundColor: const Color(0xFFA3BE8C),
                                   ),
@@ -1046,7 +1081,9 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                   SnackBar(
                                     content: Text(
                                       'Lỗi khi cập nhật dữ liệu môi trường',
-                                      style: GoogleFonts.inter(),
+                                      style: const TextStyle(
+                                        fontFamily: 'Inter',
+                                      ),
                                     ),
                                     backgroundColor: Colors.red,
                                   ),
@@ -1060,7 +1097,10 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                         ),
                         child: Text(
                           mode == EnvironmentalDialogMode.edit ? 'Lưu' : 'Thêm',
-                          style: GoogleFonts.inter(color: Colors.white),
+                          style: const TextStyle(
+                            fontFamily: 'Inter',
+                            color: Colors.white,
+                          ),
                         ),
                       )
                     : SizedBox(),

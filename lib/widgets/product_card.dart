@@ -1,7 +1,6 @@
 import 'package:enviro_agri_manager/models/product_model.dart';
 import 'package:enviro_agri_manager/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -79,10 +78,11 @@ class ProductCard extends StatelessWidget {
                         children: [
                           Text(
                             product.name,
-                            style: GoogleFonts.inter(
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
-                              color: const Color(0xFF2E3440),
+                              color: Color(0xFF2E3440),
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -90,9 +90,10 @@ class ProductCard extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             product.description,
-                            style: GoogleFonts.inter(
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 14,
-                              color: const Color(0xFF88C0D0),
+                              color: Color(0xFF88C0D0),
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -113,10 +114,11 @@ class ProductCard extends StatelessWidget {
                                 ),
                                 child: Text(
                                   product.unit,
-                                  style: GoogleFonts.inter(
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
-                                    color: const Color(0xFFA3BE8C),
+                                    color: Color(0xFFA3BE8C),
                                   ),
                                 ),
                               ),
@@ -136,7 +138,8 @@ class ProductCard extends StatelessWidget {
                                   ),
                                   child: Text(
                                     _getStatusText(product.status),
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500,
                                       color: _getStatusColor(product.status),
@@ -188,7 +191,9 @@ class ProductCard extends StatelessWidget {
                                       const SizedBox(width: 8),
                                       Text(
                                         'Chỉnh sửa',
-                                        style: GoogleFonts.inter(),
+                                        style: const TextStyle(
+                                          fontFamily: 'Inter',
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -210,7 +215,8 @@ class ProductCard extends StatelessWidget {
                                       const SizedBox(width: 8),
                                       Text(
                                         'Xóa',
-                                        style: GoogleFonts.inter(
+                                        style: const TextStyle(
+                                          fontFamily: 'Inter',
                                           color: Colors.red,
                                         ),
                                       ),
@@ -239,9 +245,10 @@ class ProductCard extends StatelessWidget {
                         children: [
                           Text(
                             'Giá bán',
-                            style: GoogleFonts.inter(
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 12,
-                              color: const Color(0xFF88C0D0),
+                              color: Color(0xFF88C0D0),
                             ),
                           ),
                           Text(
@@ -249,10 +256,11 @@ class ProductCard extends StatelessWidget {
                               locale: 'vi_VN',
                               symbol: '₫',
                             ).format(product.price),
-                            style: GoogleFonts.inter(
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: const Color(0xFFD08770),
+                              color: Color(0xFFD08770),
                             ),
                           ),
                         ],
@@ -264,17 +272,19 @@ class ProductCard extends StatelessWidget {
                         children: [
                           Text(
                             'Tồn kho',
-                            style: GoogleFonts.inter(
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 12,
-                              color: const Color(0xFF88C0D0),
+                              color: Color(0xFF88C0D0),
                             ),
                           ),
                           Text(
                             '${product.quantity} ${product.unit}',
-                            style: GoogleFonts.inter(
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: const Color(0xFF5E81AC),
+                              color: Color(0xFF5E81AC),
                             ),
                           ),
                         ],
@@ -286,17 +296,19 @@ class ProductCard extends StatelessWidget {
                         children: [
                           Text(
                             'Cập nhật',
-                            style: GoogleFonts.inter(
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 12,
-                              color: const Color(0xFF88C0D0),
+                              color: Color(0xFF88C0D0),
                             ),
                           ),
                           Text(
                             DateFormat('dd/MM/yyyy').format(product.updatedAt),
-                            style: GoogleFonts.inter(
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: const Color(0xFF2E3440),
+                              color: Color(0xFF2E3440),
                             ),
                           ),
                         ],

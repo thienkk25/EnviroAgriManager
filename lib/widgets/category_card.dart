@@ -2,7 +2,6 @@ import 'package:enviro_agri_manager/models/category_model.dart';
 import 'package:enviro_agri_manager/providers/auth_provider.dart';
 import 'package:enviro_agri_manager/providers/category_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class CategoryCard extends StatelessWidget {
@@ -65,10 +64,11 @@ class CategoryCard extends StatelessWidget {
                       const SizedBox(height: 12),
                       Text(
                         category.name,
-                        style: GoogleFonts.inter(
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF2E3440),
+                          color: Color(0xFF2E3440),
                         ),
                         textAlign: TextAlign.center,
                         maxLines: 2,
@@ -77,9 +77,10 @@ class CategoryCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         '${context.read<CategoryProvider>().getSubCategories(category.id.toString()).length} loại',
-                        style: GoogleFonts.inter(
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
                           fontSize: 12,
-                          color: const Color(0xFF88C0D0),
+                          color: Color(0xFF88C0D0),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -96,7 +97,8 @@ class CategoryCard extends StatelessWidget {
                         ),
                         child: Text(
                           category.isActive ? 'Hoạt động' : 'Tạm dừng',
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
+                            fontFamily: 'Inter',
                             fontSize: 10,
                             fontWeight: FontWeight.w500,
                             color: category.isActive
@@ -147,7 +149,9 @@ class CategoryCard extends StatelessWidget {
                                     const SizedBox(width: 8),
                                     Text(
                                       'Chỉnh sửa',
-                                      style: GoogleFonts.inter(),
+                                      style: const TextStyle(
+                                        fontFamily: 'Inter',
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -169,7 +173,8 @@ class CategoryCard extends StatelessWidget {
                                     const SizedBox(width: 8),
                                     Text(
                                       'Xóa',
-                                      style: GoogleFonts.inter(
+                                      style: const TextStyle(
+                                        fontFamily: 'Inter',
                                         color: Colors.red,
                                       ),
                                     ),

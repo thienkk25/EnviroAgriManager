@@ -1,7 +1,6 @@
 import 'package:enviro_agri_manager/models/environmental_data_model.dart';
 import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class EnvironmentalDataCard extends StatelessWidget {
@@ -53,10 +52,11 @@ class EnvironmentalDataCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       environmentalData.location ?? '',
-                      style: GoogleFonts.inter(
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF2E3440),
+                        color: Color(0xFF2E3440),
                       ),
                     ),
                   ],
@@ -73,10 +73,11 @@ class EnvironmentalDataCard extends StatelessWidget {
                     ),
                     child: Text(
                       environmentalData.weatherCondition ?? '',
-                      style: GoogleFonts.inter(
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
-                        color: const Color(0xFFA3BE8C),
+                        color: Color(0xFFA3BE8C),
                       ),
                     ),
                   ),
@@ -154,10 +155,11 @@ class EnvironmentalDataCard extends StatelessWidget {
             // Nutrients
             Text(
               'Dinh dưỡng đất',
-              style: GoogleFonts.inter(
+              style: const TextStyle(
+                fontFamily: 'Inter',
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF2E3440),
+                color: Color(0xFF2E3440),
               ),
             ),
             const SizedBox(height: 8),
@@ -208,9 +210,10 @@ class EnvironmentalDataCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         environmentalData.notes ?? '',
-                        style: GoogleFonts.inter(
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
                           fontSize: 12,
-                          color: const Color(0xFF2E3440),
+                          color: Color(0xFF2E3440),
                         ),
                       ),
                     ),
@@ -225,9 +228,10 @@ class EnvironmentalDataCard extends StatelessWidget {
               children: [
                 Text(
                   'Ghi nhận: ${DateFormat('dd/MM/yyyy HH:mm').format(environmentalData.recordedAt)}',
-                  style: GoogleFonts.inter(
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
                     fontSize: 12,
-                    color: const Color(0xFF88C0D0),
+                    color: Color(0xFF88C0D0),
                   ),
                 ),
                 Row(
@@ -288,17 +292,19 @@ class _MetricItem extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             value,
-            style: GoogleFonts.inter(
+            style: const TextStyle(
+              fontFamily: 'Inter',
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF2E3440),
+              color: Color(0xFF2E3440),
             ),
           ),
           Text(
             label,
-            style: GoogleFonts.inter(
+            style: const TextStyle(
+              fontFamily: 'Inter',
               fontSize: 10,
-              color: const Color(0xFF88C0D0),
+              color: Color(0xFF88C0D0),
             ),
           ),
         ],

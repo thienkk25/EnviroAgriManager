@@ -18,7 +18,6 @@ class CategoryProvider with ChangeNotifier {
   CategoryProvider(this._categoryRepository);
   void update(CategoryRepository repo) {
     _categoryRepository = repo;
-    notifyListeners();
   }
 
   // Lấy danh sách danh mục
