@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:enviro_agri_manager/models/product_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -64,6 +66,18 @@ class ProductService {
       await _supabase.from('products').upsert(data);
     } catch (e) {
       throw Exception('Lỗi upload products: $e');
+    }
+  }
+
+  Future<String?> uploadImageFileProducts(String fileName, File image) async {
+    try {
+      await _supabase.storage.from('ImageProduct').upload(fileName, image);
+      final publicUrl = _supabase.storage
+          .from('ImageProduct')
+          .getPublicUrl(fileName);
+      return publicUrl;
+    } catch (e) {
+      throw Exception('Lỗi upload image products: $e');
     }
   }
 }

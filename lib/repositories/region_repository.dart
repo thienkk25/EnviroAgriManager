@@ -144,6 +144,7 @@ class RegionRepository {
               ) ||
               e.toString().contains('Không thể')) {
             await _db!.regionDao.restoreRegion(id);
+            if (isOnline) rethrow;
           } else {
             await _db!.regionDao.markRegionAsDeleted(id);
           }
