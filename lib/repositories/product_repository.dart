@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:drift/drift.dart';
 import 'package:enviro_agri_manager/local/drift/app_database.dart';
 import 'package:enviro_agri_manager/models/product_model.dart';
@@ -158,9 +156,9 @@ class ProductRepository {
     }
   }
 
-  Future<String?> uploadImageFileProducts(String fileName, File image) async {
+  Future<String?> uploadImageFileProducts(Uint8List image) async {
     try {
-      return await _productService.uploadImageFileProducts(fileName, image);
+      return await _productService.uploadImageFileProducts(image);
     } catch (e) {
       rethrow;
     }

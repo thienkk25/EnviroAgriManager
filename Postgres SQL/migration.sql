@@ -287,6 +287,14 @@ for each row execute function update_environmental_data_updated_at();
 -- RLS POLICIES
 -- ======================================
 
+--- Roles
+alter table public.roles enable row level security;
+
+create policy "Allow authenticated to read roles"
+on roles for select
+to authenticated
+using (true);
+
 -- Profiles
 alter table public.profiles enable row level security;
 
@@ -543,3 +551,37 @@ BEGIN
     ORDER BY ed.recorded_at DESC;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Bật Row-Level Security (RLS) cho bảng storage.objects
+alter table storage.objects enable row level security;
+
+create policy "Allow anyone to view images"
+on storage.objects
+for select
+using (bucket_id = 'product-images');
+
+create policy "Allow admin and editor to manage product images"
+on storage.objects
+for all
+to authenticated
+using (
+  bucket_id = 'product-images'
+  and exists (
+    select 1
+    from public.profiles p
+    join public.roles r on r.id = p.role_id
+    where p.id = auth.uid()
+      and r.name in ('admin', 'editor')
+  )
+)
+with check (
+  bucket_id = 'product-images'
+  and exists (
+    select 1
+    from public.profiles p
+    join public.roles r on r.id = p.role_id
+    where p.id = auth.uid()
+      and r.name in ('admin', 'editor')
+  )
+);
+

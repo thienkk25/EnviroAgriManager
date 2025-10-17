@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:enviro_agri_manager/models/product_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -69,11 +69,14 @@ class ProductService {
     }
   }
 
-  Future<String?> uploadImageFileProducts(String fileName, File image) async {
+  Future<String?> uploadImageFileProducts(Uint8List image) async {
+    final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
     try {
-      await _supabase.storage.from('ImageProduct').upload(fileName, image);
-      final publicUrl = _supabase.storage
-          .from('ImageProduct')
+      await _supabase.storage
+          .from('product-images')
+          .uploadBinary(fileName, image);
+      final String publicUrl = _supabase.storage
+          .from('product-images')
           .getPublicUrl(fileName);
       return publicUrl;
     } catch (e) {

@@ -372,6 +372,7 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                       itemCount: filteredEnvimentalData.length,
                       itemBuilder: (context, index) {
                         return EnvironmentalDataCard(
+                          key: Key(filteredEnvimentalData[index].id),
                           environmentalData: filteredEnvimentalData[index],
                           onTap: () => _showDataDialog(
                             context: context,

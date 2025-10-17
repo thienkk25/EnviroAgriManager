@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:enviro_agri_manager/models/product_model.dart';
 import 'package:enviro_agri_manager/providers/category_provider.dart';
 import 'package:enviro_agri_manager/providers/product_provider.dart';
@@ -5,6 +7,7 @@ import 'package:enviro_agri_manager/widgets/category_selector.dart';
 import 'package:enviro_agri_manager/widgets/product_card.dart';
 import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -246,6 +249,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       itemBuilder: (context, index) {
                         final product = filteredProducts[index];
                         return ProductCard(
+                          key: Key(product.id),
                           product: product,
                           onTap: () {
                             Navigator.push(
@@ -382,9 +386,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   late TextEditingController _priceController;
   late TextEditingController _quantityController;
   late TextEditingController _unitController;
+  Uint8List? _selectedImage;
 
   String _selectedCategory = '';
-  final String _imageUrl = '';
+  String _imageUrl = '';
   String _selectedStatus = 'active';
 
   bool get isView => widget.mode == ProductFormMode.view;
@@ -409,6 +414,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     _selectedCategory = p?.categoryId ?? '';
 
     _selectedStatus = p?.status ?? 'active';
+    _imageUrl = p?.imageUrl ?? '';
   }
 
   InputDecoration _inputDecoration(String label) {
@@ -427,6 +433,18 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         borderSide: const BorderSide(color: Color(0xFF5E81AC)),
       ),
     );
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      final Uint8List bytes = await pickedFile.readAsBytes();
+      setState(() {
+        _selectedImage = bytes;
+      });
+    }
   }
 
   @override
@@ -503,6 +521,62 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                           ? 'Vui lòng nhập mô tả'
                           : null,
                     ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // --- Chọn file ảnh ---
+              Container(
+                padding: const EdgeInsets.all(20),
+                width: double.infinity,
+                decoration: _boxDecoration(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 16,
+                  children: [
+                    _sectionTitle('Ảnh sản phẩm'),
+                    // --- Nút chọn ảnh ---
+                    if (!isView)
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 40),
+                        ),
+                        onPressed: _pickImage,
+                        icon: const Icon(Icons.image),
+                        label: const Text('Chọn ảnh từ thư viện'),
+                      ),
+
+                    // --- Hiển thị ảnh đã chọn ---
+                    if (_selectedImage != null)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.memory(
+                          _selectedImage!,
+                          height: 180,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    else
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Center(
+                          child: Image.network(
+                            _imageUrl,
+                            height: 180,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(
+                                Icons.image_outlined,
+                                color: Color(0xFF5E81AC),
+                                size: 180,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -692,6 +766,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       final result = await context.read<ProductProvider>().addProduct(
         context,
         product,
+        _selectedImage,
       );
       if (!context.mounted) return;
       Navigator.of(context).pop();

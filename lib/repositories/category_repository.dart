@@ -31,9 +31,11 @@ class CategoryRepository {
         final deletedData = await _db.categoryDao
             .getDeletedUnsyncedCategories();
         if (deletedData.isNotEmpty) {
-          for (var category in deletedData) {
+          final futures = deletedData.map((category) async {
             await delete(category.id, isOnline: isOnline);
-          }
+          }).toList();
+
+          await Future.wait(futures);
         }
 
         // Lấy dữ liệu server
@@ -159,11 +161,11 @@ class CategoryRepository {
               e.toString().contains('không thể')) {
             // Server không cho xóa → rollback (phục hồi)
             await _db!.categoryDao.restoreCategory(id);
-            if (isOnline) rethrow;
           } else {
             // Lỗi mạng hoặc lỗi khác → đánh dấu soft delete để sync lại sau
             await _db!.categoryDao.markCategoryAsDeleted(id);
           }
+          rethrow;
         }
       } else {
         await _db!.categoryDao.markCategoryAsDeleted(id);

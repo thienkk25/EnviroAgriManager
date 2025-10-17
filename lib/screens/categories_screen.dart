@@ -153,6 +153,7 @@ class CategoryScreen extends StatelessWidget {
                     return LayoutBuilder(
                       builder: (context, constraints) {
                         return GridView.builder(
+                          key: const PageStorageKey('category_grid'),
                           padding: const EdgeInsets.all(16),
                           gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
@@ -169,6 +170,7 @@ class CategoryScreen extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final category = subCategories[index];
                             return CategoryCard(
+                              key: Key(category.id),
                               category: category,
                               onTap: () {
                                 // Đệ quy gọi lại chính CategoryScreen

@@ -26,28 +26,38 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
   // Map id region -> isExpanded
   final Map<String, bool> _expanded = {};
 
+  String getNodeKey(RegionModel node, String? parentId) {
+    return parentId != null ? '$parentId/${node.id}' : node.id;
+  }
+
   // Build tree recursively
-  List<Widget> buildRegionTree(String? parentId, int level) {
-    final children = parentId == null
-        ? context.read<RegionProvider>().getMainRegions()
-        : context.read<RegionProvider>().getSubRegions(parentId);
+  List<Widget> buildRegionTree(
+    String? parentId,
+    int level,
+    RegionProvider provider,
+  ) {
+    final children =
+        (parentId == null
+              ? provider.getMainRegions()
+              : provider.getSubRegions(parentId))
+          ..sort((a, b) => a.name.compareTo(b.name));
+
     List<Widget> widgets = [];
 
     for (var child in children) {
-      final hasChildren = context
-          .read<RegionProvider>()
-          .getSubRegions(child.id)
-          .isNotEmpty;
-      final isExpanded = _expanded[child.id] ?? false;
+      final fullKey = getNodeKey(child, parentId);
+      final hasChildren = provider.getSubRegions(child.id).isNotEmpty;
+      final isExpanded = _expanded[fullKey] ?? false;
 
       widgets.add(
         Padding(
+          key: ValueKey(fullKey),
           padding: EdgeInsets.only(left: level * 20.0),
           child: InkWell(
             onTap: () {
               if (hasChildren) {
                 setState(() {
-                  _expanded[child.id] = !isExpanded;
+                  _expanded[fullKey] = !isExpanded;
                 });
               }
             },
@@ -89,7 +99,7 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
                       onPressed: () {
                         showDialog(
                           context: context,
-                          builder: (ctx) => AlertDialog(
+                          builder: (context) => AlertDialog(
                             title: const Text('Xác nhận xóa'),
                             content: Text(
                               'Bạn có chắc chắn muốn xóa khu vực "${child.name}" không?'
@@ -97,20 +107,23 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
                             ),
                             actions: [
                               TextButton(
-                                onPressed: () => Navigator.pop(ctx),
+                                onPressed: () => Navigator.pop(context),
                                 child: const Text('Hủy'),
                               ),
                               ElevatedButton(
                                 onPressed: () async {
-                                  final result = await context
-                                      .read<RegionProvider>()
-                                      .deleteRegion(context, child.id);
+                                  final result = await provider.deleteRegion(
+                                    context,
+                                    child.id,
+                                  );
                                   if (!context.mounted) return;
-                                  Navigator.pop(ctx);
-                                  ScaffoldMessenger.of(ctx).showSnackBar(
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                        result ? 'Xóa thành công' : 'Có lỗi!',
+                                        result
+                                            ? 'Xóa thành công'
+                                            : provider.error,
                                         style: const TextStyle(
                                           fontFamily: 'Inter',
                                         ),
@@ -140,7 +153,7 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
       );
 
       if (hasChildren && isExpanded) {
-        widgets.addAll(buildRegionTree(child.id, level + 1));
+        widgets.addAll(buildRegionTree(child.id, level + 1, provider));
       }
     }
 
@@ -231,8 +244,9 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
               );
             }
             return ListView(
+              key: const PageStorageKey('region_list'),
               physics: const AlwaysScrollableScrollPhysics(),
-              children: buildRegionTree(null, 0),
+              children: buildRegionTree(null, 0, regionProvider),
             );
           },
         ),

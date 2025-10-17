@@ -211,7 +211,7 @@ class SimpleHomeScreen extends StatelessWidget {
 
               // Sample Products
               Text(
-                'Sản phẩm hôm nay',
+                'Sản phẩm gần đây',
                 style: const TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 20,
@@ -225,21 +225,32 @@ class SimpleHomeScreen extends StatelessWidget {
                 builder: (context, productProvider, child) {
                   final now = DateTime.now();
                   final startOfDay = DateTime(now.year, now.month, now.day);
-                  final endOfDay = startOfDay.add(const Duration(days: 1));
+
                   final products = productProvider.products
                       .where(
                         (value) =>
-                            value.updatedAt.isAfter(startOfDay) &&
-                            value.updatedAt.isBefore(endOfDay),
+                            (value.updatedAt.isBefore(
+                                  startOfDay.add(Duration(days: 1)),
+                                ) ||
+                                value.updatedAt.isAtSameMomentAs(
+                                  startOfDay.add(Duration(days: 1)),
+                                )) &&
+                            (value.updatedAt.isAfter(
+                                  startOfDay.copyWith(day: startOfDay.day - 3),
+                                ) ||
+                                value.updatedAt.isAtSameMomentAs(
+                                  startOfDay.copyWith(day: startOfDay.day - 3),
+                                )),
                       )
                       .toList();
 
                   if (products.isEmpty) {
                     return _SampleProductCard(
                       name: "Không có sản phẩm",
-                      description: "Chưa có sản phẩm thay đổi hôm nay",
+                      description: "Chưa có sản phẩm thay đổi gần đây",
                       price: '',
                       quantity: '',
+                      imageUrl: '',
                     );
                   }
 
@@ -256,6 +267,7 @@ class SimpleHomeScreen extends StatelessWidget {
                             "Giá: ${products[index].price.toStringAsFixed(0)} đ",
                         quantity:
                             "Số lượng: ${products[index].quantity.toString()}",
+                        imageUrl: products[index].imageUrl,
                       ),
                     ),
                   );
@@ -405,12 +417,14 @@ class _SampleProductCard extends StatelessWidget {
   final String description;
   final String price;
   final String quantity;
+  final String imageUrl;
 
   const _SampleProductCard({
     required this.name,
     required this.description,
     required this.price,
     required this.quantity,
+    required this.imageUrl,
   });
 
   @override
@@ -430,17 +444,28 @@ class _SampleProductCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: const Color(0xFF5E81AC).withValues(alpha: .1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.image_outlined,
-              color: Color(0xFF5E81AC),
-              size: 24,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Center(
+              child: imageUrl != ''
+                  ? Image.network(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      height: 60,
+                      width: 60,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(
+                          Icons.image_outlined,
+                          color: Color(0xFF5E81AC),
+                          size: 60,
+                        );
+                      },
+                    )
+                  : const Icon(
+                      Icons.image_outlined,
+                      color: Color(0xFF5E81AC),
+                      size: 60,
+                    ),
             ),
           ),
           const SizedBox(width: 16),

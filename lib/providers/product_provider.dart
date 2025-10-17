@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:enviro_agri_manager/models/product_model.dart';
 import 'package:enviro_agri_manager/providers/category_provider.dart';
 import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
@@ -52,13 +54,22 @@ class ProductProvider with ChangeNotifier {
   }
 
   // Thêm sản phẩm mới
-  Future<bool> addProduct(BuildContext context, ProductModel product) async {
+  Future<bool> addProduct(
+    BuildContext context,
+    ProductModel product,
+    Uint8List? image,
+  ) async {
     _isLoading = true;
     notifyListeners();
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _productRepository.add(product, isOnline: isOnline);
-      _products.add(product);
+      final data = product.copyWith(
+        imageUrl: image == null
+            ? ''
+            : await _productRepository.uploadImageFileProducts(image),
+      );
+      await _productRepository.add(data, isOnline: isOnline);
+      _products.add(data);
       _error = '';
       return true;
     } catch (e) {

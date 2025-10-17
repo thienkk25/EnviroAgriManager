@@ -28,9 +28,10 @@ class RegionRepository {
 
           final deletedData = await _db.regionDao.getDeletedUnsyncedRegions();
           if (deletedData.isNotEmpty) {
-            for (var product in deletedData) {
-              await delete(product.id, isOnline: isOnline);
-            }
+            final futures = deletedData
+                .map((e) async => await delete(e.id, isOnline: isOnline))
+                .toList();
+            await Future.wait(futures);
           }
 
           final remoteData = await _regionService.fetchRegions();
@@ -144,10 +145,10 @@ class RegionRepository {
               ) ||
               e.toString().contains('Không thể')) {
             await _db!.regionDao.restoreRegion(id);
-            if (isOnline) rethrow;
           } else {
             await _db!.regionDao.markRegionAsDeleted(id);
           }
+          rethrow;
         }
       } else {
         await _db!.regionDao.markRegionAsDeleted(id);
