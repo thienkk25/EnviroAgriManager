@@ -40,13 +40,13 @@
 | **Editor** | Chỉnh sửa nội dung | - Thêm, sửa, xóa dữ liệu trong phạm vi được phân công<br>- Không có quyền quản lý người dùng             |
 | **Viewer** | Xem dữ liệu        | - Chỉ được phép xem thông tin và báo cáo<br>- Không thể chỉnh sửa hoặc xóa dữ liệu                       |
 
-| Quyền              |  Admin |        Editor         | Viewer  |
-| ------------------ | ------- | -------------------- | ------- |
-| Thêm dữ liệu       |   ✅   |          ✅          |    ❌   |
-| Sửa dữ liệu        |   ✅   |          ✅          |    ❌   |
-| Xóa dữ liệu        |   ✅   |          ❌          |    ❌   |
-| Xem dữ liệu        |   ✅   |          ✅          |    ✅   |
-| Quản lý phân quyền |   ✅   |          ❌          |    ❌   |
+| Quyền              |  Admin |        Editor       | Viewer |
+| ------------------ | ------ | ------------------- | ------ |
+| Thêm dữ liệu       |    X   |          X          |        |
+| Sửa dữ liệu        |    X   |          X          |        |
+| Xóa dữ liệu        |    X   |                     |        |
+| Xem dữ liệu        |    X   |          X          |    X   |
+| Quản lý phân quyền |    X   |                     |        |
 
 ## Cấu trúc dự án
 
@@ -70,7 +70,10 @@ lib/
 ├── widgets/               # Các widget tái sử dụng (custom components)
 │
 └── main.dart              #  Entry point của ứng dụng
+```
 
+```scss
+UI → Provider → Repository → Service (Supabase RPC)
 ```
 
 ## Các thư viện sử dụng
