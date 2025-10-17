@@ -86,15 +86,28 @@ class ProductProvider with ChangeNotifier {
   }
 
   // Cập nhật sản phẩm
-  Future<bool> updateProduct(BuildContext context, ProductModel product) async {
+  Future<bool> updateProduct(
+    BuildContext context,
+    ProductModel product,
+    String paths,
+    Uint8List? image,
+  ) async {
     _isLoading = true;
     notifyListeners();
     final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
-      await _productRepository.update(product, isOnline: isOnline);
-      final index = _products.indexWhere((p) => p.id == product.id);
+      final data = product.copyWith(
+        imageUrl: image == null
+            ? paths
+            : await _productRepository.uploadImageFileProducts(image),
+      );
+      if (image != null) {
+        await _productRepository.deleteImageFileProducts([paths]);
+      }
+      await _productRepository.update(data, isOnline: isOnline);
+      final index = _products.indexWhere((p) => p.id == data.id);
       if (index != -1) {
-        _products[index] = product;
+        _products[index] = data;
       }
       _error = '';
       return true;

@@ -1015,34 +1015,35 @@ class _ReportsScreenState extends State<ReportsScreen> {
           topTitles: const AxisTitles(
             sideTitles: SideTitles(showTitles: false),
           ),
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 60,
-              getTitlesWidget: (double value, TitleMeta meta) {
-                final index = value.toInt();
-                if (index < 0 || index >= entries.length) {
-                  return const SizedBox();
-                }
+          bottomTitles: AxisTitles(),
+          // bottomTitles: AxisTitles(
+          //   sideTitles: SideTitles(
+          //     showTitles: true,
+          //     reservedSize: 60,
+          //     getTitlesWidget: (double value, TitleMeta meta) {
+          //       final index = value.toInt();
+          //       if (index < 0 || index >= entries.length) {
+          //         return const SizedBox();
+          //       }
 
-                return Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Transform.rotate(
-                    angle: -0.5,
-                    child: Text(
-                      entries[index].key,
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 10,
-                        color: Color(0xFF4C566A),
-                      ),
-                      textAlign: TextAlign.right,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
+          //       return Padding(
+          //         padding: const EdgeInsets.only(top: 8),
+          //         child: Transform.rotate(
+          //           angle: -0.5,
+          //           child: Text(
+          //             entries[index].key,
+          //             style: const TextStyle(
+          //               fontFamily: 'Inter',
+          //               fontSize: 10,
+          //               color: Color(0xFF4C566A),
+          //             ),
+          //             textAlign: TextAlign.right,
+          //           ),
+          //         ),
+          //       );
+          //     },
+          //   ),
+          // ),
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,

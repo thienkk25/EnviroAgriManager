@@ -70,7 +70,8 @@ class ProductService {
   }
 
   Future<String?> uploadImageFileProducts(Uint8List image) async {
-    final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final fileName =
+        'Product Images/${DateTime.now().millisecondsSinceEpoch}.jpg';
     try {
       await _supabase.storage
           .from('product-images')
@@ -81,6 +82,14 @@ class ProductService {
       return publicUrl;
     } catch (e) {
       throw Exception('Lỗi upload image products: $e');
+    }
+  }
+
+  Future<void> deleteImageFileProducts(List<String> paths) async {
+    try {
+      await _supabase.storage.from('product-images').remove(paths);
+    } catch (e) {
+      throw Exception('Lỗi delete image products: $e');
     }
   }
 }

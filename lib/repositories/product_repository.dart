@@ -163,4 +163,12 @@ class ProductRepository {
       rethrow;
     }
   }
+
+  Future<void> deleteImageFileProducts(List<String> paths) async {
+    try {
+      await _productService.deleteImageFileProducts(paths);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

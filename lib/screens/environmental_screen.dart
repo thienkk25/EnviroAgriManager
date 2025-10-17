@@ -108,7 +108,6 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                               // ==== Tỉnh ====
                               DropdownButton<String>(
                                 value: _selectedProvince,
-                                hint: Text("Chọn tỉnh"),
                                 dropdownColor: Color(0xFF5E81AC),
                                 style: const TextStyle(
                                   fontFamily: 'Inter',
@@ -122,14 +121,15 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                       style: TextStyle(color: Colors.white),
                                     ),
                                   ),
-                                  ...regionProvider.getMainRegions().map((
-                                    province,
-                                  ) {
-                                    return DropdownMenuItem(
-                                      value: province.id,
-                                      child: Text(province.name),
-                                    );
-                                  }),
+                                  ...(regionProvider.getMainRegions()..sort(
+                                        (a, b) => a.name.compareTo(b.name),
+                                      ))
+                                      .map((province) {
+                                        return DropdownMenuItem(
+                                          value: province.id,
+                                          child: Text(province.name),
+                                        );
+                                      }),
                                 ],
                                 onChanged: (value) {
                                   setState(() {
@@ -145,10 +145,6 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                   ? null
                                   : DropdownButton<String>(
                                       value: _selectedDistrict,
-                                      hint: Text(
-                                        "Chọn xã",
-                                        style: TextStyle(color: Colors.white),
-                                      ),
                                       dropdownColor: Color(0xFF5E81AC),
                                       style: const TextStyle(
                                         fontFamily: 'Inter',
@@ -166,10 +162,13 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                                   ),
                                                 ),
                                               ),
-                                              ...regionProvider
-                                                  .getSubRegions(
+                                              ...(regionProvider.getSubRegions(
                                                     _selectedProvince!,
-                                                  )
+                                                  )..sort(
+                                                    (a, b) => a.name.compareTo(
+                                                      b.name,
+                                                    ),
+                                                  ))
                                                   .map((district) {
                                                     return DropdownMenuItem(
                                                       value: district.id,
@@ -191,10 +190,6 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                   ? null
                                   : DropdownButton<String>(
                                       value: _selectedWard,
-                                      hint: Text(
-                                        "Chọn",
-                                        style: TextStyle(color: Colors.white),
-                                      ),
                                       dropdownColor: Color(0xFF5E81AC),
                                       style: const TextStyle(
                                         fontFamily: 'Inter',
@@ -212,10 +207,13 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                                   ),
                                                 ),
                                               ),
-                                              ...regionProvider
-                                                  .getSubRegions(
+                                              ...(regionProvider.getSubRegions(
                                                     _selectedDistrict!,
-                                                  )
+                                                  )..sort(
+                                                    (a, b) => a.name.compareTo(
+                                                      b.name,
+                                                    ),
+                                                  ))
                                                   .map((ward) {
                                                     return DropdownMenuItem(
                                                       value: ward.id,
@@ -332,7 +330,7 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                         _selectedWard,
                         _selectedTimeRange,
                         context.read<RegionProvider>().regions,
-                      );
+                      )..sort((a, b) => a.location!.compareTo(b.location!));
                   if (filteredEnvimentalData.isEmpty) {
                     return Center(
                       child: Column(
@@ -587,7 +585,7 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                               DropdownButtonFormField<String>(
                                 initialValue: selectedProvince,
                                 decoration: InputDecoration(
-                                  labelText: 'Chọn tỉnh',
+                                  labelText: 'Địa điểm',
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -621,7 +619,7 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                   : DropdownButtonFormField<String>(
                                       initialValue: selectedDistrict,
                                       decoration: InputDecoration(
-                                        labelText: 'Chọn xã',
+                                        labelText: '---',
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(
                                             8,
@@ -656,7 +654,7 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                   : DropdownButtonFormField<String>(
                                       initialValue: selectedWard,
                                       decoration: InputDecoration(
-                                        labelText: '---------',
+                                        labelText: '---',
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(
                                             8,

@@ -447,6 +447,17 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     }
   }
 
+  String getPathImages(String url) {
+    final reg = RegExp(r'product-images/([^?#]+)');
+    final m = reg.firstMatch(url);
+    if (m != null) {
+      final captured = m.group(1);
+      final decoded = Uri.decodeFull(captured!);
+      return decoded;
+    }
+    return '';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -804,6 +815,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       final result = await context.read<ProductProvider>().updateProduct(
         context,
         updatedProduct,
+        getPathImages(_imageUrl),
+        _selectedImage,
       );
       if (!context.mounted) return;
       Navigator.of(context).pop();
