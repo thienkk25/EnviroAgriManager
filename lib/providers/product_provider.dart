@@ -98,7 +98,7 @@ class ProductProvider with ChangeNotifier {
     try {
       final data = product.copyWith(
         imageUrl: image == null
-            ? paths
+            ? product.imageUrl
             : await _productRepository.uploadImageFileProducts(image),
       );
       if (image != null) {
