@@ -137,3 +137,7 @@ UI → Provider → Repository → Service (Supabase RPC)
 1. Vào màn hình "Báo cáo"
 2. Chọn kỳ báo cáo (tuần/tháng/quý/năm)
 3. Xem các biểu đồ cột, tròn và thống kê
+
+## Màn hình
+
+<img src="assets/resultScreen/z7128852965542_003bfceb6c41b0ada257ed5ac6f57d44.jpg" width="200" height="400"> <img src="assets/resultScreen/z7128852975298_09d84fed048cdbeb371cdc55d77f7851.jpg" width="200" height="400"> <img src="assets/resultScreen/z7128852978255_87cec4a9af0f2be9b4ff3aa6c3dd9e6c.jpg" width="200" height="400"> <img src="assets/resultScreen/z7128852985022_bb5a1e43917ebbf4f571a73e286efe09.jpg" width="200" height="400"> <img src="assets/resultScreen/z7128853020463_d915f8670ed60e0343477af0bd1d0cff.jpg" width="200" height="400"> <img src="assets/resultScreen/z7128853027861_36395846b98b1021befcae3e6f9174b6.jpg" width="200" height="400"> <img src="assets/resultScreen/z7128853034565_3aa41be912ad162342d51e70adbadb88.jpg" width="200" height="400"> <img src="assets/resultScreen/z7128853034707_54c0b9fc3b58e4997b6ca31aaa05bd23.jpg" width="200" height="400"> <img src="assets/resultScreen/z7128853034277_870ef268db006078e97c7cc7c066a4a7.jpg" width="200" height="400"> <img src="assets/resultScreen/z7128853042557_b161e6b640ac1debbfc0c7e31b57d985.jpg" width="200" height="400">
