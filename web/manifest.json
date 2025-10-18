@@ -5,7 +5,7 @@
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "",
+    "description": "hệ thống quản lý danh mục điện tử dùng chung ngành Nông nghiệp và Môi trường.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
