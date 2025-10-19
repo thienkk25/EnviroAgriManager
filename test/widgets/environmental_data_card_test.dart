@@ -108,7 +108,7 @@ void main() {
       );
       await widgetTester.pumpAndSettle();
 
-      await widgetTester.tap(find.byType(InkWell));
+      await widgetTester.tap(find.byType(InkWell).first);
       await widgetTester.pump();
 
       expect(onTap, isTrue);

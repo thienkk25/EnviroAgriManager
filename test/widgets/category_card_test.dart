@@ -109,12 +109,12 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap
-      await tester.tap(find.byType(InkWell));
+      await tester.tap(find.byType(InkWell).first);
       await tester.pump();
       expect(tapped, isTrue);
 
       // Long press
-      await tester.longPress(find.byType(InkWell));
+      await tester.longPress(find.byType(InkWell).first);
       await tester.pump();
       expect(longPressed, isTrue);
     });
