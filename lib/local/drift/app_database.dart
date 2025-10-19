@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:enviro_agri_manager/local/drift/daos/category_dao.dart';
 import 'package:enviro_agri_manager/local/drift/daos/environmental_data_dao.dart';
@@ -17,6 +18,9 @@ part 'app_database.g.dart';
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
+
+  // Dùng cho unit test
+  AppDatabase.forTesting() : super(NativeDatabase.memory());
 
   @override
   int get schemaVersion => 1;
