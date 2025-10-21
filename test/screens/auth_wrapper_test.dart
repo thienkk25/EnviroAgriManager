@@ -1,3 +1,4 @@
+import 'package:enviro_agri_manager/config/supabase_config.dart';
 import 'package:enviro_agri_manager/providers/auth_provider.dart';
 import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
 import 'package:enviro_agri_manager/services/auth_service.dart';
@@ -60,8 +61,8 @@ void main() {
 
   setUpAll(() async {
     await Supabase.initialize(
-      url: 'https://fake.supabase.co',
-      anonKey: 'fake-key',
+      url: SupabaseConfig.supabaseUrl,
+      anonKey: SupabaseConfig.supabaseAnonKey,
     );
   });
 

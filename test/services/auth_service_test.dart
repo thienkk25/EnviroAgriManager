@@ -1,3 +1,4 @@
+import 'package:enviro_agri_manager/config/supabase_config.dart';
 import 'package:enviro_agri_manager/models/user_role_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:enviro_agri_manager/services/auth_service.dart';
@@ -25,10 +26,9 @@ void main() {
   late MockGoTrueClient mockAuthClient;
 
   setUpAll(() async {
-    // Chỉ initialize Supabase một lần duy nhất
     await Supabase.initialize(
-      url: 'https://fake.supabase.co',
-      anonKey: 'fake-key',
+      url: SupabaseConfig.supabaseUrl,
+      anonKey: SupabaseConfig.supabaseAnonKey,
     );
     registerFallbackValue(FakeUserAttributes());
   });
