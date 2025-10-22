@@ -1209,6 +1209,7 @@ class _OverviewCard extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1232,6 +1233,7 @@ class _OverviewCard extends StatelessWidget {
               fontWeight: FontWeight.bold,
               color: Color(0xFF2E3440),
             ),
+            overflow: TextOverflow.ellipsis,
           ),
           Text(
             title,
@@ -1240,6 +1242,7 @@ class _OverviewCard extends StatelessWidget {
               fontSize: 12,
               color: Color(0xFF88C0D0),
             ),
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

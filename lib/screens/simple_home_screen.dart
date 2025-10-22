@@ -331,6 +331,7 @@ class _FeatureCard extends StatelessWidget {
               fontWeight: FontWeight.w600,
               color: Color(0xFF2E3440),
             ),
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
           Text(
@@ -340,6 +341,7 @@ class _FeatureCard extends StatelessWidget {
               fontSize: 12,
               color: Color(0xFF88C0D0),
             ),
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
