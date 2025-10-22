@@ -12,7 +12,7 @@ class SettingsProvider with ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.light;
   ThemeMode get themeMode => _themeMode;
 
-  int _secondSync = 300;
+  int _secondSync = 900;
   int get secondSync => _secondSync;
 
   SettingsProvider() {
@@ -26,7 +26,7 @@ class SettingsProvider with ChangeNotifier {
     final mode = _appPrefs.getThemeMode() ?? 'light';
     _themeMode = mode == 'dark' ? ThemeMode.dark : ThemeMode.light;
 
-    final second = _appPrefs.getScheduleAutoSyncData() ?? 300;
+    final second = _appPrefs.getScheduleAutoSyncData() ?? 900;
     _secondSync = second;
 
     notifyListeners();

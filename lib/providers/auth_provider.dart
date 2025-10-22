@@ -42,7 +42,7 @@ class AuthProvider with ChangeNotifier {
     _isOfflineMode = _connectivityProvider.isOnline;
 
     if (_isOfflineMode) {
-      // 🔹 Offline: load user từ local cache
+      // Offline: load user từ local cache
       final cached = _appPrefs.getCachedUser();
       if (cached['id'] != null) {
         _user = User(
@@ -56,7 +56,7 @@ class AuthProvider with ChangeNotifier {
         _userRole = UserRoleModel.fromString(cached['role']!);
       }
     } else {
-      // 🔹 Online: load từ Supabase
+      // Online: load từ Supabase
       _user = _authService.currentUser;
       await _loadUserRole();
       if (_user != null) {
