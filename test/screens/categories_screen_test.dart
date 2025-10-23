@@ -20,7 +20,8 @@ class FakeCategoryProvider extends CategoryProvider {
   final List<CategoryModel> data;
   FakeCategoryProvider(super.categoryRepository, this.data);
   @override
-  Future<void> fetchCategories(BuildContext context) async {}
+  Future<void> fetchCategories(bool isOnline) async {}
+
   @override
   List<CategoryModel> get categories => data;
 

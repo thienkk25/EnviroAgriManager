@@ -28,18 +28,21 @@ class FakeProductProvider extends ProductProvider {
   final List<ProductModel> prod;
   FakeProductProvider(super.productRepository, this.prod);
   @override
-  Future<void> fetchProducts(BuildContext context) async {}
+  Future<void> fetchProducts(bool isOnline) async {}
   @override
   List<ProductModel> get products => prod;
 
   @override
-  Map<String, double> getTrendByCategory(BuildContext context, String type) {
+  Map<String, double> getTrendByCategory(
+    List<CategoryModel> categories,
+    String type,
+  ) {
     return {'Cây công nghiệp': 200, 'Rau ăn quả': 100};
   }
 
   @override
   Map<String, double> getCategoryDistributionData(
-    BuildContext context,
+    List<CategoryModel> categories,
     String type,
   ) {
     return {'Cây công nghiệp': 200, 'Rau ăn quả': 100};
@@ -50,7 +53,7 @@ class FakeEnvironmentalDataProvider extends EnvironmentalDataProvider {
   final List<EnvironmentalDataModel> envr;
   FakeEnvironmentalDataProvider(super.environmentalDataRepository, this.envr);
   @override
-  Future<void> fetchEnvironmentalData(BuildContext context) async {}
+  Future<void> fetchEnvironmentalData(bool isOnline) async {}
 
   @override
   List<EnvironmentalDataModel> get environmentalData => envr;
@@ -76,7 +79,7 @@ class FakeCategoryProvider extends CategoryProvider {
   final List<CategoryModel> categ;
   FakeCategoryProvider(super.categoryRepository, this.categ);
   @override
-  Future<void> fetchCategories(BuildContext context) async {}
+  Future<void> fetchCategories(bool isOnline) async {}
   @override
   List<CategoryModel> get categories => categ;
 

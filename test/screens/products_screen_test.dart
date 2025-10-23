@@ -24,7 +24,7 @@ class FakeProductProvider extends ProductProvider {
   final List<ProductModel> prod;
   FakeProductProvider(super.productRepository, this.prod);
   @override
-  Future<void> fetchProducts(BuildContext context) async {}
+  Future<void> fetchProducts(bool isOnline) async {}
   @override
   List<ProductModel> get products => prod;
 }
@@ -33,7 +33,7 @@ class FakeCategoryProvider extends CategoryProvider {
   final List<CategoryModel> categ;
   FakeCategoryProvider(super.categoryRepository, this.categ);
   @override
-  Future<void> fetchCategories(BuildContext context) async {}
+  Future<void> fetchCategories(bool isOnline) async {}
   @override
   List<CategoryModel> get categories => categ;
 

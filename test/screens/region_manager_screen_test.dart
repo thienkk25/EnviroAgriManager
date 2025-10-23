@@ -19,7 +19,7 @@ class FakeRegionProvider extends RegionProvider {
   final List<RegionModel> regi;
   FakeRegionProvider(super.regionRepository, this.regi);
   @override
-  Future<void> fetchRegions(BuildContext context) async {}
+  Future<void> fetchRegions(bool isOnline) async {}
 
   @override
   List<RegionModel> get regions => regi;

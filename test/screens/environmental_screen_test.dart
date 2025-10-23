@@ -24,7 +24,7 @@ class FakeEnvironmentalDataProvider extends EnvironmentalDataProvider {
   final List<EnvironmentalDataModel> envr;
   FakeEnvironmentalDataProvider(super.environmentalDataRepository, this.envr);
   @override
-  Future<void> fetchEnvironmentalData(BuildContext context) async {}
+  Future<void> fetchEnvironmentalData(bool isOnline) async {}
 
   @override
   List<EnvironmentalDataModel> get environmentalData => envr;
@@ -45,7 +45,7 @@ class FakeRegionProvider extends RegionProvider {
   final List<RegionModel> regi;
   FakeRegionProvider(super.regionRepository, this.regi);
   @override
-  Future<void> fetchRegions(BuildContext context) async {}
+  Future<void> fetchRegions(bool isOnline) async {}
 
   @override
   List<RegionModel> get regions => regi;

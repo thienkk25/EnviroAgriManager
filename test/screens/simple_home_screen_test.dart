@@ -17,7 +17,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class FakeProductProvider extends ProductProvider {
   FakeProductProvider(super.productRepository);
   @override
-  Future<void> fetchProducts(BuildContext context) async {}
+  Future<void> fetchProducts(bool isOnline) async {}
   @override
   List<ProductModel> get products => [];
 }
