@@ -15,8 +15,13 @@ class SettingsProvider with ChangeNotifier {
   int _secondSync = 900;
   int get secondSync => _secondSync;
 
-  SettingsProvider() {
-    _init();
+  SettingsProvider({SharedPreferences? prefs, AppPreferences? appPrefs}) {
+    if (prefs != null && appPrefs != null) {
+      _prefs = prefs;
+      _appPrefs = appPrefs;
+    } else {
+      _init();
+    }
   }
 
   Future<void> _init() async {

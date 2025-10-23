@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:enviro_agri_manager/models/product_model.dart';
 import 'package:enviro_agri_manager/providers/category_provider.dart';
+import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
 import 'package:enviro_agri_manager/providers/product_provider.dart';
 import 'package:enviro_agri_manager/widgets/category_selector.dart';
 import 'package:enviro_agri_manager/widgets/product_card.dart';
@@ -28,8 +29,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ProductProvider>().fetchProducts(context);
-      context.read<CategoryProvider>().fetchCategories(context);
+      context.read<ProductProvider>().fetchProducts(
+        context.read<ConnectivityProvider>().isOnline,
+      );
+      context.read<CategoryProvider>().fetchCategories(
+        context.read<ConnectivityProvider>().isOnline,
+      );
     });
   }
 
@@ -51,8 +56,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () =>
-                context.read<ProductProvider>().refreshProducts(context),
+            onPressed: () => context.read<ProductProvider>().refreshProducts(
+              context.read<ConnectivityProvider>().isOnline,
+            ),
           ),
         ],
       ),
@@ -176,8 +182,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           ),
                           const SizedBox(height: 16),
                           ElevatedButton(
-                            onPressed: () =>
-                                productProvider.fetchProducts(context),
+                            onPressed: () => productProvider.fetchProducts(
+                              context.read<ConnectivityProvider>().isOnline,
+                            ),
                             child: const Text('Thử lại'),
                           ),
                         ],
@@ -242,7 +249,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   }
 
                   return RefreshIndicator(
-                    onRefresh: () => productProvider.refreshProducts(context),
+                    onRefresh: () => productProvider.refreshProducts(
+                      context.read<ConnectivityProvider>().isOnline,
+                    ),
                     child: ListView.builder(
                       padding: const EdgeInsets.all(16),
                       itemCount: filteredProducts.length,
@@ -333,7 +342,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
               onPressed: () async {
                 final result = await context
                     .read<ProductProvider>()
-                    .deleteProduct(context, product.id);
+                    .deleteProduct(
+                      context.read<ConnectivityProvider>().isOnline,
+                      product.id,
+                    );
                 if (!context.mounted) return;
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -775,7 +787,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       );
 
       final result = await context.read<ProductProvider>().addProduct(
-        context,
+        context.read<ConnectivityProvider>().isOnline,
         product,
         _selectedImage,
       );
@@ -813,7 +825,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       );
 
       final result = await context.read<ProductProvider>().updateProduct(
-        context,
+        context.read<ConnectivityProvider>().isOnline,
         updatedProduct,
         getPathImages(_imageUrl),
         _selectedImage,

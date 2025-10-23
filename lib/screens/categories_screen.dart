@@ -1,6 +1,7 @@
 import 'package:enviro_agri_manager/models/category_model.dart';
 import 'package:enviro_agri_manager/providers/category_provider.dart';
 import 'package:enviro_agri_manager/config/app_constants.dart';
+import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
 import 'package:enviro_agri_manager/widgets/category_card.dart';
 import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<CategoryProvider>().fetchCategories(context);
+      context.read<CategoryProvider>().fetchCategories(
+        context.read<ConnectivityProvider>().isOnline,
+      );
     });
     super.initState();
   }
@@ -69,14 +72,16 @@ class CategoryScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () =>
-                context.read<CategoryProvider>().refreshCategories(context),
+            onPressed: () => context.read<CategoryProvider>().refreshCategories(
+              context.read<ConnectivityProvider>().isOnline,
+            ),
           ),
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () =>
-            context.read<CategoryProvider>().refreshCategories(context),
+        onRefresh: () => context.read<CategoryProvider>().refreshCategories(
+          context.read<ConnectivityProvider>().isOnline,
+        ),
         child: subCategories.isEmpty
             ? const Center(child: Text('Không có danh mục'))
             : Container(
@@ -108,8 +113,9 @@ class CategoryScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 16),
                             ElevatedButton(
-                              onPressed: () =>
-                                  categoryProvider.fetchCategories(context),
+                              onPressed: () => categoryProvider.fetchCategories(
+                                context.read<ConnectivityProvider>().isOnline,
+                              ),
                               child: const Text('Thử lại'),
                             ),
                           ],
@@ -446,7 +452,10 @@ class CategoryScreen extends StatelessWidget {
                           );
                           final result = await context
                               .read<CategoryProvider>()
-                              .addCategory(context, newCategory);
+                              .addCategory(
+                                context.read<ConnectivityProvider>().isOnline,
+                                newCategory,
+                              );
                           if (!context.mounted) return;
                           Navigator.of(context).pop();
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -474,7 +483,10 @@ class CategoryScreen extends StatelessWidget {
                               );
                           final result = await context
                               .read<CategoryProvider>()
-                              .updateCategory(context, updateCategory);
+                              .updateCategory(
+                                context.read<ConnectivityProvider>().isOnline,
+                                updateCategory,
+                              );
                           if (!context.mounted) return;
                           Navigator.of(context).pop();
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -540,7 +552,10 @@ class CategoryScreen extends StatelessWidget {
               onPressed: () async {
                 final result = await context
                     .read<CategoryProvider>()
-                    .deleteCategory(context, category.id);
+                    .deleteCategory(
+                      context.read<ConnectivityProvider>().isOnline,
+                      category.id,
+                    );
                 if (!context.mounted) return;
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(

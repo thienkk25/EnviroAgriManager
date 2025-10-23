@@ -1,8 +1,6 @@
 import 'package:enviro_agri_manager/models/region_model.dart';
-import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
 import 'package:enviro_agri_manager/repositories/region_repository.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class RegionProvider with ChangeNotifier {
   RegionRepository _regionRepository;
@@ -20,11 +18,10 @@ class RegionProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String get error => _error;
 
-  Future<void> fetchRegions(BuildContext context) async {
+  Future<void> fetchRegions(bool isOnline) async {
     _isLoading = true;
     _error = '';
     notifyListeners();
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
       _regions = await _regionRepository.syncRegions(isOnline: isOnline);
     } catch (e) {
@@ -35,8 +32,7 @@ class RegionProvider with ChangeNotifier {
     }
   }
 
-  Future<void> refreshRegions(BuildContext context) async {
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
+  Future<void> refreshRegions(bool isOnline) async {
     try {
       _regions = await _regionRepository.syncRegions(isOnline: isOnline);
 
@@ -48,10 +44,9 @@ class RegionProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> addRegion(BuildContext context, RegionModel region) async {
+  Future<bool> addRegion(bool isOnline, RegionModel region) async {
     _isLoading = true;
     notifyListeners();
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
       await _regionRepository.add(region, isOnline: isOnline);
       _regions.add(region);
@@ -67,13 +62,12 @@ class RegionProvider with ChangeNotifier {
   }
 
   Future<bool> updateRegion(
-    BuildContext context,
+    bool isOnline,
     RegionModel region,
     bool level,
   ) async {
     _isLoading = true;
     notifyListeners();
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
       await _regionRepository.update(region, level, isOnline: isOnline);
 
@@ -92,10 +86,9 @@ class RegionProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> deleteRegion(BuildContext context, String id) async {
+  Future<bool> deleteRegion(bool isOnline, String id) async {
     _isLoading = true;
     notifyListeners();
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
       await _regionRepository.delete(id, isOnline: isOnline);
 

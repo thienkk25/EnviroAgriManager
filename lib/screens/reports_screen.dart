@@ -1,5 +1,6 @@
 import 'package:enviro_agri_manager/models/environmental_data_model.dart';
 import 'package:enviro_agri_manager/providers/category_provider.dart';
+import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
 import 'package:enviro_agri_manager/providers/environmental_data_provider.dart';
 import 'package:enviro_agri_manager/providers/product_provider.dart';
 import 'package:flutter/material.dart';
@@ -24,20 +25,25 @@ class _ReportsScreenState extends State<ReportsScreen> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await context.read<ProductProvider>().fetchProducts(context);
+      await context.read<ProductProvider>().fetchProducts(
+        context.read<ConnectivityProvider>().isOnline,
+      );
       if (!mounted) return;
       await context.read<EnvironmentalDataProvider>().fetchEnvironmentalData(
-        context,
+        context.read<ConnectivityProvider>().isOnline,
       );
 
       setState(() {
         _trendData = context.read<ProductProvider>().getTrendByCategory(
-          context,
+          context.read<CategoryProvider>().categories,
           _selectedPeriod,
         );
         _categoryData = context
             .read<ProductProvider>()
-            .getCategoryDistributionData(context, _selectedPeriod);
+            .getCategoryDistributionData(
+              context.read<CategoryProvider>().categories,
+              _selectedPeriod,
+            );
         _environmentalData = context
             .read<EnvironmentalDataProvider>()
             .getEnvironmentalDataByTime(_selectedPeriod);
@@ -47,21 +53,30 @@ class _ReportsScreenState extends State<ReportsScreen> {
   }
 
   Future<void> refreshData() async {
-    await context.read<ProductProvider>().fetchProducts(context);
+    await context.read<ProductProvider>().fetchProducts(
+      context.read<ConnectivityProvider>().isOnline,
+    );
     if (!mounted) return;
     await context.read<EnvironmentalDataProvider>().fetchEnvironmentalData(
-      context,
+      context.read<ConnectivityProvider>().isOnline,
     );
     setState(() {
-      context.read<ProductProvider>().fetchProducts(context);
-      context.read<EnvironmentalDataProvider>().fetchEnvironmentalData(context);
+      context.read<ProductProvider>().fetchProducts(
+        context.read<ConnectivityProvider>().isOnline,
+      );
+      context.read<EnvironmentalDataProvider>().fetchEnvironmentalData(
+        context.read<ConnectivityProvider>().isOnline,
+      );
       _trendData = context.read<ProductProvider>().getTrendByCategory(
-        context,
+        context.read<CategoryProvider>().categories,
         _selectedPeriod,
       );
       _categoryData = context
           .read<ProductProvider>()
-          .getCategoryDistributionData(context, _selectedPeriod);
+          .getCategoryDistributionData(
+            context.read<CategoryProvider>().categories,
+            _selectedPeriod,
+          );
       _environmentalData = context
           .read<EnvironmentalDataProvider>()
           .getEnvironmentalDataByTime(_selectedPeriod);

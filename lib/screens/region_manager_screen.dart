@@ -1,4 +1,5 @@
 import 'package:enviro_agri_manager/models/region_model.dart';
+import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
 import 'package:enviro_agri_manager/providers/region_provider.dart';
 import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,9 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<RegionProvider>().fetchRegions(context);
+      context.read<RegionProvider>().fetchRegions(
+        context.read<ConnectivityProvider>().isOnline,
+      );
     });
     super.initState();
   }
@@ -113,7 +116,9 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
                               ElevatedButton(
                                 onPressed: () async {
                                   final result = await provider.deleteRegion(
-                                    context,
+                                    context
+                                        .read<ConnectivityProvider>()
+                                        .isOnline,
                                     child.id,
                                   );
                                   if (!context.mounted) return;
@@ -168,13 +173,16 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () =>
-                context.read<RegionProvider>().refreshRegions(context),
+            onPressed: () => context.read<RegionProvider>().refreshRegions(
+              context.read<ConnectivityProvider>().isOnline,
+            ),
           ),
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () => context.read<RegionProvider>().refreshRegions(context),
+        onRefresh: () => context.read<RegionProvider>().refreshRegions(
+          context.read<ConnectivityProvider>().isOnline,
+        ),
         child: Consumer<RegionProvider>(
           builder: (context, regionProvider, child) {
             if (regionProvider.isLoading) {
@@ -202,7 +210,9 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: () => regionProvider.fetchRegions(context),
+                      onPressed: () => regionProvider.fetchRegions(
+                        context.read<ConnectivityProvider>().isOnline,
+                      ),
                       child: const Text('Thử lại'),
                     ),
                   ],
@@ -469,7 +479,10 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
                       );
                       final result = await context
                           .read<RegionProvider>()
-                          .addRegion(context, newRegion);
+                          .addRegion(
+                            context.read<ConnectivityProvider>().isOnline,
+                            newRegion,
+                          );
                       if (!context.mounted) return;
                       Navigator.pop(ctx);
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -496,11 +509,19 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
                       if (selectedLocationFirstLevel == null) {
                         result = await context
                             .read<RegionProvider>()
-                            .updateRegion(context, newRegion, true);
+                            .updateRegion(
+                              context.read<ConnectivityProvider>().isOnline,
+                              newRegion,
+                              true,
+                            );
                       } else {
                         result = await context
                             .read<RegionProvider>()
-                            .updateRegion(context, newRegion, false);
+                            .updateRegion(
+                              context.read<ConnectivityProvider>().isOnline,
+                              newRegion,
+                              false,
+                            );
                       }
 
                       if (!context.mounted) return;

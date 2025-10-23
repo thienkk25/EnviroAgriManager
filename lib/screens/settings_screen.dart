@@ -1,6 +1,7 @@
 import 'package:enviro_agri_manager/models/user_role_model.dart';
 import 'package:enviro_agri_manager/providers/auth_provider.dart';
 import 'package:enviro_agri_manager/providers/category_provider.dart';
+import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
 import 'package:enviro_agri_manager/providers/environmental_data_provider.dart';
 import 'package:enviro_agri_manager/providers/product_provider.dart';
 import 'package:enviro_agri_manager/providers/region_provider.dart';
@@ -31,12 +32,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (!kIsWeb) {
         context.read<SettingsProvider>().scheduleAutoSyncData(() async {
           await Future.wait([
-            context.read<ProductProvider>().refreshProducts(context),
-            context.read<CategoryProvider>().refreshCategories(context),
-            context.read<EnvironmentalDataProvider>().refreshEnvironmentalData(
-              context,
+            context.read<ProductProvider>().refreshProducts(
+              context.read<ConnectivityProvider>().isOnline,
             ),
-            context.read<RegionProvider>().refreshRegions(context),
+            context.read<CategoryProvider>().refreshCategories(
+              context.read<ConnectivityProvider>().isOnline,
+            ),
+            context.read<EnvironmentalDataProvider>().refreshEnvironmentalData(
+              context.read<ConnectivityProvider>().isOnline,
+            ),
+            context.read<RegionProvider>().refreshRegions(
+              context.read<ConnectivityProvider>().isOnline,
+            ),
           ]);
         }, context.read<SettingsProvider>().secondSync);
       }
@@ -554,12 +561,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
               if (!kIsWeb) {
                 context.read<SettingsProvider>().scheduleAutoSyncData(() async {
                   await Future.wait([
-                    context.read<ProductProvider>().refreshProducts(context),
-                    context.read<CategoryProvider>().refreshCategories(context),
+                    context.read<ProductProvider>().refreshProducts(
+                      context.read<ConnectivityProvider>().isOnline,
+                    ),
+                    context.read<CategoryProvider>().refreshCategories(
+                      context.read<ConnectivityProvider>().isOnline,
+                    ),
                     context
                         .read<EnvironmentalDataProvider>()
-                        .refreshEnvironmentalData(context),
-                    context.read<RegionProvider>().refreshRegions(context),
+                        .refreshEnvironmentalData(
+                          context.read<ConnectivityProvider>().isOnline,
+                        ),
+                    context.read<RegionProvider>().refreshRegions(
+                      context.read<ConnectivityProvider>().isOnline,
+                    ),
                   ]);
                 }, _selectedSync);
               }

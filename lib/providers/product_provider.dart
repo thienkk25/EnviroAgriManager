@@ -1,11 +1,9 @@
 import 'dart:typed_data';
 
+import 'package:enviro_agri_manager/models/category_model.dart';
 import 'package:enviro_agri_manager/models/product_model.dart';
-import 'package:enviro_agri_manager/providers/category_provider.dart';
-import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
 import 'package:enviro_agri_manager/repositories/product_repository.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class ProductProvider with ChangeNotifier {
   ProductRepository _productRepository;
@@ -25,11 +23,10 @@ class ProductProvider with ChangeNotifier {
   String get error => _error;
 
   // Lấy danh sách sản phẩm
-  Future<void> fetchProducts(BuildContext context) async {
+  Future<void> fetchProducts(bool isOnline) async {
     _isLoading = true;
     _error = '';
     notifyListeners();
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
       _products = await _productRepository.syncProducts(isOnline: isOnline);
     } catch (e) {
@@ -40,14 +37,13 @@ class ProductProvider with ChangeNotifier {
     }
   }
 
-  Future<void> refreshProducts(BuildContext context) async {
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
+  Future<void> refreshProducts(bool isOnline) async {
     try {
       _products = await _productRepository.syncProducts(isOnline: isOnline);
 
       _error = '';
     } catch (e) {
-      _error = 'Lỗi khi tải danh sách danh mục: ${e.toString()}';
+      _error = 'Lỗi khi tải danh sách: ${e.toString()}';
     } finally {
       notifyListeners();
     }
@@ -55,13 +51,12 @@ class ProductProvider with ChangeNotifier {
 
   // Thêm sản phẩm mới
   Future<bool> addProduct(
-    BuildContext context,
+    bool isOnline,
     ProductModel product,
     Uint8List? image,
   ) async {
     _isLoading = true;
     notifyListeners();
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
       final data = product.copyWith(
         imageUrl: image == null
@@ -73,11 +68,8 @@ class ProductProvider with ChangeNotifier {
       _error = '';
       return true;
     } catch (e) {
-      if (e.toString().contains('Không thể thêm/cập nhật')) {
-        _error = 'Danh mục này đang tạm dừng, không thể thêm sản phẩm!';
-      } else {
-        _error = 'Lỗi khi thêm sản phẩm: ${e.toString()}';
-      }
+      _error = 'Lỗi khi thêm sản phẩm: ${e.toString()}';
+
       return false;
     } finally {
       _isLoading = false;
@@ -87,14 +79,13 @@ class ProductProvider with ChangeNotifier {
 
   // Cập nhật sản phẩm
   Future<bool> updateProduct(
-    BuildContext context,
+    bool isOnline,
     ProductModel product,
     String paths,
     Uint8List? image,
   ) async {
     _isLoading = true;
     notifyListeners();
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
       final data = product.copyWith(
         imageUrl: image == null
@@ -112,11 +103,8 @@ class ProductProvider with ChangeNotifier {
       _error = '';
       return true;
     } catch (e) {
-      if (e.toString().contains('Không thể thêm/cập nhật')) {
-        _error = 'Danh mục này đang tạm dừng, không thể cập nhật sản phẩm!';
-      } else {
-        _error = 'Lỗi khi cập nhật sản phẩm: ${e.toString()}';
-      }
+      _error = 'Lỗi khi cập nhật sản phẩm: ${e.toString()}';
+
       return false;
     } finally {
       _isLoading = false;
@@ -125,10 +113,10 @@ class ProductProvider with ChangeNotifier {
   }
 
   // Xóa sản phẩm
-  Future<bool> deleteProduct(BuildContext context, String productId) async {
+  Future<bool> deleteProduct(bool isOnline, String productId) async {
     _isLoading = true;
     notifyListeners();
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
+
     try {
       await _productRepository.delete(productId, isOnline: isOnline);
       _products.removeWhere((product) => product.id == productId);
@@ -213,14 +201,17 @@ class ProductProvider with ChangeNotifier {
   }
 
   // Procuct theo category
-  Map<String, double> getTrendByCategory(BuildContext context, String type) {
+  Map<String, double> getTrendByCategory(
+    List<CategoryModel> categories,
+    String type,
+  ) {
     final Map<String, double> result = {};
 
     for (var p in _products.where((p) => p.status == 'active')) {
       String key;
-      final categoryName = context.read<CategoryProvider>().getCategoryName(
-        p.categoryId,
-      );
+      final categoryName = categories
+          .firstWhere((category) => category.id == p.categoryId)
+          .name;
 
       switch (type) {
         case 'week':
@@ -254,7 +245,7 @@ class ProductProvider with ChangeNotifier {
 
   // Get category distribution data from products
   Map<String, double> getCategoryDistributionData(
-    BuildContext context,
+    List<CategoryModel> categories,
     String type,
   ) {
     final Map<String, double> categoryMap = {};
@@ -262,9 +253,10 @@ class ProductProvider with ChangeNotifier {
     for (var product in _products.where((p) => p.status == 'active')) {
       String key;
       final categoryId = product.categoryId;
-      final categoryName = context.read<CategoryProvider>().getCategoryName(
-        categoryId,
-      );
+
+      final categoryName = categories
+          .firstWhere((category) => category.id == categoryId)
+          .name;
 
       switch (type) {
         case 'week':

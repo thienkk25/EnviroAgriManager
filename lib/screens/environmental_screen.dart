@@ -1,4 +1,5 @@
 import 'package:enviro_agri_manager/models/environmental_data_model.dart';
+import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
 import 'package:enviro_agri_manager/providers/environmental_data_provider.dart';
 import 'package:enviro_agri_manager/providers/region_provider.dart';
 import 'package:enviro_agri_manager/screens/region_manager_screen.dart';
@@ -21,8 +22,12 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<EnvironmentalDataProvider>().fetchEnvironmentalData(context);
-      context.read<RegionProvider>().fetchRegions(context);
+      context.read<EnvironmentalDataProvider>().fetchEnvironmentalData(
+        context.read<ConnectivityProvider>().isOnline,
+      );
+      context.read<RegionProvider>().fetchRegions(
+        context.read<ConnectivityProvider>().isOnline,
+      );
     });
 
     super.initState();
@@ -316,7 +321,9 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                           const SizedBox(height: 16),
                           ElevatedButton(
                             onPressed: () => environmentalDataProvider
-                                .fetchEnvironmentalData(context),
+                                .fetchEnvironmentalData(
+                                  context.read<ConnectivityProvider>().isOnline,
+                                ),
                             child: const Text('Thử lại'),
                           ),
                         ],
@@ -363,8 +370,10 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                     );
                   }
                   return RefreshIndicator(
-                    onRefresh: () => environmentalDataProvider
-                        .refreshEnvironmentalData(context),
+                    onRefresh: () =>
+                        environmentalDataProvider.refreshEnvironmentalData(
+                          context.read<ConnectivityProvider>().isOnline,
+                        ),
                     child: ListView.builder(
                       padding: const EdgeInsets.all(16),
                       itemCount: filteredEnvimentalData.length,
@@ -414,7 +423,9 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                       final result = await context
                                           .read<EnvironmentalDataProvider>()
                                           .deleteEnvironmentalData(
-                                            context,
+                                            context
+                                                .read<ConnectivityProvider>()
+                                                .isOnline,
                                             filteredEnvimentalData[index].id,
                                           );
 
@@ -986,7 +997,9 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                               final result = await context
                                   .read<EnvironmentalDataProvider>()
                                   .addEnvironmentalData(
-                                    context,
+                                    context
+                                        .read<ConnectivityProvider>()
+                                        .isOnline,
                                     newEnvironmentalData,
                                   );
                               if (!context.mounted) return;
@@ -1058,7 +1071,9 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                               final result = await context
                                   .read<EnvironmentalDataProvider>()
                                   .updateEnvironmentalData(
-                                    context,
+                                    context
+                                        .read<ConnectivityProvider>()
+                                        .isOnline,
                                     newEnvironmentalData,
                                   );
                               if (!context.mounted) return;

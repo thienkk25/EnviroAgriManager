@@ -1,8 +1,6 @@
 import 'package:enviro_agri_manager/models/category_model.dart';
-import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
 import 'package:enviro_agri_manager/repositories/category_repository.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class CategoryProvider with ChangeNotifier {
   CategoryRepository _categoryRepository;
@@ -21,12 +19,11 @@ class CategoryProvider with ChangeNotifier {
   }
 
   // Lấy danh sách danh mục
-  Future<void> fetchCategories(BuildContext context) async {
+  Future<void> fetchCategories(bool isOnline) async {
     _isLoading = true;
     _error = '';
     notifyListeners();
 
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
       _categories = await _categoryRepository.syncCategories(
         isOnline: isOnline,
@@ -40,8 +37,7 @@ class CategoryProvider with ChangeNotifier {
   }
 
   // Làm mới danh sách danh mục
-  Future<void> refreshCategories(BuildContext context) async {
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
+  Future<void> refreshCategories(bool isOnline) async {
     try {
       _categories = await _categoryRepository.syncCategories(
         isOnline: isOnline,
@@ -56,11 +52,10 @@ class CategoryProvider with ChangeNotifier {
   }
 
   // Thêm danh mục mới
-  Future<bool> addCategory(BuildContext context, CategoryModel category) async {
+  Future<bool> addCategory(bool isOnline, CategoryModel category) async {
     _isLoading = true;
     notifyListeners();
 
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
       await _categoryRepository.add(category, isOnline: isOnline);
       _categories.add(category);
@@ -76,14 +71,10 @@ class CategoryProvider with ChangeNotifier {
   }
 
   // Cập nhật danh mục
-  Future<bool> updateCategory(
-    BuildContext context,
-    CategoryModel category,
-  ) async {
+  Future<bool> updateCategory(bool isOnline, CategoryModel category) async {
     _isLoading = true;
     notifyListeners();
 
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
       await _categoryRepository.update(category, isOnline: isOnline);
 
@@ -103,11 +94,10 @@ class CategoryProvider with ChangeNotifier {
   }
 
   // Xóa danh mục
-  Future<bool> deleteCategory(BuildContext context, String id) async {
+  Future<bool> deleteCategory(bool isOnline, String id) async {
     _isLoading = true;
     notifyListeners();
 
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
       await _categoryRepository.delete(id, isOnline: isOnline);
 

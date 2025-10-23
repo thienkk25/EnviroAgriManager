@@ -1,9 +1,7 @@
 import 'package:enviro_agri_manager/models/environmental_data_model.dart';
 import 'package:enviro_agri_manager/models/region_model.dart';
-import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
 import 'package:enviro_agri_manager/repositories/environmental_data_repository.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class EnvironmentalDataProvider with ChangeNotifier {
   EnvironmentalDataRepository _environmentalDataRepository;
@@ -23,31 +21,29 @@ class EnvironmentalDataProvider with ChangeNotifier {
   }
 
   // Lấy danh sách môi trường
-  Future<void> fetchEnvironmentalData(BuildContext context) async {
+  Future<void> fetchEnvironmentalData(bool isOnline) async {
     _isLoading = true;
     _error = '';
     notifyListeners();
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
       _environmentalData = await _environmentalDataRepository
           .syncEnvironmentalData(isOnline: isOnline);
     } catch (e) {
-      _error = 'Lỗi khi tải danh sách danh mục: ${e.toString()}';
+      _error = 'Lỗi khi tải: ${e.toString()}';
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> refreshEnvironmentalData(BuildContext context) async {
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
+  Future<void> refreshEnvironmentalData(bool isOnline) async {
     try {
       _environmentalData = await _environmentalDataRepository
           .syncEnvironmentalData(isOnline: isOnline);
 
       _error = '';
     } catch (e) {
-      _error = 'Lỗi khi tải danh sách danh mục: ${e.toString()}';
+      _error = 'Lỗi khi tải: ${e.toString()}';
     } finally {
       notifyListeners();
     }
@@ -55,12 +51,11 @@ class EnvironmentalDataProvider with ChangeNotifier {
 
   // Thêm môi trường mới
   Future<bool> addEnvironmentalData(
-    BuildContext context,
+    bool isOnline,
     EnvironmentalDataModel environmentalData,
   ) async {
     _isLoading = true;
     notifyListeners();
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
       await _environmentalDataRepository.add(
         environmentalData,
@@ -70,7 +65,7 @@ class EnvironmentalDataProvider with ChangeNotifier {
       _error = '';
       return true;
     } catch (e) {
-      _error = 'Lỗi khi thêm danh mục: ${e.toString()}';
+      _error = 'Lỗi khi thêm: ${e.toString()}';
       return false;
     } finally {
       _isLoading = false;
@@ -80,12 +75,11 @@ class EnvironmentalDataProvider with ChangeNotifier {
 
   // Cập nhật môi trường
   Future<bool> updateEnvironmentalData(
-    BuildContext context,
+    bool isOnline,
     EnvironmentalDataModel environmentalData,
   ) async {
     _isLoading = true;
     notifyListeners();
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
       await _environmentalDataRepository.update(
         environmentalData,
@@ -101,7 +95,7 @@ class EnvironmentalDataProvider with ChangeNotifier {
       _error = '';
       return true;
     } catch (e) {
-      _error = 'Lỗi khi cập nhật danh mục: ${e.toString()}';
+      _error = 'Lỗi khi cập nhật: ${e.toString()}';
       return false;
     } finally {
       _isLoading = false;
@@ -110,10 +104,9 @@ class EnvironmentalDataProvider with ChangeNotifier {
   }
 
   // Xóa môi trường
-  Future<bool> deleteEnvironmentalData(BuildContext context, String id) async {
+  Future<bool> deleteEnvironmentalData(bool isOnline, String id) async {
     _isLoading = true;
     notifyListeners();
-    final isOnline = context.read<ConnectivityProvider>().isOnline;
     try {
       await _environmentalDataRepository.delete(id, isOnline: isOnline);
 
@@ -123,11 +116,8 @@ class EnvironmentalDataProvider with ChangeNotifier {
       _error = '';
       return true;
     } catch (e) {
-      if (e.toString().contains('Không thể xóa')) {
-        _error = 'Danh mục này có sản phẩm liên quan, không thể xóa!';
-      } else {
-        _error = 'Lỗi khi xóa danh mục: ${e.toString()}';
-      }
+      _error = 'Lỗi khi xóa: ${e.toString()}';
+
       return false;
     } finally {
       _isLoading = false;
