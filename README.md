@@ -51,25 +51,77 @@
 ## Cấu trúc dự án
 
 ```
-lib/
-│
-├── config/                # Cấu hình
-│
-├── local/                 # Dữ liệu và thao tác lưu trữ cục bộ
-│  
-├── models/                # Định nghĩa các model dữ liệu
-│
-├── providers/             # State management (Provider / ChangeNotifier)
-│
-├── repositories/          # Xử lý trung gian giữa local DB và remote API
-│
-├── services/              # Tầng giao tiếp với server (Supabase / API)
-│
-├── screens/               # Giao diện người dùng (UI)
-│
-├── widgets/               # Các widget tái sử dụng (custom components)
-│
-└── main.dart              #  Entry point của ứng dụng
+├── config
+│   ├── app_constants.dart
+│   └── supabase_config.dart
+├── local
+│   ├── drift
+│   │   ├── daos
+│   │   │   ├── category_dao.dart
+│   │   │   ├── category_dao.g.dart
+│   │   │   ├── environmental_data_dao.dart
+│   │   │   ├── environmental_data_dao.g.dart
+│   │   │   ├── product_dao.dart
+│   │   │   ├── product_dao.g.dart
+│   │   │   ├── region_dao.dart
+│   │   │   └── region_dao.g.dart
+│   │   ├── tables
+│   │   │   ├── category_table.dart
+│   │   │   ├── environmental_data_table.dart
+│   │   │   ├── product_table.dart
+│   │   │   └── region_table.dart
+│   │   ├── app_database.dart
+│   │   └── app_database.g.dart
+│   └── prefs
+│       └── app_preferences.dart
+├── models
+│   ├── category_model.dart
+│   ├── environmental_data_model.dart
+│   ├── product_model.dart
+│   ├── region_model.dart
+│   └── user_role_model.dart
+├── providers
+│   ├── auth_provider.dart
+│   ├── category_provider.dart
+│   ├── connectivity_provider.dart
+│   ├── environmental_data_provider.dart
+│   ├── product_provider.dart
+│   ├── region_provider.dart
+│   └── settings_provider.dart
+├── repositories
+│   ├── category_repository.dart
+│   ├── environmental_data_repository.dart
+│   ├── product_repository.dart
+│   └── region_repository.dart
+├── screens
+│   ├── auth_wrapper.dart
+│   ├── categories_screen.dart
+│   ├── environmental_screen.dart
+│   ├── forgot_password_screen.dart
+│   ├── login_screen.dart
+│   ├── main_screen.dart
+│   ├── products_screen.dart
+│   ├── region_manager_screen.dart
+│   ├── register_screen.dart
+│   ├── reports_screen.dart
+│   ├── settings_screen.dart
+│   ├── simple_home_screen.dart
+│   └── user_management_screen.dart
+├── services
+│   ├── auth_service.dart
+│   ├── category_service.dart
+│   ├── connectivity_service.dart
+│   ├── environmental_data_service.dart
+│   ├── product_service.dart
+│   ├── regions_service.dart
+│   └── role_service.dart
+├── widgets
+│   ├── category_card.dart
+│   ├── category_selector.dart
+│   ├── environmental_data_card.dart
+│   ├── product_card.dart
+│   └── role_based_widget.dart
+└── main.dart
 ```
 
 ```scss
