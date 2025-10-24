@@ -8,7 +8,7 @@ void main() {
   late ProductDao dao;
 
   setUp(() {
-    db = AppDatabase.forTesting();
+    db = AppDatabase.forTesting(openTestConnection());
     dao = db.productDao;
   });
 

@@ -8,7 +8,7 @@ void main() {
   late EnvironmentalDataDao dao;
 
   setUp(() {
-    db = AppDatabase.forTesting();
+    db = AppDatabase.forTesting(openTestConnection());
     dao = db.environmentalDataDao;
   });
 

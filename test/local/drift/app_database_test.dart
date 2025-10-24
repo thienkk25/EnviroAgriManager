@@ -5,7 +5,7 @@ void main() {
   late AppDatabase database;
 
   setUp(() {
-    database = AppDatabase.forTesting();
+    database = AppDatabase.forTesting(openTestConnection());
   });
 
   tearDown(() async {

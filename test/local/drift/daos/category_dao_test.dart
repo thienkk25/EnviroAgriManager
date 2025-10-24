@@ -8,7 +8,7 @@ void main() {
   late CategoryDao dao;
 
   setUp(() {
-    db = AppDatabase.forTesting();
+    db = AppDatabase.forTesting(openTestConnection());
     dao = db.categoryDao;
   });
 
