@@ -13,23 +13,41 @@ class UserManagementScreen extends StatefulWidget {
   State<UserManagementScreen> createState() => _UserManagementScreenState();
 }
 
-class _UserManagementScreenState extends State<UserManagementScreen> {
+class _UserManagementScreenState extends State<UserManagementScreen>
+    with SingleTickerProviderStateMixin {
+  bool _isRefresh = false;
+  late AnimationController _rotationController;
   late Future<List<Map<String, dynamic>>?> _usersFuture;
-
   @override
   void initState() {
-    super.initState();
-    _loadUsers();
-  }
+    _rotationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 700),
+    );
 
-  void _loadUsers() {
     _usersFuture = context.read<AuthProvider>().getAllUsersWithRoles();
+
+    super.initState();
   }
 
-  Future<void> _refreshUsers() async {
+  Future<void> _refreshUsers(BuildContext context) async {
+    if (_isRefresh) return;
     setState(() {
-      _loadUsers();
+      _isRefresh = true;
     });
+    _rotationController.forward(from: 0);
+    _usersFuture = context.read<AuthProvider>().getAllUsersWithRoles();
+    await _usersFuture;
+    await Future.delayed(Duration(milliseconds: 700));
+    setState(() {
+      _isRefresh = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _rotationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -48,7 +66,13 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         backgroundColor: const Color(0xFF5E81AC),
         elevation: 0,
         actions: [
-          IconButton(onPressed: _refreshUsers, icon: const Icon(Icons.refresh)),
+          IconButton(
+            icon: RotationTransition(
+              turns: _rotationController,
+              child: Icon(Icons.refresh, color: Colors.white),
+            ),
+            onPressed: _isRefresh ? null : () => _refreshUsers(context),
+          ),
         ],
       ),
       body: RoleBasedWidget(
@@ -99,7 +123,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             }
 
             return RefreshIndicator(
-              onRefresh: _refreshUsers,
+              onRefresh: () => _refreshUsers(context),
               child: ListView.builder(
                 padding: const EdgeInsets.all(16),
                 itemCount: users.length,
@@ -239,7 +263,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                     backgroundColor: Colors.green,
                   ),
                 );
-                _refreshUsers();
+                _refreshUsers(context);
               }
             },
             child: Column(

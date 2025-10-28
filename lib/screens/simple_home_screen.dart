@@ -445,6 +445,7 @@ class _SampleProductCard extends StatelessWidget {
         ],
       ),
       child: Row(
+        spacing: 16,
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
@@ -470,7 +471,6 @@ class _SampleProductCard extends StatelessWidget {
                     ),
             ),
           ),
-          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -479,32 +479,24 @@ class _SampleProductCard extends StatelessWidget {
                   name,
                   style: const TextStyle(
                     fontFamily: 'Inter',
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF2E3440),
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
+                Text(
+                  description,
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey,
                   ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFA3BE8C).withValues(alpha: .1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    description,
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFFA3BE8C),
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -518,18 +510,22 @@ class _SampleProductCard extends StatelessWidget {
                   price,
                   style: const TextStyle(
                     fontFamily: 'Inter',
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFFD08770),
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   quantity,
                   style: const TextStyle(
                     fontFamily: 'Inter',
-                    fontSize: 12,
+                    fontSize: 11,
                     color: Color(0xFF88C0D0),
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

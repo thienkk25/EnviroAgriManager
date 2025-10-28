@@ -1,16 +1,19 @@
 import 'package:enviro_agri_manager/local/drift/app_database.dart';
 import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
 import 'package:enviro_agri_manager/providers/environmental_data_provider.dart';
+import 'package:enviro_agri_manager/providers/product_review_provider.dart';
 import 'package:enviro_agri_manager/providers/region_provider.dart';
 import 'package:enviro_agri_manager/providers/settings_provider.dart';
 import 'package:enviro_agri_manager/repositories/category_repository.dart';
 import 'package:enviro_agri_manager/repositories/environmental_data_repository.dart';
 import 'package:enviro_agri_manager/repositories/product_repository.dart';
+import 'package:enviro_agri_manager/repositories/product_review_repository.dart';
 import 'package:enviro_agri_manager/repositories/region_repository.dart';
 import 'package:enviro_agri_manager/services/auth_service.dart';
 import 'package:enviro_agri_manager/services/category_service.dart';
 import 'package:enviro_agri_manager/services/connectivity_service.dart';
 import 'package:enviro_agri_manager/services/environmental_data_service.dart';
+import 'package:enviro_agri_manager/services/product_review_service.dart';
 import 'package:enviro_agri_manager/services/product_service.dart';
 import 'package:enviro_agri_manager/services/regions_service.dart';
 import 'package:flutter/foundation.dart';
@@ -76,6 +79,7 @@ void main() async {
         Provider(create: (_) => CategoryService()),
         Provider(create: (_) => EnvironmentalDataService()),
         Provider(create: (_) => ProductService()),
+        Provider(create: (_) => ProductReviewService()),
         Provider(create: (_) => RegionService()),
 
         // Category
@@ -115,6 +119,22 @@ void main() async {
           create: (context) =>
               ProductProvider(context.read<ProductRepository>()),
           update: (_, repo, provider) => provider!..update(repo),
+        ),
+        // Product Reviews
+        ProxyProvider<ProductReviewService, ProductReviewRepository>(
+          update: (_, service, _) => ProductReviewRepository(service),
+        ),
+        ChangeNotifierProxyProvider2<
+          ProductReviewRepository,
+          ProductRepository,
+          ProductReviewProvider
+        >(
+          create: (context) => ProductReviewProvider(
+            context.read<ProductReviewRepository>(),
+            context.read<ProductRepository>(),
+          ),
+          update: (_, repo1, repo2, provider) =>
+              provider!..update(repo1, repo2),
         ),
 
         // Region

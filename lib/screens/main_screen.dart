@@ -27,17 +27,13 @@ class _MainScreenState extends State<MainScreen> {
     final screens = [
       const SimpleHomeScreen(),
       const ProductsScreen(),
-      const CategoriesScreen(),
+      if (userRole != UserRoleModel.viewer) const CategoriesScreen(),
       const EnvironmentalScreen(),
       const ReportsScreen(),
+      if (userRole == UserRoleModel.admin) const UserManagementScreen(),
+      const SettingsScreen(),
     ];
 
-    // Thêm màn hình quản lý user cho admin
-    if (userRole == UserRoleModel.admin) {
-      screens.add(const UserManagementScreen());
-    }
-
-    screens.add(const SettingsScreen());
     return screens;
   }
 
@@ -97,10 +93,12 @@ class _MainScreenState extends State<MainScreen> {
         icon: Icon(Icons.inventory_2),
         label: _currentIndex == 1 ? 'Sản phẩm' : '',
       ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.category),
-        label: _currentIndex == 2 ? 'Danh mục' : '',
-      ),
+      if (userRole != UserRoleModel.viewer)
+        BottomNavigationBarItem(
+          icon: Icon(Icons.category),
+          label: _currentIndex == 2 ? 'Danh mục' : '',
+        ),
+
       BottomNavigationBarItem(
         icon: Icon(Icons.eco),
         label: _currentIndex == 3 ? 'Môi trường' : '',
@@ -109,24 +107,18 @@ class _MainScreenState extends State<MainScreen> {
         icon: Icon(Icons.analytics),
         label: _currentIndex == 4 ? 'Báo cáo' : '',
       ),
-    ];
 
-    // Thêm menu quản lý user cho admin
-    if (userRole == UserRoleModel.admin) {
-      items.add(
+      if (userRole == UserRoleModel.admin)
         BottomNavigationBarItem(
           icon: Icon(Icons.people),
           label: _currentIndex == 5 ? 'Người dùng' : '',
         ),
-      );
-    }
 
-    items.add(
       BottomNavigationBarItem(
         icon: Icon(Icons.settings),
         label: _currentIndex == 6 ? 'Cài đặt' : '',
       ),
-    );
+    ];
 
     return items;
   }

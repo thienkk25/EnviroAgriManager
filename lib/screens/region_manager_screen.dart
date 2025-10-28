@@ -15,7 +15,10 @@ class RegionManagerScreen extends StatefulWidget {
   State<RegionManagerScreen> createState() => _RegionManagerScreenState();
 }
 
-class _RegionManagerScreenState extends State<RegionManagerScreen> {
+class _RegionManagerScreenState extends State<RegionManagerScreen>
+    with SingleTickerProviderStateMixin {
+  bool _isRefreshing = false;
+  late AnimationController _rotationController;
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -23,7 +26,32 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
         context.read<ConnectivityProvider>().isOnline,
       );
     });
+    _rotationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 700),
+    );
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _rotationController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _refreshRegions(BuildContext context) async {
+    if (_isRefreshing) return;
+    setState(() {
+      _isRefreshing = true;
+    });
+    _rotationController.forward(from: 0);
+    await context.read<RegionProvider>().refreshRegions(
+      context.read<ConnectivityProvider>().isOnline,
+    );
+    await Future.delayed(Duration(milliseconds: 700));
+    setState(() {
+      _isRefreshing = false;
+    });
   }
 
   // Map id region -> isExpanded
@@ -172,17 +200,17 @@ class _RegionManagerScreenState extends State<RegionManagerScreen> {
         title: const Text('Các địa điểm hoạt động'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => context.read<RegionProvider>().refreshRegions(
-              context.read<ConnectivityProvider>().isOnline,
+            tooltip: 'Làm mới',
+            icon: RotationTransition(
+              turns: _rotationController,
+              child: Icon(Icons.refresh, color: Colors.white),
             ),
+            onPressed: _isRefreshing ? null : () => _refreshRegions(context),
           ),
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () => context.read<RegionProvider>().refreshRegions(
-          context.read<ConnectivityProvider>().isOnline,
-        ),
+        onRefresh: () => _refreshRegions(context),
         child: Consumer<RegionProvider>(
           builder: (context, regionProvider, child) {
             if (regionProvider.isLoading) {

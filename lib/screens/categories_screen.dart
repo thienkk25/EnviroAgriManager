@@ -34,7 +34,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   }
 }
 
-class CategoryScreen extends StatelessWidget {
+class CategoryScreen extends StatefulWidget {
   final String? parentId;
   final String? title;
   final bool startFirst;
@@ -47,20 +47,60 @@ class CategoryScreen extends StatelessWidget {
   });
 
   @override
+  State<CategoryScreen> createState() => _CategoryScreenState();
+}
+
+class _CategoryScreenState extends State<CategoryScreen>
+    with SingleTickerProviderStateMixin {
+  bool _isRefreshing = false;
+  late AnimationController _rotationController;
+
+  @override
+  void initState() {
+    _rotationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 700),
+    );
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _rotationController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _refreshCategories(BuildContext context) async {
+    if (_isRefreshing) return;
+    setState(() {
+      _isRefreshing = true;
+    });
+
+    _rotationController.forward(from: 0);
+    await context.read<CategoryProvider>().refreshCategories(
+      context.read<ConnectivityProvider>().isOnline,
+    );
+    await Future.delayed(Duration(milliseconds: 700));
+    setState(() {
+      _isRefreshing = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final categoryProvider = context.watch<CategoryProvider>();
     List<CategoryModel> subCategories;
-    if (startFirst) {
+    if (widget.startFirst) {
       subCategories = categoryProvider.getMainCategories();
     } else {
-      subCategories = categoryProvider.getSubCategories(parentId!);
+      subCategories = categoryProvider.getSubCategories(widget.parentId!);
     }
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         title: Text(
-          title ?? 'Quản lý Danh mục',
+          widget.title ?? 'Quản lý Danh mục',
           style: const TextStyle(
             fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
@@ -71,17 +111,17 @@ class CategoryScreen extends StatelessWidget {
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => context.read<CategoryProvider>().refreshCategories(
-              context.read<ConnectivityProvider>().isOnline,
+            tooltip: 'Làm mới',
+            icon: RotationTransition(
+              turns: _rotationController,
+              child: const Icon(Icons.refresh, color: Colors.white),
             ),
+            onPressed: _isRefreshing ? null : () => _refreshCategories(context),
           ),
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () => context.read<CategoryProvider>().refreshCategories(
-          context.read<ConnectivityProvider>().isOnline,
-        ),
+        onRefresh: () => _refreshCategories(context),
         child: subCategories.isEmpty
             ? const Center(child: Text('Không có danh mục'))
             : Container(
@@ -169,6 +209,7 @@ class CategoryScreen extends StatelessWidget {
                                 crossAxisSpacing: 16,
                                 mainAxisSpacing: 16,
                                 childAspectRatio: .7,
+                                mainAxisExtent: 250,
                               ),
                           itemCount: subCategories.length,
                           itemBuilder: (context, index) {
@@ -446,7 +487,9 @@ class CategoryScreen extends StatelessWidget {
                             icon: selectedIcon,
                             color: selectedColor,
                             isActive: selectedIsActive,
-                            parentId: startFirst ? null : parentId,
+                            parentId: widget.startFirst
+                                ? null
+                                : widget.parentId,
                             createdAt: DateTime.now(),
                             updatedAt: DateTime.now(),
                           );

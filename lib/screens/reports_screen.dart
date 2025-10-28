@@ -14,16 +14,23 @@ class ReportsScreen extends StatefulWidget {
   State<ReportsScreen> createState() => _ReportsScreenState();
 }
 
-class _ReportsScreenState extends State<ReportsScreen> {
+class _ReportsScreenState extends State<ReportsScreen>
+    with SingleTickerProviderStateMixin {
   String _selectedPeriod = 'month';
   Map<String, double> _trendData = {};
   List<EnvironmentalDataModel> _environmentalData = [];
   Map<String, double> _categoryData = {};
   String _selectedEnvMetric =
       'temperature'; // temperature, humidity, ph, light_intensity
+  bool _isRefresh = false;
+  late AnimationController _rotationController;
 
   @override
   void initState() {
+    _rotationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 700),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await context.read<ProductProvider>().fetchProducts(
         context.read<ConnectivityProvider>().isOnline,
@@ -49,24 +56,33 @@ class _ReportsScreenState extends State<ReportsScreen> {
             .getEnvironmentalDataByTime(_selectedPeriod);
       });
     });
+
     super.initState();
   }
 
-  Future<void> refreshData() async {
-    await context.read<ProductProvider>().fetchProducts(
-      context.read<ConnectivityProvider>().isOnline,
-    );
-    if (!mounted) return;
-    await context.read<EnvironmentalDataProvider>().fetchEnvironmentalData(
-      context.read<ConnectivityProvider>().isOnline,
-    );
+  Future<void> _refreshData(BuildContext context) async {
+    if (_isRefresh) return;
     setState(() {
+      _isRefresh = true;
+    });
+    _rotationController.forward(from: 0);
+
+    await Future.wait([
       context.read<ProductProvider>().fetchProducts(
         context.read<ConnectivityProvider>().isOnline,
-      );
+      ),
       context.read<EnvironmentalDataProvider>().fetchEnvironmentalData(
         context.read<ConnectivityProvider>().isOnline,
-      );
+      ),
+      context.read<ProductProvider>().fetchProducts(
+        context.read<ConnectivityProvider>().isOnline,
+      ),
+      context.read<EnvironmentalDataProvider>().fetchEnvironmentalData(
+        context.read<ConnectivityProvider>().isOnline,
+      ),
+    ]);
+    await Future.delayed(Duration(milliseconds: 700));
+    setState(() {
       _trendData = context.read<ProductProvider>().getTrendByCategory(
         context.read<CategoryProvider>().categories,
         _selectedPeriod,
@@ -80,7 +96,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
       _environmentalData = context
           .read<EnvironmentalDataProvider>()
           .getEnvironmentalDataByTime(_selectedPeriod);
+      _isRefresh = false;
     });
+  }
+
+  @override
+  void dispose() {
+    _rotationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -102,7 +125,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           PopupMenuButton<String>(
             onSelected: (value) async {
               _selectedPeriod = value;
-              refreshData();
+              _refreshData(context);
             },
             itemBuilder: (BuildContext context) => [
               const PopupMenuItem<String>(
@@ -126,7 +149,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () async => refreshData,
+        onRefresh: () => _refreshData(context),
         child: Container(
           color: Theme.of(context).scaffoldBackgroundColor,
           child: SingleChildScrollView(
@@ -176,11 +199,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       ),
                       const Spacer(),
                       IconButton(
-                        icon: const Icon(
-                          Icons.refresh,
-                          color: Color(0xFF5E81AC),
+                        tooltip: 'Làm mới',
+                        icon: RotationTransition(
+                          turns: _rotationController,
+                          child: Icon(Icons.refresh, color: Color(0xFF5E81AC)),
                         ),
-                        onPressed: refreshData,
+                        onPressed: _isRefresh
+                            ? null
+                            : () => _refreshData(context),
                       ),
                     ],
                   ),

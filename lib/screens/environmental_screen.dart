@@ -595,6 +595,7 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                               // ==== Tỉnh ====
                               DropdownButtonFormField<String>(
                                 initialValue: selectedProvince,
+                                isExpanded: true,
                                 decoration: InputDecoration(
                                   labelText: 'Địa điểm',
                                   border: OutlineInputBorder(
@@ -629,6 +630,7 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                   ? null
                                   : DropdownButtonFormField<String>(
                                       initialValue: selectedDistrict,
+                                      isExpanded: true,
                                       decoration: InputDecoration(
                                         labelText: '---',
                                         border: OutlineInputBorder(
@@ -664,6 +666,7 @@ class _EnvironmentalScreenState extends State<EnvironmentalScreen> {
                                   ? null
                                   : DropdownButtonFormField<String>(
                                       initialValue: selectedWard,
+                                      isExpanded: true,
                                       decoration: InputDecoration(
                                         labelText: '---',
                                         border: OutlineInputBorder(

@@ -39,46 +39,52 @@ class EnvironmentalDataCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              spacing: 8,
+              runSpacing: 8,
               children: [
                 Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 8,
                   children: [
                     const Icon(
                       Icons.location_on,
                       color: Color(0xFF5E81AC),
                       size: 20,
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      environmentalData.location ?? '',
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF2E3440),
+                    SizedBox(
+                      width: MediaQuery.sizeOf(context).width - 100,
+                      child: Text(
+                        environmentalData.location ?? '',
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF2E3440),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFA3BE8C).withValues(alpha: .1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      environmentalData.weatherCondition ?? '',
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFFA3BE8C),
-                      ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFA3BE8C).withValues(alpha: .1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    environmentalData.weatherCondition ?? '',
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFFA3BE8C),
                     ),
                   ),
                 ),

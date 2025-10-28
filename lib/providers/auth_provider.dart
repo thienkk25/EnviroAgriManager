@@ -189,6 +189,10 @@ class AuthProvider with ChangeNotifier {
         return _userRole.canViewReports;
       case 'manage_settings':
         return _userRole.canManageSettings;
+      case 'isEditor':
+        return _userRole.isEditor;
+      case 'isAdmin':
+        return _userRole.isAdmin;
       default:
         return false;
     }

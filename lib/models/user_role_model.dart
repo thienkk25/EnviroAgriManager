@@ -27,6 +27,8 @@ enum UserRoleModel {
       this == UserRoleModel.admin || this == UserRoleModel.editor;
   bool get canDelete => this == UserRoleModel.admin;
   bool get canManageUsers => this == UserRoleModel.admin;
-  bool get canViewReports => true; // Tất cả role đều có thể xem báo cáo
+  bool get canViewReports => true;
   bool get canManageSettings => this == UserRoleModel.admin;
+  bool get isEditor => this == UserRoleModel.editor;
+  bool get isAdmin => this == UserRoleModel.admin;
 }
