@@ -13,6 +13,7 @@ import 'package:enviro_agri_manager/services/category_service.dart';
 import 'package:enviro_agri_manager/services/connectivity_service.dart';
 import 'package:enviro_agri_manager/services/product_service.dart';
 import 'package:enviro_agri_manager/widgets/product_card.dart';
+import 'package:enviro_agri_manager/widgets/product_form_screen.dart';
 import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -46,6 +47,15 @@ class FakeCategoryProvider extends CategoryProvider {
   }
 }
 
+class FakeAuthProvider extends AuthProvider {
+  FakeAuthProvider(super.connectivityProvider, super.authService);
+
+  @override
+  bool hasPermission(String permission) {
+    return true;
+  }
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   SharedPreferences.setMockInitialValues({});
@@ -67,8 +77,8 @@ void main() {
         ChangeNotifierProvider(
           create: (context) => ConnectivityProvider(ConnectivityService()),
         ),
-        ChangeNotifierProvider(
-          create: (context) => AuthProvider(
+        ChangeNotifierProvider<AuthProvider>(
+          create: (context) => FakeAuthProvider(
             ConnectivityProvider(ConnectivityService()),
             AuthService(),
           ),
@@ -189,7 +199,11 @@ void main() {
       ];
       await widgetTester.pumpWidget(
         buildTestWidget(
-          ProductFormScreen(mode: ProductFormMode.view, product: prod[0]),
+          ProductFormScreen(
+            mode: ProductFormMode.view,
+            product: prod[0],
+            isEditProductReview: false,
+          ),
           prod,
           categ,
         ),
@@ -242,7 +256,10 @@ void main() {
       ];
       await widgetTester.pumpWidget(
         buildTestWidget(
-          ProductFormScreen(mode: ProductFormMode.add),
+          ProductFormScreen(
+            mode: ProductFormMode.add,
+            isEditProductReview: false,
+          ),
           prod,
           categ,
         ),
@@ -258,7 +275,7 @@ void main() {
       expect(find.text('Trạng thái sản phẩm'), findsOneWidget);
       expect(find.byIcon(Icons.image_outlined).first, findsOneWidget);
       expect(
-        find.widgetWithText(ElevatedButton, 'Lưu sản phẩm').first,
+        find.widgetWithText(ElevatedButton, 'Thêm sản phẩm').first,
         findsOneWidget,
       );
     });
@@ -293,7 +310,11 @@ void main() {
       ];
       await widgetTester.pumpWidget(
         buildTestWidget(
-          ProductFormScreen(mode: ProductFormMode.edit, product: prod[0]),
+          ProductFormScreen(
+            mode: ProductFormMode.edit,
+            product: prod[0],
+            isEditProductReview: false,
+          ),
           prod,
           categ,
         ),

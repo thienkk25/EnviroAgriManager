@@ -222,7 +222,7 @@ void main() {
   }
 
   group('MainScreen', () {
-    testWidgets('Kiểm tra màn hình viewer/editer', (widgetTester) async {
+    testWidgets('Kiểm tra màn hình viewer', (widgetTester) async {
       await widgetTester.pumpWidget(buildTestWidget(isTrue: false));
       await widgetTester.pumpAndSettle();
 
@@ -235,10 +235,6 @@ void main() {
       expect(find.text('Trang chủ'), findsOneWidget);
       expect(
         find.widgetWithIcon(BottomNavigationBar, Icons.inventory_2),
-        findsOneWidget,
-      );
-      expect(
-        find.widgetWithIcon(BottomNavigationBar, Icons.category),
         findsOneWidget,
       );
       expect(
