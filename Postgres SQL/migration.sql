@@ -585,3 +585,361 @@ with check (
   )
 );
 
+-- ===========================================
+--  BẢNG PRODUCT_REVIEWS
+-- ===========================================
+create table if not exists public.product_reviews (
+  id uuid primary key default gen_random_uuid(),
+  product_id uuid references public.products(id) on delete cascade,
+  edited_by uuid references public.profiles(id) on delete cascade,
+  reviewed_by uuid references auth.users(id),
+  status text check (status in ('pending', 'approved', 'rejected')) default 'pending',
+  changes jsonb, -- chứa dữ liệu thay đổi (ví dụ: {"name": "New name", "price": 20})
+  note text, -- ghi chú của editor hoặc admin (tùy chọn)
+  created_at timestamptz default now(),
+  reviewed_at timestamptz
+);
+
+-- ===========================================
+--  FUNCTION RPC: ADMIN DUYỆT HOẶC TỪ CHỐI REVIEW
+-- ===========================================
+create or replace function public.approve_or_reject_review(
+  p_review_id uuid,
+  p_action text  -- 'approve' hoặc 'reject'
+)
+returns void as $$
+declare
+  v_product_id uuid;
+  v_changes jsonb;
+  v_sql text;
+  v_key text;
+  v_value jsonb;
+  v_pairs text := '';
+  v_final_value text;
+  v_is_new_product boolean := false;
+  v_columns text := '';
+  v_values text := '';
+begin
+  -- Kiểm tra quyền
+  if not is_admin(auth.uid()) then
+    raise exception 'Access denied: only admin can approve or reject reviews';
+  end if;
+
+  -- Lấy thông tin review
+  select product_id, changes
+  into v_product_id, v_changes
+  from public.product_reviews
+  where id = p_review_id;
+
+  if not found then
+    raise exception 'Review not found: %', p_review_id;
+  end if;
+
+  -- Xác định INSERT hay UPDATE
+  if v_product_id is null then
+    -- Tạo UUID mới cho sản phẩm
+    v_product_id := gen_random_uuid();
+    v_is_new_product := true;
+    
+    raise notice 'Creating new product with ID: %', v_product_id;
+  else
+    -- Kiểm tra sản phẩm cũ có tồn tại không
+    if not exists (select 1 from public.products where id = v_product_id) then
+      raise exception 'Invalid product_id: % (not found in products)', v_product_id;
+    end if;
+    
+    raise notice 'Updating existing product: %', v_product_id;
+  end if;
+
+  if p_action = 'approve' then
+    if v_is_new_product then
+      -- INSERT sản phẩm mới
+      for v_key, v_value in
+        select key, value from jsonb_each(v_changes)
+      loop
+        -- Bỏ qua id cũ nếu có trong changes
+        if v_key in ('id', 'created_at', 'updated_at') then
+          continue;
+        end if;
+
+        -- Xử lý giá trị
+        case jsonb_typeof(v_value)
+          when 'string' then
+            v_final_value := v_value #>> '{}';
+          when 'number' then
+            v_final_value := v_value::text;
+          when 'boolean' then
+            v_final_value := v_value::text;
+          when 'null' then
+            v_final_value := 'NULL';
+          else
+            v_final_value := v_value::text;
+        end case;
+
+        -- Thêm vào danh sách columns và values
+        if v_columns <> '' then
+          v_columns := v_columns || ', ';
+          v_values := v_values || ', ';
+        end if;
+
+        v_columns := v_columns || format('%I', v_key);
+        
+        if v_final_value = 'NULL' then
+          v_values := v_values || 'NULL';
+        else
+          v_values := v_values || format('%L', v_final_value);
+        end if;
+      end loop;
+
+      if v_columns = '' then
+        raise exception 'No data to insert for new product';
+      end if;
+
+      -- Execute INSERT
+      v_sql := format(
+        'INSERT INTO public.products (id, %s, created_at, updated_at) VALUES (%L, %s, now(), now())',
+        v_columns,
+        v_product_id,
+        v_values
+      );
+      
+      raise notice 'Executing INSERT: %', v_sql;
+      execute v_sql;
+
+    else
+      -- UPDATE sản phẩm cũ
+      for v_key, v_value in
+        select key, value from jsonb_each(v_changes)
+      loop
+        -- Bỏ qua các trường metadata
+        if v_key in ('id', 'created_at', 'updated_at') then
+          continue;
+        end if;
+
+        if v_pairs <> '' then
+          v_pairs := v_pairs || ', ';
+        end if;
+
+        -- Xử lý giá trị
+        case jsonb_typeof(v_value)
+          when 'string' then
+            v_final_value := v_value #>> '{}';
+          when 'number' then
+            v_final_value := v_value::text;
+          when 'boolean' then
+            v_final_value := v_value::text;
+          when 'null' then
+            v_final_value := 'NULL';
+          else
+            v_final_value := v_value::text;
+        end case;
+
+        -- Format với giá trị đã xử lý
+        if v_final_value = 'NULL' then
+          v_pairs := v_pairs || format('%I = NULL', v_key);
+        else
+          v_pairs := v_pairs || format('%I = %L', v_key, v_final_value);
+        end if;
+      end loop;
+
+      if v_pairs = '' then
+        raise notice 'No changes to apply for product %', v_product_id;
+      else
+        -- Execute UPDATE
+        v_sql := format('UPDATE public.products SET %s, updated_at = now() WHERE id = $1', v_pairs);
+        raise notice 'Executing UPDATE: %', v_sql;
+        execute v_sql using v_product_id;
+      end if;
+    end if;
+
+    -- Cập nhật trạng thái review và lưu product_id
+    update public.product_reviews
+    set
+      product_id = v_product_id,  -- Lưu lại product_id mới tạo
+      status = 'approved',
+      reviewed_by = auth.uid(),
+      reviewed_at = now()
+    where id = p_review_id;
+
+  elsif p_action = 'reject' then
+    update public.product_reviews
+    set
+      status = 'rejected',
+      reviewed_by = auth.uid(),
+      reviewed_at = now()
+    where id = p_review_id;
+
+  else
+    raise exception 'Invalid action: %, must be approve or reject', p_action;
+  end if;
+end;
+$$ language plpgsql security definer;
+
+-- ===========================================
+--  TRIGGER: TỰ GHI NGƯỜI DUYỆT & THỜI GIAN
+-- ===========================================
+create or replace function public.auto_fill_review_meta()
+returns trigger as $$
+begin
+  if new.status in ('approved', 'rejected')
+     and old.status <> new.status then
+    new.reviewed_at := now();
+    if new.reviewed_by is null then
+      new.reviewed_by := auth.uid();
+    end if;
+  end if;
+  return new;
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists fill_review_meta on public.product_reviews;
+create trigger fill_review_meta
+before update on public.product_reviews
+for each row
+execute function public.auto_fill_review_meta();
+
+-- ===========================================
+--  RLS (ROW LEVEL SECURITY)
+-- ===========================================
+alter table public.product_reviews enable row level security;
+
+-- Xem: admin xem tất cả, editor xem review của mình
+create policy "View reviews"
+on public.product_reviews for select
+using (
+  is_admin(auth.uid())
+  or edited_by = auth.uid()
+);
+
+-- Thêm review mới (editor)
+create policy "Insert review"
+on public.product_reviews for insert
+with check (is_editor(auth.uid()));
+
+-- Cập nhật review pending của chính mình (editor)
+create policy "Edit pending review"
+on public.product_reviews for update
+using (edited_by = auth.uid() and status = 'pending');
+
+-- Xóa review pending của chính mình (editor)
+create policy "Delete pending review"
+on public.product_reviews for delete
+using (edited_by = auth.uid() and status = 'pending');
+
+-- Chỉ admin mới được update (duyệt hoặc từ chối)
+create policy "Admin update reviews"
+on public.product_reviews for update
+using (is_admin(auth.uid()));
+
+
+-- ======================================
+-- TẠO BẢNG LƯU LOG
+-- ======================================
+create table if not exists public.audit_logs (
+    id bigserial primary key,
+    table_name text not null,             -- bảng thao tác
+    action text not null,                 -- INSERT / UPDATE / DELETE
+    record_id text,                       -- id hoặc khóa chính (nếu có)
+    old_data jsonb,                       -- dữ liệu cũ
+    new_data jsonb,                       -- dữ liệu mới
+    performed_by uuid,                    -- người thực hiện (auth.uid() hoặc app.user_id)
+    performed_at timestamptz default now()
+);
+
+-- ======================================
+-- FUNCTION GHI LOG DÙNG CHUNG
+-- ======================================
+create or replace function public.log_changes()
+returns trigger
+language plpgsql
+security definer
+as $$
+declare
+    user_id uuid;
+    pk_value text;
+begin
+    -- Ưu tiên lấy user từ context backend (nếu có set local app.user_id)
+    begin
+        user_id := current_setting('app.user_id', true)::uuid;
+    exception when others then
+        user_id := null;
+    end;
+
+    -- Nếu chưa có thì lấy auth.uid() (khi thao tác từ client Supabase)
+    if user_id is null then
+        begin
+            user_id := auth.uid();
+        exception when others then
+            user_id := null;
+        end;
+    end if;
+
+    -- Lấy khóa chính (nếu có cột id)
+    if TG_OP = 'INSERT' then
+        if to_jsonb(NEW) ? 'id' then pk_value := NEW.id::text; end if;
+
+        insert into public.audit_logs(table_name, action, record_id, new_data, performed_by)
+        values (TG_TABLE_NAME, 'INSERT', pk_value, to_jsonb(NEW), user_id);
+        return NEW;
+
+    elsif TG_OP = 'UPDATE' then
+        if to_jsonb(NEW) ? 'id' then pk_value := NEW.id::text; end if;
+
+        insert into public.audit_logs(table_name, action, record_id, old_data, new_data, performed_by)
+        values (TG_TABLE_NAME, 'UPDATE', pk_value, to_jsonb(OLD), to_jsonb(NEW), user_id);
+        return NEW;
+
+    elsif TG_OP = 'DELETE' then
+        if to_jsonb(OLD) ? 'id' then pk_value := OLD.id::text; end if;
+
+        insert into public.audit_logs(table_name, action, record_id, old_data, performed_by)
+        values (TG_TABLE_NAME, 'DELETE', pk_value, to_jsonb(OLD), user_id);
+        return OLD;
+    end if;
+
+    return null;
+end;
+$$;
+
+
+-- ======================================
+-- SCRIPT GẮN TRIGGER TỰ ĐỘNG CHO TẤT CẢ BẢNG
+-- ======================================
+do $$
+declare
+    tbl record;
+    trigger_name text;
+begin
+    for tbl in
+        select tablename
+        from pg_tables
+        where schemaname = 'public'
+          and tablename not in ('audit_logs')
+    loop
+        trigger_name := tbl.tablename || '_audit_trigger';
+
+        execute format('drop trigger if exists %I on public.%I;', trigger_name, tbl.tablename);
+
+        execute format($sql$
+            create trigger %I
+            after insert or update or delete
+            on public.%I
+            for each row
+            execute function public.log_changes();
+        $sql$, trigger_name, tbl.tablename);
+    end loop;
+end$$;
+
+
+-- ======================================
+-- POLICY CHỈ CHO ADMIN XEM LOG
+-- ======================================
+alter table public.audit_logs enable row level security;
+
+drop policy if exists "admin can view audit logs" on public.audit_logs;
+create policy "admin can view audit logs"
+on public.audit_logs
+for select
+using (is_admin(auth.uid()));
+
+
