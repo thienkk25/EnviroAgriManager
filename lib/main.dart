@@ -163,6 +163,7 @@ class MainApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         primaryColor: const Color(0xFF5E81AC),
         fontFamily: 'Inter',
+        fontFamilyFallback: const ['NotoSans'],
         scaffoldBackgroundColor: const Color(0xFFF5F5F5),
         appBarTheme: AppBarTheme(
           backgroundColor: const Color(0xFF5E81AC),
@@ -246,6 +247,7 @@ class MainApp extends StatelessWidget {
           fillColor: const Color(0xFF2C2C2C),
           hintStyle: const TextStyle(
             fontFamily: 'Inter',
+
             color: Colors.white54,
           ),
           border: OutlineInputBorder(
