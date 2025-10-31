@@ -1,5 +1,6 @@
 import 'package:enviro_agri_manager/models/user_role_model.dart';
 import 'package:enviro_agri_manager/providers/auth_provider.dart';
+import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
 import 'package:enviro_agri_manager/widgets/role_based_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -52,6 +53,12 @@ class _UserManagementScreenState extends State<UserManagementScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isOnline = context.watch<ConnectivityProvider>().isOnline;
+    if (!isOnline) {
+      return const Scaffold(
+        body: Center(child: Text('Chức năng này cần online')),
+      );
+    }
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(

@@ -1,4 +1,5 @@
 import 'package:enviro_agri_manager/models/product_model.dart';
+import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
 import 'package:enviro_agri_manager/providers/product_review_provider.dart';
 import 'package:enviro_agri_manager/screens/products_screen.dart';
 import 'package:enviro_agri_manager/widgets/product_card.dart';
@@ -51,6 +52,12 @@ class _ReviewProductsPageState extends State<ReviewProductsPage>
 
   @override
   Widget build(BuildContext context) {
+    final isOnline = context.watch<ConnectivityProvider>().isOnline;
+    if (!isOnline) {
+      return const Scaffold(
+        body: Center(child: Text('Chức năng này cần online')),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Duyệt sản phẩm'),
