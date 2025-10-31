@@ -103,7 +103,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (context, authProvider, child) {
         final user = authProvider.user;
         final userRole = authProvider.userRole;
-        final displayName = user?.userMetadata?['full_name'] ?? 'Người dùng';
+        final displayName = user?.userMetadata?['full_name'] ?? 'Tên';
         final email = user?.email ?? 'email@example.com';
 
         return Container(
@@ -131,15 +131,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              Text(
-                displayName,
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF2E3440),
-                ),
+
+              // --- Tên + nút sửa ---
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    displayName,
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2E3440),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.edit,
+                      size: 18,
+                      color: Color(0xFF5E81AC),
+                    ),
+                    onPressed: () {
+                      _showEditNameDialog(displayName);
+                    },
+                    tooltip: 'Chỉnh sửa tên',
+                  ),
+                ],
               ),
+
+              // --- Email ---
               Text(
                 email,
                 style: const TextStyle(
@@ -148,7 +168,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   color: Color(0xFF88C0D0),
                 ),
               ),
+
               const SizedBox(height: 8),
+
+              // --- Vai trò người dùng ---
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -169,26 +192,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
 
-              // HACK
-              // const SizedBox(height: 16),
-              // ElevatedButton(
-              //   onPressed: () {
-              //     _showEditProfileDialog();
-              //   },
-              //   style: ElevatedButton.styleFrom(
-              //     backgroundColor: const Color(0xFF5E81AC),
-              //     shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(12),
-              //     ),
-              //   ),
-              //   child: Text(
-              //     'Chỉnh sửa thông tin',
-              //     style: const TextStyle(fontFamily: 'Inter',
-              //       color: Colors.white,
-              //       fontWeight: FontWeight.w500,
-              //     ),
-              //   ),
-              // ),
+              const SizedBox(height: 20),
+
+              // --- Nút đổi mật khẩu ---
+              ElevatedButton.icon(
+                onPressed: _showChangePasswordDialog,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF5E81AC),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                icon: const Icon(
+                  Icons.lock_outline,
+                  color: Colors.white,
+                  size: 18,
+                ),
+                label: const Text(
+                  'Đổi mật khẩu',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
             ],
           ),
         );
@@ -471,32 +499,197 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // HACK
-  // void _showEditProfileDialog() {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Text(
-  //           'Chỉnh sửa thông tin',
-  //           style: const TextStyle(fontFamily: 'Inter',fontWeight: FontWeight.w600),
-  //         ),
-  //         content: const Text(
-  //           'Tính năng này sẽ được phát triển trong phiên bản tiếp theo.',
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () => Navigator.of(context).pop(),
-  //             child: Text(
-  //               'Đóng',
-  //               style: const TextStyle(fontFamily: 'Inter',color: const Color(0xFF5E81AC)),
-  //             ),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
+  void _showEditNameDialog(String currentName) {
+    final controller = TextEditingController(text: currentName);
+    final keyForm = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Chỉnh sửa tên hiển thị',
+            style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600),
+          ),
+          content: Form(
+            key: keyForm,
+            child: TextFormField(
+              controller: controller,
+              decoration: const InputDecoration(
+                labelText: 'Tên mới',
+                border: OutlineInputBorder(),
+              ),
+              validator: (value) => (value == null || value.isEmpty)
+                  ? 'Vui lòng nhập tên mới'
+                  : null,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
+                'Hủy',
+                style: TextStyle(fontFamily: 'Inter', color: Colors.grey),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (!keyForm.currentState!.validate()) return;
+                await _updateDisplayName(context, controller.text.trim());
+                if (!context.mounted) return;
+                Navigator.of(context).pop();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF5E81AC),
+              ),
+              child: const Text(
+                'Lưu',
+                style: TextStyle(fontFamily: 'Inter', color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _updateDisplayName(BuildContext context, String newName) async {
+    final success = await context.read<AuthProvider>().updateDisplayName(
+      newName,
+    );
+    if (!context.mounted) return;
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Cập nhật thành công'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Cập nhật thất bại'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _showChangePasswordDialog() {
+    final formKey = GlobalKey<FormState>();
+    final oldPass = TextEditingController();
+    final newPass = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Đổi mật khẩu',
+            style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600),
+          ),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: oldPass,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Mật khẩu hiện tại',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Vui lòng nhập mật khẩu';
+                    }
+                    if (value.length < 6) {
+                      return 'Mật khẩu tối thiểu 6 ký tự';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: newPass,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Mật khẩu mới',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Vui lòng nhập mật khẩu';
+                    }
+                    if (value.length < 6) {
+                      return 'Mật khẩu tối thiểu 6 ký tự';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Hủy',
+                style: TextStyle(fontFamily: 'Inter', color: Colors.grey),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (!formKey.currentState!.validate()) return;
+                await _changePassword(
+                  context,
+                  oldPass.text.trim(),
+                  newPass.text.trim(),
+                );
+                if (!context.mounted) return;
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF5E81AC),
+              ),
+              child: const Text(
+                'Lưu',
+                style: TextStyle(fontFamily: 'Inter', color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _changePassword(
+    BuildContext context,
+    String oldPassword,
+    String newPassword,
+  ) async {
+    final success = await context.read<AuthProvider>().updatePassword(
+      oldPassword,
+      newPassword,
+    );
+    if (!context.mounted) return;
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Đổi mật khẩu thành công'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Đổi mật khẩu thất bại'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   // void _showLanguageDialog() {
   //   showDialog(

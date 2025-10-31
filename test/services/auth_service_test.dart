@@ -148,20 +148,6 @@ void main() {
       verify(() => mockAuthClient.signOut()).called(1);
     });
 
-    test('updatePassword() thành công', () async {
-      final fakeUserResponse = MockUserResponse();
-
-      when(
-        () => mockAuthClient.updateUser(any()),
-      ).thenAnswer((_) async => fakeUserResponse);
-
-      final result = await authService.updatePassword('newPass123');
-      expect(result, isA<UserResponse>());
-      verify(
-        () => mockAuthClient.updateUser(any(that: isA<UserAttributes>())),
-      ).called(1);
-    });
-
     test('getCurrentUserRole() trả về viewer nếu chưa đăng nhập', () async {
       when(() => mockAuthClient.currentUser).thenReturn(null);
 

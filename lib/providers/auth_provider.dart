@@ -41,7 +41,7 @@ class AuthProvider with ChangeNotifier {
     _appPrefs = AppPreferences(_prefs);
     _isOfflineMode = _connectivityProvider.isOnline;
 
-    if (_isOfflineMode) {
+    if (!_isOfflineMode) {
       // Offline: load user từ local cache
       final cached = _appPrefs.getCachedUser();
       if (cached['id'] != null) {
@@ -49,7 +49,7 @@ class AuthProvider with ChangeNotifier {
           id: cached['id']!,
           email: cached['email'],
           appMetadata: {},
-          userMetadata: {},
+          userMetadata: {"full_name": "Offline"},
           aud: '',
           createdAt: '',
         );
@@ -114,7 +114,6 @@ class AuthProvider with ChangeNotifier {
       }
       return false;
     } catch (e) {
-      // _setError(e.toString());
       return false;
     }
   }
@@ -142,7 +141,6 @@ class AuthProvider with ChangeNotifier {
       }
       return false;
     } catch (e) {
-      // _setError(e.toString());
       return false;
     }
   }
@@ -152,7 +150,6 @@ class AuthProvider with ChangeNotifier {
       await _authService.resetPassword(email);
       return true;
     } catch (e) {
-      // _setError(e.toString());
       return false;
     }
   }
@@ -170,6 +167,40 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       _errorMessage = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> updatePassword(String oldPassword, String newPassword) async {
+    _isLoading = true;
+    _errorMessage = '';
+    notifyListeners();
+
+    try {
+      await _authService.updatePassword(oldPassword, newPassword);
+      _errorMessage = '';
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> updateDisplayName(String newName) async {
+    _isLoading = true;
+    _errorMessage = '';
+    notifyListeners();
+    try {
+      await _authService.updateDisplayName(newName);
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();

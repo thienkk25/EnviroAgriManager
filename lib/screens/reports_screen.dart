@@ -32,14 +32,15 @@ class _ReportsScreenState extends State<ReportsScreen>
       duration: Duration(milliseconds: 700),
     );
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await context.read<ProductProvider>().fetchProducts(
-        context.read<ConnectivityProvider>().isOnline,
-      );
+      await Future.wait([
+        context.read<ProductProvider>().fetchProducts(
+          context.read<ConnectivityProvider>().isOnline,
+        ),
+        context.read<EnvironmentalDataProvider>().fetchEnvironmentalData(
+          context.read<ConnectivityProvider>().isOnline,
+        ),
+      ]);
       if (!mounted) return;
-      await context.read<EnvironmentalDataProvider>().fetchEnvironmentalData(
-        context.read<ConnectivityProvider>().isOnline,
-      );
-
       setState(() {
         _trendData = context.read<ProductProvider>().getTrendByCategory(
           context.read<CategoryProvider>().categories,
@@ -82,6 +83,7 @@ class _ReportsScreenState extends State<ReportsScreen>
       ),
     ]);
     await Future.delayed(Duration(milliseconds: 700));
+    if (!mounted) return;
     setState(() {
       _trendData = context.read<ProductProvider>().getTrendByCategory(
         context.read<CategoryProvider>().categories,

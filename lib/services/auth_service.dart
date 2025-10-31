@@ -1,7 +1,7 @@
+import 'package:enviro_agri_manager/config/supabase_config.dart';
+import 'package:enviro_agri_manager/models/user_role_model.dart';
+import 'package:enviro_agri_manager/services/role_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../config/supabase_config.dart';
-import '../models/user_role_model.dart';
-import 'role_service.dart';
 
 class AuthService {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -9,6 +9,12 @@ class AuthService {
 
   // Lấy user hiện tại
   User? get currentUser => _supabase.auth.currentUser;
+
+  // Kiểm tra xem user đã đăng nhập chưa
+  bool get isSignedIn => currentUser != null;
+
+  // Lấy session hiện tại
+  Session? get currentSession => _supabase.auth.currentSession;
 
   // Stream để theo dõi trạng thái authentication
   Stream<AuthState> get authStateChanges => _supabase.auth.onAuthStateChange;
@@ -75,12 +81,21 @@ class AuthService {
   }
 
   // Cập nhật mật khẩu
-  Future<UserResponse> updatePassword(String newPassword) async {
+  Future<void> updatePassword(String oldPassword, String newPassword) async {
     try {
-      final response = await _supabase.auth.updateUser(
-        UserAttributes(password: newPassword),
+      final email = _supabase.auth.currentUser?.email;
+
+      if (email == null) throw Exception('Không tìm thấy email người dùng');
+
+      final loginResponse = await _supabase.auth.signInWithPassword(
+        email: email,
+        password: oldPassword,
       );
-      return response;
+
+      if (loginResponse.user == null) {
+        throw Exception('Mật khẩu cũ không đúng');
+      }
+      await _supabase.auth.updateUser(UserAttributes(password: newPassword));
     } on AuthException catch (error) {
       throw Exception('Lỗi cập nhật mật khẩu: ${error.message}');
     } catch (error) {
@@ -88,11 +103,30 @@ class AuthService {
     }
   }
 
-  // Kiểm tra xem user đã đăng nhập chưa
-  bool get isSignedIn => currentUser != null;
+  // Cập nhật tên hiển thị của người dùng (displayName)
+  Future<void> updateDisplayName(String newName) async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) {
+        throw Exception('Người dùng chưa đăng nhập');
+      }
 
-  // Lấy session hiện tại
-  Session? get currentSession => _supabase.auth.currentSession;
+      // Cập nhật thông tin user trong Supabase Auth
+      final response = await _supabase.auth.updateUser(
+        UserAttributes(data: {'full_name': newName}),
+      );
+
+      if (response.user == null) {
+        throw Exception('Cập nhật thất bại');
+      }
+      await _supabase
+          .from('profiles')
+          .update({'full_name': newName})
+          .eq('id', user.id);
+    } catch (e) {
+      rethrow;
+    }
+  }
 
   // Lấy role của user hiện tại
   Future<UserRoleModel> getCurrentUserRole() async {
