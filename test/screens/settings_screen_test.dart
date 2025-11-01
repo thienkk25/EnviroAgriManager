@@ -125,7 +125,7 @@ void main() {
 
       expect(find.byType(Scaffold).first, findsOneWidget);
       expect(find.widgetWithText(AppBar, 'Cài đặt'), findsOneWidget);
-      expect(find.text('Người dùng'), findsOneWidget);
+      expect(find.text('Tên'), findsOneWidget);
       expect(find.text('email@example.com'), findsOneWidget);
       expect(find.text('Cài đặt hệ thống'), findsOneWidget);
       expect(find.text('Chế độ tối'), findsOneWidget);
