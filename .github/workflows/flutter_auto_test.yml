@@ -1,5 +1,5 @@
 
-name: EnviroAgriManager
+name: Flutter auto test
 
 on:
   push:

@@ -44,7 +44,3 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 .vscode/launch.json
-lib/config/supabase_config.dart
-.firebase/hosting.YnVpbGRcd2Vi.cache
-.firebaserc
-firebase.json
