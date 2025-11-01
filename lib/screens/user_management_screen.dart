@@ -242,57 +242,140 @@ class _UserManagementScreenState extends State<UserManagementScreen>
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: Text(
-            'Cập nhật quyền cho ${userData['email']}',
-            style: const TextStyle(
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w600,
-            ),
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
-          content: RadioGroup<UserRoleModel>(
-            groupValue: currentRole,
-            onChanged: (UserRoleModel? newRole) async {
-              if (newRole == null) return;
-              Navigator.of(dialogContext).pop(); // đóng dialog
-              final authProvider = context.read<AuthProvider>();
-
-              final success = await authProvider.updateUserRole(
-                userData['id'],
-                newRole,
-              );
-
-              if (success && context.mounted) {
-                // Dùng context cha (không phải dialogContext)
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Đã cập nhật quyền của ${userData['email']}'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-                _refreshUsers(context);
-              }
-            },
+          child: Padding(
+            padding: const EdgeInsets.all(20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: UserRoleModel.values.map((role) {
-                return ListTile(
-                  title: Text(role.displayName),
-                  subtitle: Text(role.description),
-                  leading: Radio<UserRoleModel>(value: role),
-                );
-              }).toList(),
+              children: [
+                // Header
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.security_rounded,
+                      color: Colors.blueAccent,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Cập nhật quyền cho\n${userData['email']}',
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // List quyền
+                Column(
+                  children: UserRoleModel.values.map((role) {
+                    final isSelected = role == currentRole;
+                    final roleIcon = _getRoleIcon(role);
+
+                    return Container(
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? Colors.blueAccent.withOpacity(0.1)
+                            : Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected
+                              ? Colors.blueAccent
+                              : Colors.grey.shade300,
+                          width: 1,
+                        ),
+                      ),
+                      child: InkWell(
+                        onTap: () async {
+                          Navigator.of(dialogContext).pop();
+                          final authProvider = context.read<AuthProvider>();
+
+                          final success = await authProvider.updateUserRole(
+                            userData['id'],
+                            role,
+                          );
+
+                          if (success && context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Colors.green.shade600,
+                                content: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.check_circle_outline,
+                                      color: Colors.white,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        'Đã cập nhật quyền ${role.displayName} cho ${userData['email']}',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                            _refreshUsers(context);
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: ListTile(
+                          leading: Icon(roleIcon, color: Colors.blueAccent),
+                          title: Text(
+                            role.displayName,
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w600,
+                              color: isSelected
+                                  ? Colors.blueAccent
+                                  : Colors.grey.shade800,
+                            ),
+                          ),
+                          subtitle: Text(
+                            role.description,
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 13,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                          trailing: isSelected
+                              ? const Icon(
+                                  Icons.check_circle,
+                                  color: Colors.blueAccent,
+                                )
+                              : null,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton.icon(
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    icon: const Icon(Icons.close, size: 18, color: Colors.grey),
+                    label: const Text(
+                      'Hủy',
+                      style: TextStyle(fontFamily: 'Inter', color: Colors.grey),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(
-                'Hủy',
-                style: TextStyle(fontFamily: 'Inter', color: Colors.grey[600]),
-              ),
-            ),
-          ],
         );
       },
     );
