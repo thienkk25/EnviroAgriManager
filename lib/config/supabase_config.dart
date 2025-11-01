@@ -1,16 +1,7 @@
-// File này là ví dụ về cấu hình Supabase
-// Copy nội dung này vào supabase_config.dart và thay thế bằng thông tin thực tế
-
 class SupabaseConfig {
-  // Thay thế bằng URL thực tế từ Supabase project của bạn
-  // Ví dụ: 'https://abcdefghijklmnop.supabase.co'
-  static const String supabaseUrl = 'YOUR_SUPABASE_URL';
-
-  // Thay thế bằng anon key thực tế từ Supabase project của bạn
-  // Ví dụ: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
-  static const String supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY';
-
-  // URL redirect cho deep linking (không cần thay đổi)
+  static const String supabaseUrl = 'https://fvcmpmemafogezilylcc.supabase.co';
+  static const String supabaseAnonKey =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ2Y21wbWVtYWZvZ2V6aWx5bGNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3MTkzNDIsImV4cCI6MjA3NTI5NTM0Mn0.deDMFt0cTQSAX_2PKTuLQkudxcwHexYPnrGKKLJdUGM';
   static const String redirectUrl =
-      'io.supabase.enviroagrimanager://login-callback/';
+      'https://enviroagrimanager.web.app://login-callback/';
 }
