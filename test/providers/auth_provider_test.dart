@@ -31,6 +31,9 @@ void main() {
     mockAuthService = MockAuthService();
     mockConnectivity = MockConnectivityProvider();
     when(() => mockConnectivity.isOnline).thenReturn(true);
+    when(
+      () => mockAuthService.authStateChanges,
+    ).thenAnswer((_) => Stream.empty());
 
     provider = AuthProvider(mockConnectivity, mockAuthService);
     await Future.delayed(Duration(milliseconds: 50));
@@ -84,6 +87,84 @@ void main() {
 
       expect(result, isFalse);
       expect(provider.user, isNull);
+    });
+    test('signUp thành công => trả true và cập nhật user', () async {
+      final mockUser = MockUser();
+      when(
+        () => mockAuthService.signUp(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+          fullName: any(named: 'fullName'),
+        ),
+      ).thenAnswer((_) async => AuthResponse(user: mockUser, session: null));
+
+      final result = await provider.signUp(
+        email: 'test@example.com',
+        password: '123456',
+        fullName: 'John Doe',
+      );
+
+      expect(result, isTrue);
+      expect(provider.user, equals(mockUser));
+    });
+
+    test('signUp thất bại => trả false và user null', () async {
+      when(
+        () => mockAuthService.signUp(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+          fullName: any(named: 'fullName'),
+        ),
+      ).thenAnswer((_) async => AuthResponse(user: null, session: null));
+
+      final result = await provider.signUp(
+        email: 'fail@example.com',
+        password: '123456',
+        fullName: 'Fail User',
+      );
+
+      expect(result, isFalse);
+      expect(provider.user, isNull);
+    });
+
+    test('signUp ném exception => trả false', () async {
+      when(
+        () => mockAuthService.signUp(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+          fullName: any(named: 'fullName'),
+        ),
+      ).thenThrow(Exception('Network error'));
+
+      final result = await provider.signUp(
+        email: 'error@example.com',
+        password: '123456',
+        fullName: 'Error User',
+      );
+
+      expect(result, isFalse);
+      expect(provider.user, isNull);
+    });
+    test('resetPassword thành công => trả true', () async {
+      when(
+        () => mockAuthService.resetPassword(any()),
+      ).thenAnswer((_) async => Future.value());
+
+      final result = await provider.resetPassword('test@example.com');
+
+      expect(result, isTrue);
+      verify(() => mockAuthService.resetPassword('test@example.com')).called(1);
+    });
+
+    test('resetPassword thất bại => trả false', () async {
+      when(
+        () => mockAuthService.resetPassword(any()),
+      ).thenThrow(Exception('Network error'));
+
+      final result = await provider.resetPassword('fail@example.com');
+
+      expect(result, isFalse);
+      verify(() => mockAuthService.resetPassword('fail@example.com')).called(1);
     });
 
     test('updateUserRole => cập nhật local khi userId trùng', () async {
