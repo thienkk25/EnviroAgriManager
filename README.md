@@ -33,6 +33,9 @@
 - Tự động đồng bộ dữ liệu
 - Thông tin ứng dụng
 
+### Trợ lý Bot AI
+- Hỏi và Trả lời thắc mắc của người dùng trong phạm vi
+
 ## Phân quyền người dùng
 | Vai trò    | Quyền hạn          | Mô tả                                                                                                    |
 | ---------- | ------------------ | ---------------------------------------------------------------------------------------------------------|
@@ -51,12 +54,13 @@
 ## Cấu trúc dự án
 
 ```
-├── config
+lib
+├── config/
 │   ├── app_constants.dart
 │   └── supabase_config.dart
-├── local
-│   ├── drift
-│   │   ├── daos
+├── local/
+│   ├── drift/
+│   │   ├── daos/
 │   │   │   ├── category_dao.dart
 │   │   │   ├── category_dao.g.dart
 │   │   │   ├── environmental_data_dao.dart
@@ -65,35 +69,42 @@
 │   │   │   ├── product_dao.g.dart
 │   │   │   ├── region_dao.dart
 │   │   │   └── region_dao.g.dart
-│   │   ├── tables
+│   │   ├── tables/
 │   │   │   ├── category_table.dart
 │   │   │   ├── environmental_data_table.dart
 │   │   │   ├── product_table.dart
 │   │   │   └── region_table.dart
 │   │   ├── app_database.dart
-│   │   └── app_database.g.dart
-│   └── prefs
+│   │   ├── app_database.g.dart
+│   │   └── database_stub.dart
+│   └── prefs/
 │       └── app_preferences.dart
-├── models
+├── models/
 │   ├── category_model.dart
 │   ├── environmental_data_model.dart
+│   ├── message_model.dart
 │   ├── product_model.dart
+│   ├── product_review_model.dart
 │   ├── region_model.dart
 │   └── user_role_model.dart
-├── providers
+├── providers/
+│   ├── ai_provider.dart
 │   ├── auth_provider.dart
 │   ├── category_provider.dart
 │   ├── connectivity_provider.dart
 │   ├── environmental_data_provider.dart
 │   ├── product_provider.dart
+│   ├── product_review_provider.dart
 │   ├── region_provider.dart
 │   └── settings_provider.dart
-├── repositories
+├── repositories/
+│   ├── ai_repository.dart
 │   ├── category_repository.dart
 │   ├── environmental_data_repository.dart
 │   ├── product_repository.dart
+│   ├── product_review_repository.dart
 │   └── region_repository.dart
-├── screens
+├── screens/
 │   ├── auth_wrapper.dart
 │   ├── categories_screen.dart
 │   ├── environmental_screen.dart
@@ -107,19 +118,24 @@
 │   ├── settings_screen.dart
 │   ├── simple_home_screen.dart
 │   └── user_management_screen.dart
-├── services
+├── services/
+│   ├── ai_service.dart
 │   ├── auth_service.dart
 │   ├── category_service.dart
 │   ├── connectivity_service.dart
 │   ├── environmental_data_service.dart
+│   ├── product_review_service.dart
 │   ├── product_service.dart
 │   ├── regions_service.dart
 │   └── role_service.dart
-├── widgets
+├── widgets/
 │   ├── category_card.dart
 │   ├── category_selector.dart
+│   ├── chat_bubble.dart
 │   ├── environmental_data_card.dart
 │   ├── product_card.dart
+│   ├── product_form_screen.dart
+│   ├── review_products_page.dart
 │   └── role_based_widget.dart
 └── main.dart
 ```
@@ -196,3 +212,7 @@ UI → Provider → Repository → Service (Supabase RPC)
 ## Màn hình
 
 <img src="assets/resultScreen/Screenshot 2025-10-28 152246.png" width="300" height="400"> <img src="assets/resultScreen/Screenshot 2025-10-28 152254.png" width="300" height="400"> <img src="assets/resultScreen/Screenshot 2025-10-28 152304.png" width="300" height="400"> <img src="assets/resultScreen/Screenshot 2025-10-28 151324.png" width="300" height="400"> <img src="assets/resultScreen/Screenshot 2025-10-28 151335.png" width="300" height="400"> <img src="assets/resultScreen/Screenshot 2025-10-28 151350.png" width="300" height="400"> <img src="assets/resultScreen/Screenshot 2025-10-28 151403.png" width="300" height="400"> <img src="assets/resultScreen/Screenshot 2025-10-28 151412.png" width="300" height="400"> <img src="assets/resultScreen/Screenshot 2025-10-28 152732.png" width="300" height="400"> <img src="assets/resultScreen/Screenshot 2025-10-28 151425.png" width="300" height="400"> <img src="assets/resultScreen/Screenshot 2025-10-28 151434.png" width="300" height="400"> <img src="assets/resultScreen/Screenshot 2025-10-28 151450.png" width="300" height="400"> <img src="assets/resultScreen/test.png" width="300" height="400">
+
+## Video
+
+- [Link Video demo](https://player.cloudinary.com/embed/?cloud_name=dksr7si4o&public_id=flutter%2Fvideo_kq%2F7197953355633_btjl4x&profile=cld-default)
