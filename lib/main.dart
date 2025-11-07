@@ -1,14 +1,17 @@
 import 'package:enviro_agri_manager/local/drift/app_database.dart';
+import 'package:enviro_agri_manager/providers/ai_provider.dart';
 import 'package:enviro_agri_manager/providers/connectivity_provider.dart';
 import 'package:enviro_agri_manager/providers/environmental_data_provider.dart';
 import 'package:enviro_agri_manager/providers/product_review_provider.dart';
 import 'package:enviro_agri_manager/providers/region_provider.dart';
 import 'package:enviro_agri_manager/providers/settings_provider.dart';
+import 'package:enviro_agri_manager/repositories/ai_repository.dart';
 import 'package:enviro_agri_manager/repositories/category_repository.dart';
 import 'package:enviro_agri_manager/repositories/environmental_data_repository.dart';
 import 'package:enviro_agri_manager/repositories/product_repository.dart';
 import 'package:enviro_agri_manager/repositories/product_review_repository.dart';
 import 'package:enviro_agri_manager/repositories/region_repository.dart';
+import 'package:enviro_agri_manager/services/ai_service.dart';
 import 'package:enviro_agri_manager/services/auth_service.dart';
 import 'package:enviro_agri_manager/services/category_service.dart';
 import 'package:enviro_agri_manager/services/connectivity_service.dart';
@@ -18,6 +21,7 @@ import 'package:enviro_agri_manager/services/product_service.dart';
 import 'package:enviro_agri_manager/services/regions_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config/supabase_config.dart';
@@ -32,6 +36,7 @@ import 'screens/user_management_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   await Supabase.initialize(
     url: SupabaseConfig.supabaseUrl,
     anonKey: SupabaseConfig.supabaseAnonKey,
@@ -81,6 +86,7 @@ void main() async {
         Provider(create: (_) => ProductService()),
         Provider(create: (_) => ProductReviewService()),
         Provider(create: (_) => RegionService()),
+        Provider(create: (_) => AiService()),
 
         // Category
         ProxyProvider2<AppDatabase?, CategoryService, CategoryRepository>(
@@ -143,6 +149,23 @@ void main() async {
         ),
         ChangeNotifierProxyProvider<RegionRepository, RegionProvider>(
           create: (context) => RegionProvider(context.read<RegionRepository>()),
+          update: (_, repo, provider) => provider!..update(repo),
+        ),
+
+        // AI Provider
+        ProxyProvider5<
+          AiService,
+          RegionRepository,
+          EnvironmentalDataRepository,
+          ProductRepository,
+          CategoryRepository,
+          AiRepository
+        >(
+          update: (_, service, reg, env, pro, cat, _) =>
+              AiRepository(service, reg, env, pro, cat),
+        ),
+        ChangeNotifierProxyProvider<AiRepository, AiProvider>(
+          create: (context) => AiProvider(context.read<AiRepository>()),
           update: (_, repo, provider) => provider!..update(repo),
         ),
       ],

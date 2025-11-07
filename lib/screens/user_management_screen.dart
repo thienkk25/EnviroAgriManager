@@ -283,7 +283,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                       margin: const EdgeInsets.symmetric(vertical: 6),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? Colors.blueAccent.withOpacity(0.1)
+                            ? Colors.blueAccent.withValues(alpha: .1)
                             : Colors.grey.shade100,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
