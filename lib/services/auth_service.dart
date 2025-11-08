@@ -1,7 +1,9 @@
 import 'package:enviro_agri_manager/config/supabase_config.dart';
 import 'package:enviro_agri_manager/models/user_role_model.dart';
 import 'package:enviro_agri_manager/services/role_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:web/web.dart' as web;
 
 class AuthService {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -61,6 +63,11 @@ class AuthService {
   Future<void> signOut() async {
     try {
       await _supabase.auth.signOut();
+      if (kIsWeb) {
+        web.window.localStorage.removeItem(
+          'sb-fvcmpmemafogezilylcc-auth-token',
+        );
+      }
     } catch (error) {
       throw Exception('Lỗi đăng xuất: $error');
     }
