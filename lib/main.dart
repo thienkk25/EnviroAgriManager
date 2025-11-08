@@ -11,6 +11,7 @@ import 'package:enviro_agri_manager/repositories/environmental_data_repository.d
 import 'package:enviro_agri_manager/repositories/product_repository.dart';
 import 'package:enviro_agri_manager/repositories/product_review_repository.dart';
 import 'package:enviro_agri_manager/repositories/region_repository.dart';
+import 'package:enviro_agri_manager/screens/reset_password_screen.dart';
 import 'package:enviro_agri_manager/services/ai_service.dart';
 import 'package:enviro_agri_manager/services/auth_service.dart';
 import 'package:enviro_agri_manager/services/category_service.dart';
@@ -290,6 +291,7 @@ class MainApp extends StatelessWidget {
             const ForgotPasswordScreen(),
         UserManagementScreen.routeName: (context) =>
             const UserManagementScreen(),
+        ResetPasswordScreen.routeName: (context) => const ResetPasswordScreen(),
       },
       debugShowCheckedModeBanner: false,
     );
