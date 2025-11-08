@@ -14,34 +14,13 @@ class CategoryRepository {
     if (kIsWeb) return await _categoryService.fetchCategories();
     if (isOnline) {
       try {
-        // Lấy dữ liệu local chưa sync (dưới dạng Model)
-        final localNewData = await _db!.categoryDao.getUnsyncedCategories();
-
-        // Push dữ liệu local lên server
-        if (localNewData.isNotEmpty) {
-          await _categoryService.uploadCategories(localNewData);
-
-          // Đánh dấu đã sync
-          await _db.categoryDao.markAsSynced(
-            localNewData.map((e) => e.id).toList(),
-          );
-        }
-
-        // Push các item đã xóa
-        final deletedData = await _db.categoryDao
-            .getDeletedUnsyncedCategories();
-        if (deletedData.isNotEmpty) {
-          final futures = deletedData.map((category) async {
-            await delete(category.id, isOnline: isOnline);
-          }).toList();
-
-          await Future.wait(futures);
-        }
+        // PUSH & CHECK: Đẩy local changes lên server với conflict resolution
+        await pushLocalChangesWithConflictCheck();
 
         // Lấy dữ liệu server
         final remoteData = await _categoryService.fetchCategories();
         // Merge dữ liệu server về local
-        await _db.categoryDao.syncFromSupabase(remoteData);
+        await _db!.categoryDao.syncFromSupabase(remoteData);
 
         return remoteData;
       } catch (e) {
@@ -169,6 +148,65 @@ class CategoryRepository {
         }
       } else {
         await _db!.categoryDao.markCategoryAsDeleted(id);
+      }
+    }
+  }
+
+  // Push local changes với conflict check
+  Future<void> pushLocalChangesWithConflictCheck() async {
+    // Push các categories chưa sync
+    final unsyncedCategories = await _db!.categoryDao.getUnsyncedCategories();
+    for (final localCategory in unsyncedCategories) {
+      await _pushAndCheckConflict(localCategory);
+    }
+
+    // Push các categories đã xóa
+    final deletedCategories = await _db.categoryDao
+        .getDeletedUnsyncedCategories();
+    for (final deletedCategory in deletedCategories) {
+      await _deleteWithConflictCheck(deletedCategory.id);
+    }
+  }
+
+  Future<void> _pushAndCheckConflict(CategoryModel localCategory) async {
+    // 1. Lấy data từ server để CHECK
+    final serverCategory = await _categoryService.getCategory(localCategory.id);
+
+    // CHECK CONFLICT: So sánh timestamp - LAST WRITE WINS
+    final serverUpdatedAt = serverCategory.updatedAt;
+    final localUpdatedAt = localCategory.updatedAt;
+
+    if (localUpdatedAt.isAfter(serverUpdatedAt)) {
+      // LOCAL THẮNG - PUSH lên server
+      await _categoryService.updateCategory(localCategory);
+    } else {
+      // SERVER THẮNG - KHÔNG PUSH, để server data ghi đè local
+    }
+
+    // Đánh dấu đã sync (dù thắng hay thua)
+    await _db!.categoryDao.markAsSynced([localCategory.id]);
+  }
+
+  // Xóa với check conflict
+  Future<void> _deleteWithConflictCheck(String categoryId) async {
+    try {
+      final serverCategory = await _categoryService.getCategory(categoryId);
+
+      // CHECK: Nếu server có data mới hơn thì không xóa
+      final localCategory = await _db!.categoryDao.getCategoryById(categoryId);
+      if (localCategory != null &&
+          serverCategory.updatedAt.isAfter(localCategory.updatedAt)) {
+        await _db.categoryDao.restoreCategory(categoryId);
+        return;
+      }
+
+      // Thực hiện xóa trên server
+      await _categoryService.deleteCategory(categoryId);
+      await _db.categoryDao.markAsSynced([categoryId]);
+    } catch (e) {
+      if (e.toString().contains('Không thể xóa danh mục đang có sản phẩm')) {
+        // Server không cho xóa → phục hồi local
+        await _db!.categoryDao.restoreCategory(categoryId);
       }
     }
   }

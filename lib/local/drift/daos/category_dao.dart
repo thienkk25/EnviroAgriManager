@@ -35,6 +35,14 @@ class CategoryDao extends DatabaseAccessor<AppDatabase>
     return rows.map(_mapToModel).toList();
   }
 
+  // Lấy category by id
+  Future<CategoryModel?> getCategoryById(String id) async {
+    final row = await (select(
+      categoryTable,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
+    return row != null ? _mapToModel(row) : null;
+  }
+
   // Lấy danh mục chưa đồng bộ
   Future<List<CategoryModel>> getUnsyncedCategories() async {
     final rows = await (select(
@@ -45,9 +53,9 @@ class CategoryDao extends DatabaseAccessor<AppDatabase>
 
   // Thêm / Cập nhật danh mục và đánh dấu chưa sync
   Future<void> insertOrUpdateCategory(CategoryTableCompanion entry) {
-    return into(
-      categoryTable,
-    ).insertOnConflictUpdate(entry.copyWith(isSynced: Value(false)));
+    return into(categoryTable).insertOnConflictUpdate(
+      entry.copyWith(updatedAt: Value(DateTime.now()), isSynced: Value(false)),
+    );
   }
 
   // Đánh dấu danh mục đã sync

@@ -51,9 +51,9 @@ class EnvironmentalDataDao extends DatabaseAccessor<AppDatabase>
   Future<void> insertOrUpdateEnvironmentalData(
     EnvironmentalDataTableCompanion entry,
   ) {
-    return into(
-      environmentalDataTable,
-    ).insertOnConflictUpdate(entry.copyWith(isSynced: Value(false)));
+    return into(environmentalDataTable).insertOnConflictUpdate(
+      entry.copyWith(updatedAt: Value(DateTime.now()), isSynced: Value(false)),
+    );
   }
 
   Future<void> markAsSynced(List<String> ids) {

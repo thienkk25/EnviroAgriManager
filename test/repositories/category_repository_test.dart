@@ -59,29 +59,86 @@ void main() {
 
   group('CategoryRepository', () {
     group('syncCategories()', () {
-      test('online: push unsynced + merge remote', () async {
-        // Giả lập dữ liệu local chưa sync
-        when(
-          () => mockDao.getUnsyncedCategories(),
-        ).thenAnswer((_) async => [sampleCategory]);
-        when(
-          () => mockService.uploadCategories(any()),
-        ).thenAnswer((_) async => {});
-        when(() => mockDao.markAsSynced(any())).thenAnswer((_) async => {});
-        when(
-          () => mockDao.getDeletedUnsyncedCategories(),
-        ).thenAnswer((_) async => []);
-        when(
-          () => mockService.fetchCategories(),
-        ).thenAnswer((_) async => [sampleCategory]);
-        when(() => mockDao.syncFromSupabase(any())).thenAnswer((_) async => {});
+      test(
+        'pushLocalChangesWithConflictCheck - push and delete with conflict',
+        () async {
+          final unsynced = [
+            CategoryModel(
+              id: '1',
+              name: 'Local',
+              updatedAt: DateTime(2025, 11, 8),
+              description: '',
+              icon: '',
+              color: '',
+              createdAt: DateTime.now(),
+            ),
+          ];
+          final deleted = [
+            CategoryModel(
+              id: '2',
+              name: 'Deleted',
+              updatedAt: DateTime(2025, 11, 7),
+              description: '',
+              icon: '',
+              color: '',
+              createdAt: DateTime.now(),
+            ),
+          ];
+          final serverCategory = CategoryModel(
+            id: '1',
+            name: 'Server',
+            updatedAt: DateTime(2025, 11, 7),
+            description: '',
+            icon: '',
+            color: '',
+            createdAt: DateTime.now(),
+          );
+          final serverDeletedCategory = CategoryModel(
+            id: '2',
+            name: 'ServerDeleted',
+            updatedAt: DateTime(2025, 11, 6),
+            description: '',
+            icon: '',
+            color: '',
+            createdAt: DateTime.now(),
+          );
 
-        final result = await repository.syncCategories(isOnline: true);
+          // Mock DAO
+          when(
+            () => mockDao.getUnsyncedCategories(),
+          ).thenAnswer((_) async => unsynced);
+          when(
+            () => mockDao.getDeletedUnsyncedCategories(),
+          ).thenAnswer((_) async => deleted);
+          when(() => mockDao.markAsSynced(any())).thenAnswer((_) async {});
+          when(
+            () => mockDao.getCategoryById('2'),
+          ).thenAnswer((_) async => deleted[0]);
+          when(() => mockDao.restoreCategory(any())).thenAnswer((_) async {});
 
-        expect(result, isA<List<CategoryModel>>());
-        verify(() => mockService.uploadCategories(any())).called(1);
-        verify(() => mockDao.syncFromSupabase(any())).called(1);
-      });
+          // Mock service
+          when(
+            () => mockService.getCategory('1'),
+          ).thenAnswer((_) async => serverCategory);
+          when(
+            () => mockService.updateCategory(any()),
+          ).thenAnswer((_) async {});
+          when(
+            () => mockService.getCategory('2'),
+          ).thenAnswer((_) async => serverDeletedCategory);
+          when(() => mockService.deleteCategory('2')).thenAnswer((_) async {});
+
+          await repository.pushLocalChangesWithConflictCheck();
+
+          // Verify push local category
+          verify(() => mockService.updateCategory(unsynced[0])).called(1);
+          verify(() => mockDao.markAsSynced(['1'])).called(1);
+
+          // Verify delete category
+          verify(() => mockService.deleteCategory('2')).called(1);
+          verify(() => mockDao.markAsSynced(['2'])).called(1);
+        },
+      );
 
       test('offline: return local data only', () async {
         when(

@@ -40,9 +40,9 @@ class RegionDao extends DatabaseAccessor<AppDatabase> with _$RegionDaoMixin {
   }
 
   Future<void> insertOrUpdateRegion(RegionTableCompanion entry) {
-    return into(
-      regionTable,
-    ).insertOnConflictUpdate(entry.copyWith(isSynced: Value(false)));
+    return into(regionTable).insertOnConflictUpdate(
+      entry.copyWith(updatedAt: Value(DateTime.now()), isSynced: Value(false)),
+    );
   }
 
   Future<void> markAsSynced(List<String> ids) {

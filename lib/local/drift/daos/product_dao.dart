@@ -44,9 +44,9 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
   }
 
   Future<void> insertOrUpdateProduct(ProductTableCompanion entry) {
-    return into(
-      productTable,
-    ).insertOnConflictUpdate(entry.copyWith(isSynced: Value(false)));
+    return into(productTable).insertOnConflictUpdate(
+      entry.copyWith(updatedAt: Value(DateTime.now()), isSynced: Value(false)),
+    );
   }
 
   Future<void> markAsSynced(List<String> ids) {
