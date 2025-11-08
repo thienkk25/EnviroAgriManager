@@ -60,7 +60,7 @@ class AuthService {
   // Đăng xuất
   Future<void> signOut() async {
     try {
-      await _supabase.auth.signOut(scope: SignOutScope.global);
+      await _supabase.auth.signOut();
     } catch (error) {
       throw Exception('Lỗi đăng xuất: $error');
     }
