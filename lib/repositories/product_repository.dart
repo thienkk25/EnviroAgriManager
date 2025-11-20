@@ -16,25 +16,10 @@ class ProductRepository {
     } else {
       if (isOnline) {
         try {
-          final localNewData = await _db!.productDao.getUnsyncedProducts();
-
-          if (localNewData.isNotEmpty) {
-            await _productService.uploadProducts(localNewData);
-
-            await _db.productDao.markAsSynced(
-              localNewData.map((e) => e.id).toList(),
-            );
-          }
-
-          final deletedData = await _db.productDao.getDeletedUnsyncedProducts();
-          if (deletedData.isNotEmpty) {
-            for (var product in deletedData) {
-              await delete(product.id, isOnline: isOnline);
-            }
-          }
+          await pushLocalChangesWithConflictCheck();
 
           final remoteData = await _productService.fetchProducts();
-          await _db.productDao.syncFromSupabase(remoteData);
+          await _db!.productDao.syncFromSupabase(remoteData);
 
           return remoteData;
         } catch (e) {
@@ -169,6 +154,51 @@ class ProductRepository {
       await _productService.deleteImageFileProducts(paths);
     } catch (e) {
       rethrow;
+    }
+  }
+
+  Future<void> pushLocalChangesWithConflictCheck() async {
+    final unsyncedProducts = await _db!.productDao.getUnsyncedProducts();
+    for (final localProduct in unsyncedProducts) {
+      await _pushAndCheckConflict(localProduct);
+    }
+
+    final deletedProducts = await _db.productDao.getDeletedUnsyncedProducts();
+    for (final deletedProduct in deletedProducts) {
+      await _deleteWithConflictCheck(deletedProduct.id);
+    }
+  }
+
+  Future<void> _pushAndCheckConflict(ProductModel localProduct) async {
+    final serverCategory = await _productService.getProduct(localProduct.id);
+
+    final serverUpdatedAt = serverCategory.updatedAt;
+    final localUpdatedAt = localProduct.updatedAt;
+
+    if (localUpdatedAt.isAfter(serverUpdatedAt)) {
+      await _productService.updateProduct(localProduct);
+    }
+
+    await _db!.categoryDao.markAsSynced([localProduct.id]);
+  }
+
+  Future<void> _deleteWithConflictCheck(String productId) async {
+    try {
+      final serverProduct = await _productService.getProduct(productId);
+
+      final localProduct = await _db!.productDao.getCategoryById(productId);
+      if (localProduct != null &&
+          serverProduct.updatedAt.isAfter(localProduct.updatedAt)) {
+        await _db.categoryDao.restoreCategory(productId);
+        return;
+      }
+
+      await _productService.deleteProduct(productId);
+      await _db.categoryDao.markAsSynced([productId]);
+    } catch (e) {
+      if (e.toString().contains('Không thể xóa danh mục đang có sản phẩm')) {
+        await _db!.categoryDao.restoreCategory(productId);
+      }
     }
   }
 }

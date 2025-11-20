@@ -43,6 +43,13 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
     return rows.map(_mapToModel).toList();
   }
 
+  Future<ProductModel?> getCategoryById(String id) async {
+    final row = await (select(
+      productTable,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
+    return row != null ? _mapToModel(row) : null;
+  }
+
   Future<void> insertOrUpdateProduct(ProductTableCompanion entry) {
     return into(productTable).insertOnConflictUpdate(
       entry.copyWith(updatedAt: Value(DateTime.now()), isSynced: Value(false)),
